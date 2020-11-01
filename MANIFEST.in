@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include vfd_tz *.css
+recursive-include vfd_tz *.csv
+recursive-include vfd_tz *.html
+recursive-include vfd_tz *.ico
+recursive-include vfd_tz *.js
+recursive-include vfd_tz *.json
+recursive-include vfd_tz *.md
+recursive-include vfd_tz *.png
+recursive-include vfd_tz *.py
+recursive-include vfd_tz *.svg
+recursive-include vfd_tz *.txt
+recursive-exclude vfd_tz *.pyc
