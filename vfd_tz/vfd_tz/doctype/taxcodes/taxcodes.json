@@ -1,0 +1,37 @@
+{
+ "creation": "2020-10-31 23:25:28.828697",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "tax",
+  "tax_percent"
+ ],
+ "fields": [
+  {
+   "fieldname": "tax",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "TAX",
+   "read_only": 1
+  },
+  {
+   "fieldname": "tax_percent",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": " TAX Percent",
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "modified": "2020-11-02 01:32:46.519196",
+ "modified_by": "Administrator",
+ "module": "vfd-tz",
+ "name": "TAXCODES",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
