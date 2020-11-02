@@ -18,10 +18,16 @@ class VFDRegistration(Document):
 	def before_submit(self):
 		self.registration()
 	
+
 	def onload(self):
 		# token = get_token(self.company)
 		# console(token)
 		pass
+	
+
+	def on_cancel(self):
+		frappe.db.set_value("VFD Registration", self.name, "r_status", "Inactive", update_modified=False)
+
 
 	def registration(self):
 		xmldict = get_registration(self)
@@ -42,6 +48,7 @@ class VFDRegistration(Document):
 			frappe.msgprint(efdmsresp.get("ackmsg"),alert=True)
 		else:
 			frappe.throw(efdmsresp.get("ackmsg"))
+
 
 
 	def set_active(self):
