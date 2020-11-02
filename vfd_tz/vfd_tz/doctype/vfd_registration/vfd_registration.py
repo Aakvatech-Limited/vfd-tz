@@ -46,7 +46,6 @@ class VFDRegistration(Document):
 
 	def set_active(self):
 		doc_list = frappe.get_all("VFD Registration", filters = {
-			"docstatus": 1,
 			"company": self.company
 		})
 		for doc in doc_list:
