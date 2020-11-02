@@ -20,36 +20,42 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Company",
-   "options": "Company"
+   "options": "Company",
+   "reqd": 1
   },
   {
    "default": "Today",
    "fieldname": "posting_date",
    "fieldtype": "Datetime",
    "in_list_view": 1,
-   "label": "Posting Date"
+   "label": "Posting Date",
+   "reqd": 1
   },
   {
    "fieldname": "vfd_registration",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "VFD Registration",
-   "options": "VFD Registration"
+   "options": "VFD Registration",
+   "reqd": 1
   },
   {
    "fieldname": "access_token",
    "fieldtype": "Small Text",
+   "hidden": 1,
    "label": "Access Token"
   },
   {
    "fieldname": "expires_in",
    "fieldtype": "Int",
-   "label": "Expires In"
+   "label": "Expires In",
+   "reqd": 1
   },
   {
    "fieldname": "expires_date",
    "fieldtype": "Datetime",
-   "label": "Expires Date"
+   "label": "Expires Date",
+   "reqd": 1
   },
   {
    "fieldname": "amended_from",
@@ -62,7 +68,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2020-11-02 19:14:40.473530",
+ "modified": "2020-11-03 00:34:26.662637",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Token",
@@ -78,20 +84,6 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "cancel": 1,
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "Administrator",
    "share": 1,
    "submit": 1,
    "write": 1

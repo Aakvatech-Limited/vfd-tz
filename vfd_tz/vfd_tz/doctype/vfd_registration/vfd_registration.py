@@ -21,7 +21,7 @@ class VFDRegistration(Document):
 	def onload(self):
 		# token = get_token(self.company)
 		# console(token)
-		# pass
+		pass
 	
 
 	def on_cancel(self):
