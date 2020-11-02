@@ -12,14 +12,7 @@ import json
 from csf_tz import console
 
 class VFDToken(Document):
-	def validate(self):
-		console("validate")
-
-	def on_submit(self):
-		console("on_submit")
-		all_list = frappe.get_all("VFD Token",fields = ["*"])
-		console(all_list)
-
+	pass
 
 
 def get_token(company):
@@ -64,6 +57,8 @@ def get_token(company):
 			"access_token" : token_data.get("access_token")
 		})
 
+		token_doc.flags.ignore_permissions=True
 		token_doc.insert(ignore_permissions=True)
 		token_doc.submit()
+		frappe.db.commit()
 		return token_data.get("access_token")
