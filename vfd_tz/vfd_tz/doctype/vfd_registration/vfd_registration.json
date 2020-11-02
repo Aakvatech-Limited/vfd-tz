@@ -41,11 +41,6 @@
   "section_break_32",
   "taxcodes",
   "efdmssignature",
-  "section_break_37",
-  "access_token",
-  "column_break_39",
-  "expires_in",
-  "expires_date",
   "section_break_40",
   "amended_from"
  ],
@@ -79,13 +74,13 @@
   },
   {
    "fieldname": "cert_serial",
-   "fieldtype": "Data",
+   "fieldtype": "Password",
    "label": "Cert Serial",
    "reqd": 1
   },
   {
    "fieldname": "tin",
-   "fieldtype": "Data",
+   "fieldtype": "Password",
    "label": "TIN",
    "reqd": 1
   },
@@ -95,13 +90,13 @@
   },
   {
    "fieldname": "certkey",
-   "fieldtype": "Data",
+   "fieldtype": "Password",
    "label": "CERTKEY",
    "reqd": 1
   },
   {
    "fieldname": "certificate_password",
-   "fieldtype": "Data",
+   "fieldtype": "Password",
    "label": "Certificate Password",
    "reqd": 1
   },
@@ -165,13 +160,13 @@
   },
   {
    "fieldname": "username",
-   "fieldtype": "Data",
+   "fieldtype": "Password",
    "label": "USERNAME",
    "read_only": 1
   },
   {
    "fieldname": "password",
-   "fieldtype": "Data",
+   "fieldtype": "Password",
    "label": "PASSWORD",
    "read_only": 1
   },
@@ -253,38 +248,8 @@
   {
    "fieldname": "efdmssignature",
    "fieldtype": "Small Text",
+   "hidden": 1,
    "label": "EFDMSSIGNATURE",
-   "read_only": 1
-  },
-  {
-   "fieldname": "section_break_37",
-   "fieldtype": "Section Break"
-  },
-  {
-   "allow_on_submit": 1,
-   "fieldname": "access_token",
-   "fieldtype": "Text",
-   "label": "Access Token",
-   "read_only": 1
-  },
-  {
-   "fieldname": "column_break_39",
-   "fieldtype": "Column Break"
-  },
-  {
-   "allow_on_submit": 1,
-   "depends_on": "access_token",
-   "fieldname": "expires_in",
-   "fieldtype": "Int",
-   "label": "Expires In",
-   "read_only": 1
-  },
-  {
-   "allow_on_submit": 1,
-   "depends_on": "access_token",
-   "fieldname": "expires_date",
-   "fieldtype": "Datetime",
-   "label": "Expires Date",
    "read_only": 1
   },
   {
@@ -302,7 +267,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2020-11-02 15:58:16.810094",
+ "modified": "2020-11-03 00:51:43.796896",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Registration",

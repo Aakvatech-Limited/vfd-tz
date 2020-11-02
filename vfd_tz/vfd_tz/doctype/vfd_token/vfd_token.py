@@ -39,8 +39,8 @@ def get_token(company):
 		doc = frappe.get_doc("VFD Registration", doc_list[0].name)
 		url = doc.url + "/efdmsRctApi/vfdtoken"
 		data = {
-			'Username': doc.username,
-			'Password': doc.password,
+			'Username': doc.get_password('username'),
+			'Password': doc.get_password('password'),
 			'grant_type': "password"
 		}
 		response = requests.request("POST", url, data = data, timeout=5)

@@ -67,17 +67,17 @@ def get_registration(doc):
 	key = key_file.read()
 	key_file.close()
 
-	password = doc.certificate_password
+	password = doc.get_password('certificate_password')
 	p12 = crypto.load_pkcs12(key,password)
 	pkey = p12.get_privatekey()
 
-	data = "<REGDATA><TIN>{0}</TIN><CERTKEY>{1}</CERTKEY></REGDATA>".format(doc.tin, doc.certkey)
+	data = "<REGDATA><TIN>{0}</TIN><CERTKEY>{1}</CERTKEY></REGDATA>".format(doc.get_password('tin'), doc.get_password('certkey'))
 	sign = OpenSSL.crypto.sign(pkey, data, "sha1") 
 	data_base64 = base64.b64encode(sign)
 	data_base64 =str(data_base64)[2:-1]
 	extend_data ="<?xml version=\"1.0\" encoding=\"UTF-8\"?><EFDMS>{0}<EFDMSSIGNATURE>{1}</EFDMSSIGNATURE></EFDMS>".format(data, data_base64)
 	url = doc.url + "/efdmsRctApi/api/vfdRegReq"
-	cert_serial_bytes = doc.cert_serial.encode('ascii')
+	cert_serial_bytes = doc.get_password('cert_serial').encode('ascii')
 	cert_serial = str(base64.b64encode(cert_serial_bytes))[2:-1]
 	headers = {
 		'Content-Type': 'application/xml',
