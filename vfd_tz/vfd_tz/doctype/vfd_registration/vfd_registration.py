@@ -5,14 +5,13 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe import _
-from frappe.utils import  now, add_to_date, now_datetime
 import OpenSSL
 from OpenSSL import crypto
 import base64
 import requests
 from api.xml import xml_to_dic
-import json
 from csf_tz import console
+# from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 
 class VFDRegistration(Document):
 	def before_submit(self):
@@ -92,37 +91,10 @@ def get_registration(doc):
 	return xmldict
 
 
-def get_token(company):
-	doc_list = doc_list = frappe.get_all("VFD Registration", filters = {
-										"docstatus": 1,
-										"company": company,
-										"r_status": "Active"
-										})
-	if not len(doc_list):
-		frappe.throw(_("There no active VFD Registration for company ") + company)
-	doc = frappe.get_doc("VFD Registration", doc_list[0].name)
-	if doc.expires_date and doc.expires_date > now_datetime():
-		return doc.access_token
-	url = doc.url + "/efdmsRctApi/vfdtoken"
-	data = {
-	'Username': doc.username,
-	'Password': doc.password,
-	'grant_type': "password"
-	}
-	response = requests.request("POST", url, data = data, timeout=5)
-	if not response.status_code == 200:
-		frappe.throw(str(response.text.encode('utf8')))
-	token_data =json.loads(response.text)
-	doc.access_token = token_data.get("access_token")
-	doc.expires_in = token_data.get("expires_in")
-	doc.expires_date = add_to_date(now(),seconds= (doc.expires_in - 1000))
-	doc.db_update()
-	return token_data.get("access_token")
-
-
 def get_absolute_path(file_name, is_private=False):
 	from frappe.utils import cstr
 	site_name = cstr(frappe.local.site)
 	if(file_name.startswith('/files/')):
 		file_name = file_name[7:]
 	return frappe.utils.get_bench_path()+ "/sites/" + site_name  + "/" + frappe.utils.get_path('private' if is_private else 'public', 'files', file_name)[1:]
+	

@@ -1,0 +1,103 @@
+{
+ "allow_copy": 1,
+ "autoname": "VFDT-.YY.-.######",
+ "creation": "2020-11-02 17:14:37.630441",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "posting_date",
+  "vfd_registration",
+  "expires_in",
+  "expires_date",
+  "access_token",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "vfd_registration",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "VFD Registration",
+   "options": "VFD Registration"
+  },
+  {
+   "fieldname": "access_token",
+   "fieldtype": "Small Text",
+   "label": "Access Token"
+  },
+  {
+   "fieldname": "expires_in",
+   "fieldtype": "Int",
+   "label": "Expires In"
+  },
+  {
+   "fieldname": "expires_date",
+   "fieldtype": "Datetime",
+   "label": "Expires Date"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "VFD Token",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "is_submittable": 1,
+ "modified": "2020-11-02 19:14:40.473530",
+ "modified_by": "Administrator",
+ "module": "vfd-tz",
+ "name": "VFD Token",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Administrator",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
