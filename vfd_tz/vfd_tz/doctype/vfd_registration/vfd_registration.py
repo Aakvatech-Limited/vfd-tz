@@ -71,7 +71,7 @@ def get_registration(doc):
 	p12 = crypto.load_pkcs12(key,password)
 	pkey = p12.get_privatekey()
 
-	data = "<REGDATA><TIN>{0}</TIN><CERTKEY>{1}</CERTKEY></REGDATA>".format(doc.get_password('tin'), doc.get_password('certkey'))
+	data = "<REGDATA><TIN>{0}</TIN><CERTKEY>{1}</CERTKEY></REGDATA>".format(doc.tin, doc.get_password('certkey'))
 	sign = OpenSSL.crypto.sign(pkey, data, "sha1") 
 	data_base64 = base64.b64encode(sign)
 	data_base64 =str(data_base64)[2:-1]

@@ -80,7 +80,7 @@
   },
   {
    "fieldname": "tin",
-   "fieldtype": "Password",
+   "fieldtype": "Data",
    "label": "TIN",
    "reqd": 1
   },
@@ -267,7 +267,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2020-11-03 00:51:43.796896",
+ "modified": "2020-11-03 16:41:52.204653",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Registration",

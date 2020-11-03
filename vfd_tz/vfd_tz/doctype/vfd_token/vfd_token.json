@@ -43,7 +43,9 @@
    "fieldname": "access_token",
    "fieldtype": "Small Text",
    "hidden": 1,
-   "label": "Access Token"
+   "label": "Access Token",
+   "print_hide": 1,
+   "report_hide": 1
   },
   {
    "fieldname": "expires_in",
@@ -68,7 +70,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2020-11-03 00:34:26.662637",
+ "modified": "2020-11-03 16:06:19.671974",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Token",
