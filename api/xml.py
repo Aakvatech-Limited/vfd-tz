@@ -1,11 +1,20 @@
 from xml.etree import cElementTree as ElementTree
+from dicttoxml import dicttoxml 
 
 def xml_to_dic(xml_string):
     root = ElementTree.XML(xml_string)
     xmldict = XmlDictConfig(root)
     return xmldict
 
+def dict_to_xml(obj):
+	xml = dicttoxml(obj, custom_root='EFDMS', attr_type=False, item_func=default_item_func)
+	return str(xml)[2:-1]
 
+
+def default_item_func(name):
+    return "ITEM"
+
+	
 class XmlListConfig(list):
 	def __init__(self, aList):
 		for element in aList:

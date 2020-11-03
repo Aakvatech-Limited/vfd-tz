@@ -10,8 +10,9 @@ from OpenSSL import crypto
 import base64
 import requests
 from api.xml import xml_to_dic
+from api.utlis import to_base64, get_signenature
 from csf_tz import console
-# from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
+
 
 class VFDRegistration(Document):
 	def before_submit(self):
@@ -19,8 +20,6 @@ class VFDRegistration(Document):
 	
 
 	def onload(self):
-		# token = get_token(self.company)
-		# console(token)
 		pass
 	
 
@@ -62,23 +61,11 @@ class VFDRegistration(Document):
 
 
 def get_registration(doc):
-	link = get_absolute_path(doc.certificate, True)
-	key_file = open(link, 'rb')
-	key = key_file.read()
-	key_file.close()
-
-	password = doc.get_password('certificate_password')
-	p12 = crypto.load_pkcs12(key,password)
-	pkey = p12.get_privatekey()
-
 	data = "<REGDATA><TIN>{0}</TIN><CERTKEY>{1}</CERTKEY></REGDATA>".format(doc.tin, doc.get_password('certkey'))
-	sign = OpenSSL.crypto.sign(pkey, data, "sha1") 
-	data_base64 = base64.b64encode(sign)
-	data_base64 =str(data_base64)[2:-1]
-	extend_data ="<?xml version=\"1.0\" encoding=\"UTF-8\"?><EFDMS>{0}<EFDMSSIGNATURE>{1}</EFDMSSIGNATURE></EFDMS>".format(data, data_base64)
+	signenature = get_signenature(data, doc)
+	extend_data ="<?xml version=\"1.0\" encoding=\"UTF-8\"?><EFDMS>{0}<EFDMSSIGNATURE>{1}</EFDMSSIGNATURE></EFDMS>".format(data, signenature)
 	url = doc.url + "/efdmsRctApi/api/vfdRegReq"
-	cert_serial_bytes = doc.get_password('cert_serial').encode('ascii')
-	cert_serial = str(base64.b64encode(cert_serial_bytes))[2:-1]
+	cert_serial = to_base64(doc.get_password('cert_serial'))
 	headers = {
 		'Content-Type': 'application/xml',
 		'Cert-Serial': cert_serial,
@@ -90,11 +77,3 @@ def get_registration(doc):
 	xmldict = xml_to_dic(response.text.encode('utf8'))
 	return xmldict
 
-
-def get_absolute_path(file_name, is_private=False):
-	from frappe.utils import cstr
-	site_name = cstr(frappe.local.site)
-	if(file_name.startswith('/files/')):
-		file_name = file_name[7:]
-	return frappe.utils.get_bench_path()+ "/sites/" + site_name  + "/" + frappe.utils.get_path('private' if is_private else 'public', 'files', file_name)[1:]
-	

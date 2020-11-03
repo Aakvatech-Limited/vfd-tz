@@ -7,15 +7,17 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import  now, add_to_date, now_datetime
+from api.utlis import to_base64
 import requests
 import json
-from csf_tz import console
+# from csf_tz import console
 
 class VFDToken(Document):
 	pass
 
 
 def get_token(company):
+	token_data = {}
 	doc_list = doc_list = frappe.get_all("VFD Registration", filters = {
 										"docstatus": 1,
 										"company": company,
@@ -23,6 +25,10 @@ def get_token(company):
 										})
 	if not len(doc_list):
 		frappe.throw(_("There no active VFD Registration for company ") + company)
+	doc = frappe.get_doc("VFD Registration", doc_list[0].name)
+	token_data["cert_serial"] = to_base64(doc.get_password('cert_serial'))
+	token_data["doc"] = doc
+	
 	token_list = frappe.get_all("VFD Token", 
 										filters = {
 											"docstatus": 1,
@@ -34,9 +40,9 @@ def get_token(company):
 										)
 
 	if len(token_list):
-		return token_list[0]["access_token"]
+		token_data["token"] = "bearer " + token_list[0]["access_token"] 
+	
 	else:
-		doc = frappe.get_doc("VFD Registration", doc_list[0].name)
 		url = doc.url + "/efdmsRctApi/vfdtoken"
 		data = {
 			'Username': doc.get_password('username'),
@@ -61,4 +67,6 @@ def get_token(company):
 		token_doc.insert(ignore_permissions=True)
 		token_doc.submit()
 		frappe.db.commit()
-		return token_data.get("access_token")
+		token_data["token"] = "bearer " + token_data.get("access_token")
+	
+	return token_data
