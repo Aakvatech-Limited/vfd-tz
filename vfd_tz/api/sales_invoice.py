@@ -7,7 +7,7 @@ import frappe
 from frappe import _
 from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from api.xml import xml_to_dic, dict_to_xml
-from api.utlis import get_signenature
+from api.utlis import get_signature
 import requests
 from frappe.utils import flt
 from csf_tz import console
@@ -75,7 +75,7 @@ def posting_vfd_invoice(invoice_name):
     console(rect_data_xml)
     efdms_data = {
         "RCT": rect_data,
-        "EFDMSSIGNATURE": get_signenature(rect_data_xml, registration_doc)
+        "EFDMSSIGNATURE": get_signature(rect_data_xml, registration_doc)
     }
     data = dict_to_xml(efdms_data)
     console(data)
@@ -84,8 +84,21 @@ def posting_vfd_invoice(invoice_name):
     if not response.status_code == 200:
         frappe.throw(str(response.text))
     xmldict = xml_to_dic(response.text)
-    console(xmldict)
-    return xmldict
+    rctack = xmldict.get("rctack")
+    posting_info_doc = frappe.get_doc({
+        "doctype" : "VFD Invoice Posting Info",
+        "sales_invoice" : doc.name,
+        "ackcode" : rctack.get("ackcode"),
+        "ackmsg" : rctack.get("ackmsg"),
+        "date" : rctack.get("date"),
+        "time" : rctack.get("time"),
+        "efdmssignature" : xmldict.get("efdmssignature"),
+	})
+
+    posting_info_doc.flags.ignore_permissions=True
+    posting_info_doc.insert(ignore_permissions=True)
+    frappe.db.commit()
+    frappe.msgprint(rctack.get("ackmsg"),alert=True)
 
 
 

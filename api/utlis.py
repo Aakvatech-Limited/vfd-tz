@@ -16,7 +16,7 @@ def to_base64(value):
     return str(data)[2:-1]
 
 
-def get_signenature(data, doc):
+def get_signature(data, doc):
     """
     doc is registration doc
     """
