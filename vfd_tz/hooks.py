@@ -129,3 +129,12 @@ doctype_js = {
 # 	"Task": "vfd_tz.task.get_dashboard_data"
 # }
 
+fixtures = [
+	{"doctype":"Custom Field", "filters": [["name", "in", (
+        "Customer-vfd_custid",
+        "Customer-vfd_custidtype",
+	)]]},
+	{"doctype":"Property Setter", "filters": [["name", "in", (
+	
+	)]]},
+]

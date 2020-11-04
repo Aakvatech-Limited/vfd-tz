@@ -6,8 +6,8 @@ def xml_to_dic(xml_string):
     xmldict = XmlDictConfig(root)
     return xmldict
 
-def dict_to_xml(obj):
-	xml = dicttoxml(obj, custom_root='EFDMS', attr_type=False, item_func=default_item_func)
+def dict_to_xml(obj, custom_root = "EFDMS"):
+	xml = dicttoxml(obj, custom_root = custom_root, attr_type=False, item_func=default_item_func)
 	return str(xml)[2:-1]
 
 
