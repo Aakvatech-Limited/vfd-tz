@@ -24,7 +24,6 @@ def posting_vfd_invoice(invoice_name):
         'Cert-Serial': token_data["cert_serial"],
         'Authorization': token_data["token"]
     }
-    console(headers)
     customer_id_info = get_customer_id_info(doc.customer)
 
     rect_data = {
@@ -37,28 +36,25 @@ def posting_vfd_invoice(invoice_name):
         "CUSTID": customer_id_info["cust_id"],
         "CUSTNAME": doc.customer,
         "MOBILENUM": customer_id_info["mobile_no"],
-        "RCTNUM": 3,
-        "DC": 2,
-        "GC": 3,
+        "RCTNUM": 4,
+        "DC": 3,
+        "GC": 4,
         "ZNUM": str(doc.posting_date).replace("-", ""),
-        "RCTVNUM": str(registration_doc.receiptcode) + str(3),
+        "RCTVNUM": str(registration_doc.receiptcode) + str(4),
         "ITEMS": [],
         "TOTALS": {
             "TOTALTAXEXCL": flt(doc.base_net_total,2),
             "TOTALTAXINCL": flt(doc.base_total,2),
             "DISCOUNT": flt(doc.base_discount_amount,2)
         },
-        "PAYMENTS": {
-            "PMTTYPE": "INVOICE",
-            "PMTAMOUNT": flt(doc.base_total,2)
-        },
+        "PAYMENTS": get_payments(doc.payments, doc.base_total),
         "VATTOTALS": {
             "VATRATE": get_vatrate(doc.taxes_and_charges),
             "NETTAMOUNT": flt(doc.base_net_total,2),
             "TAXAMOUNT": flt(flt(doc.base_total,2) - flt(doc.base_net_total,2), 2)
         },
     }
-    # TODO: get VATRATE from Total by Item Tax Template ? 
+
     # TODO : set DC & GC & RCTNUM mechanism
     for item in doc.items:
         item_data = {
@@ -68,15 +64,15 @@ def posting_vfd_invoice(invoice_name):
             "TAXCODE": get_item_taxcode(item.item_tax_template),  
             "AMT": flt(item.base_amount,2)
         }
-        rect_data["ITEMS"].append(item_data)
+        rect_data["ITEMS"].append({"ITEM":item_data})
 
-    rect_data_xml = dict_to_xml(rect_data, "RCT")[39:]
-    console(rect_data_xml)
+    rect_data_xml = str(dict_to_xml(rect_data, "RCT")[39:]).replace("<None>", "").replace("</None>", "")
+
     efdms_data = {
         "RCT": rect_data,
         "EFDMSSIGNATURE": get_signature(rect_data_xml, registration_doc)
     }
-    data = dict_to_xml(efdms_data)
+    data = dict_to_xml(efdms_data).replace("<None>", "").replace("</None>", "")
     console(data)
     url = registration_doc.url + "/efdmsRctApi/api/efdmsRctInfo"
     response = requests.request("POST", url, headers=headers, data = data, timeout=5)
@@ -114,7 +110,7 @@ def get_customer_id_info(customer):
         data["cust_id"] = cust_id
         data["cust_id_type"] = int(cust_id_type[:1])
     
-    data["mobile_no"] = int(mobile_no) or 0
+    data["mobile_no"] = int(mobile_no or 0)
     return data
 
 
@@ -144,3 +140,22 @@ def get_vatrate(taxes_and_charges = None):
         else:
             vatrate = "C"
     return vatrate
+
+
+def get_payments(payments, base_total):
+    payments_dict = []
+    total_payments_amount = 0
+    for payment in payments:
+        pmttype = "CASH"
+        vfd_pmttype = frappe.get_value("Mode of Payment", payment.mode_of_payment, "vfd_pmttype")
+        if vfd_pmttype:
+            pmttype = vfd_pmttype
+        total_payments_amount += payment.base_amount
+        payments_dict.append({"PMTTYPE": pmttype})
+        payments_dict.append({"PMTAMOUNT": flt(payment.base_amount,2)})
+    
+    if base_total > total_payments_amount:
+        payments_dict.append({"PMTTYPE": "INVOICE"})
+        payments_dict.append({"PMTAMOUNT": flt(base_total,2)})
+     
+    return payments_dict

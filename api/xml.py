@@ -12,7 +12,7 @@ def dict_to_xml(obj, custom_root = "EFDMS"):
 
 
 def default_item_func(name):
-    return "ITEM"
+    return "None"
 
 	
 class XmlListConfig(list):

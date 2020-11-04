@@ -74,7 +74,7 @@
   "modified": "2020-11-04 22:02:20.859576",
   "name": "Mode of Payment-vfd_pmttype",
   "no_copy": 0,
-  "options": "\n1- CASH\n2- CHEQUE\n3- CCARD\n4- EMONEY\n5- INVOICE",
+  "options": "\nCASH\nCHEQUE\nCCARD\nEMONEY\nINVOICE",
   "parent": null,
   "parentfield": null,
   "parenttype": null,
