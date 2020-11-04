@@ -53,7 +53,7 @@ def posting_vfd_invoice(invoice_name):
             "PMTAMOUNT": flt(doc.base_total,2)
         },
         "VATTOTALS": {
-            "VATRATE": "A",
+            "VATRATE": get_vatrate(doc.taxes_and_charges),
             "NETTAMOUNT": flt(doc.base_net_total,2),
             "TAXAMOUNT": flt(flt(doc.base_total,2) - flt(doc.base_net_total,2), 2)
         },
@@ -65,7 +65,7 @@ def posting_vfd_invoice(invoice_name):
             "ID": item.item_code,
             "DESC": item.item_name,
             "QTY": flt(item.stock_qty,2),
-            "TAXCODE": get_item_taxcode(item),  
+            "TAXCODE": get_item_taxcode(item.item_tax_template),  
             "AMT": flt(item.base_amount,2)
         }
         rect_data["ITEMS"].append(item_data)
@@ -118,10 +118,29 @@ def get_customer_id_info(customer):
     return data
 
 
-def get_item_taxcode(item):
-    vfd_taxcode = frappe.get_value("Item Tax Template", item.item_tax_template, "vfd_taxcode")
-    if vfd_taxcode:
-        vfd_taxcode = int(vfd_taxcode[:1])
+def get_item_taxcode(item_tax_template = None):
+    taxcode = 0
+    if not item_tax_template:
+        ## NOTE : how we shold handle if there no item_tax_template in item
+        taxcode = 3
     else:
-        vfd_taxcode = 3
-    return vfd_taxcode
+        vfd_taxcode = frappe.get_value("Item Tax Template", item_tax_template, "vfd_taxcode")
+        if vfd_taxcode:
+            taxcode = int(vfd_taxcode[:1])
+        else:
+            taxcode = 3
+    return taxcode
+
+
+def get_vatrate(taxes_and_charges = None):
+    vatrate = ""
+    if not taxes_and_charges:
+        ## NOTE : how we shold handle if there no taxes_and_charges in sales invoice
+        vatrate = "C"
+    else:
+        vfd_vatrate = frappe.get_value("Sales Taxes and Charges Template", taxes_and_charges, "vfd_vatrate")
+        if vfd_vatrate:
+            vatrate = vfd_vatrate[:1]
+        else:
+            vatrate = "C"
+    return vatrate
