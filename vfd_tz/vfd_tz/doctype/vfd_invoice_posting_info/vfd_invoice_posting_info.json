@@ -14,44 +14,54 @@
   "date",
   "time",
   "section_break_8",
-  "efdmssignature"
+  "efdmssignature",
+  "section_break_10",
+  "req_headers",
+  "req_data"
  ],
  "fields": [
   {
    "fieldname": "sales_invoice",
    "fieldtype": "Link",
    "label": "Sales Invoice",
-   "options": "Sales Invoice"
+   "options": "Sales Invoice",
+   "read_only": 1
   },
   {
    "fieldname": "ackcode",
    "fieldtype": "Int",
-   "label": "ACKCODE"
+   "label": "ACKCODE",
+   "read_only": 1
   },
   {
    "fieldname": "ackmsg",
    "fieldtype": "Data",
-   "label": "ACKMSG"
+   "label": "ACKMSG",
+   "read_only": 1
   },
   {
    "fieldname": "rctnum",
    "fieldtype": "Int",
-   "label": "RCTNUM"
+   "label": "RCTNUM",
+   "read_only": 1
   },
   {
    "fieldname": "date",
    "fieldtype": "Date",
-   "label": "DATE"
+   "label": "DATE",
+   "read_only": 1
   },
   {
    "fieldname": "time",
    "fieldtype": "Time",
-   "label": "TIME"
+   "label": "TIME",
+   "read_only": 1
   },
   {
    "fieldname": "efdmssignature",
    "fieldtype": "Small Text",
-   "label": "EFDMSSIGNATURE"
+   "label": "EFDMSSIGNATURE",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_4",
@@ -60,9 +70,25 @@
   {
    "fieldname": "section_break_8",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "req_data",
+   "fieldtype": "Code",
+   "label": "REQ Data",
+   "read_only": 1
+  },
+  {
+   "fieldname": "req_headers",
+   "fieldtype": "Small Text",
+   "label": "REQ Headers",
+   "read_only": 1
   }
  ],
- "modified": "2020-11-04 22:25:09.586876",
+ "modified": "2020-11-05 02:15:24.242503",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Invoice Posting Info",

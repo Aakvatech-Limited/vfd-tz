@@ -89,6 +89,8 @@ def posting_vfd_invoice(invoice_name):
         "time" : rctack.get("time"),
         "rctnum": rctack.get("rctnum"),
         "efdmssignature" : xmldict.get("efdmssignature"),
+        "req_headers": str(headers),
+        "req_data": str(data).encode('utf8')
 	})
     posting_info_doc.flags.ignore_permissions=True
     posting_info_doc.insert(ignore_permissions=True)
@@ -156,6 +158,6 @@ def get_payments(payments, base_total):
     
     if base_total > total_payments_amount:
         payments_dict.append({"PMTTYPE": "INVOICE"})
-        payments_dict.append({"PMTAMOUNT": flt(base_total,2)})
+        payments_dict.append({"PMTAMOUNT": flt(base_total - total_payments_amount,2)})
      
     return payments_dict
