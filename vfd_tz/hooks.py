@@ -133,6 +133,9 @@ fixtures = [
 	{"doctype":"Custom Field", "filters": [["name", "in", (
         "Customer-vfd_custid",
         "Customer-vfd_custidtype",
+		"Mode of Payment-vfd_pmttype",
+		"Sales Taxes and Charges Template-vfd_vatrate",
+		"Item Tax Template-vfd_taxcode",
 	)]]},
 	{"doctype":"Property Setter", "filters": [["name", "in", (
 	

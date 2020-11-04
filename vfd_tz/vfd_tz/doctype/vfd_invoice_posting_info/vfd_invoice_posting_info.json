@@ -9,9 +9,11 @@
   "sales_invoice",
   "ackcode",
   "ackmsg",
+  "column_break_4",
   "rctnum",
   "date",
   "time",
+  "section_break_8",
   "efdmssignature"
  ],
  "fields": [
@@ -50,9 +52,17 @@
    "fieldname": "efdmssignature",
    "fieldtype": "Small Text",
    "label": "EFDMSSIGNATURE"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break"
   }
  ],
- "modified": "2020-11-04 17:34:24.067433",
+ "modified": "2020-11-04 22:25:09.586876",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Invoice Posting Info",

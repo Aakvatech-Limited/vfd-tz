@@ -92,9 +92,9 @@ def posting_vfd_invoice(invoice_name):
         "ackmsg" : rctack.get("ackmsg"),
         "date" : rctack.get("date"),
         "time" : rctack.get("time"),
+        "rctnum": rctack.get("rctnum"),
         "efdmssignature" : xmldict.get("efdmssignature"),
 	})
-
     posting_info_doc.flags.ignore_permissions=True
     posting_info_doc.insert(ignore_permissions=True)
     frappe.db.commit()
