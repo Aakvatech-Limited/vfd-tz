@@ -9,6 +9,7 @@ from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from api.xml import xml_to_dic, dict_to_xml
 from api.utlis import get_signenature
 import requests
+from frappe.utils import flt
 from csf_tz import console
 
 
@@ -23,7 +24,7 @@ def posting_vfd_invoice(invoice_name):
         'Cert-Serial': token_data["cert_serial"],
         'Authorization': token_data["token"]
     }
-
+    console(headers)
     customer_id_info = get_customer_id_info(doc.customer)
 
     rect_data = {
@@ -36,22 +37,25 @@ def posting_vfd_invoice(invoice_name):
         "CUSTID": customer_id_info["cust_id"],
         "CUSTNAME": doc.customer,
         "MOBILENUM": customer_id_info["mobile_no"],
-        "RCTNUM": 1,
-        "DC": 2,
-        "GC": 1,
+        "RCTNUM": 2,
+        "DC": 1,
+        "GC": 2,
         "ZNUM": str(doc.posting_date).replace("-", ""),
-        "RCTVNUM": str(registration_doc.receiptcode) + str(1),
+        "RCTVNUM": str(registration_doc.receiptcode) + str(2),
         "ITEMS": [],
         "TOTALS": {
-            "TOTALTAXEXCL": doc.base_net_total,
-            "TOTALTAXINCL": doc.base_total,
-            "DISXOUNT": doc.base_discount_amount
+            "TOTALTAXEXCL": flt(doc.base_net_total,2),
+            "TOTALTAXINCL": flt(doc.base_total,2),
+            "DISCOUNT": flt(doc.base_discount_amount,2)
         },
-        "PAYMENTS": "",
+        "PAYMENTS": {
+            "PMTTYPE": "INVOICE",
+            "PMTAMOUNT": flt(doc.base_total,2)
+        },
         "VATTOTALS": {
             "VATRATE": "A",
-            "NETTAMOUNT": doc.base_net_total,
-            "TAXAMOUNT": doc.base_total - doc.base_net_total
+            "NETTAMOUNT": flt(doc.base_net_total,2),
+            "TAXAMOUNT": flt(flt(doc.base_total,2) - flt(doc.base_net_total,2), 2)
         },
     }
     # TODO: get VATRATE from Total by Item Tax Template ? 
@@ -60,9 +64,9 @@ def posting_vfd_invoice(invoice_name):
         item_data = {
             "ID": item.item_code,
             "DESC": item.item_name,
-            "QTY": item.stock_qty,
+            "QTY": flt(item.stock_qty,2),
             "TAXCODE": 1,  
-            "AMT": item.base_amount
+            "AMT": flt(item.base_amount,2)
         }
         rect_data["ITEMS"].append(item_data)
         # TODO: Set itme TAXCODE in item Tax Template 
