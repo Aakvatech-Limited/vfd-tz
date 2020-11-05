@@ -24,6 +24,11 @@ def posting_vfd_invoice(kwargs):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
     if doc.vfd_posting_info or doc.docstatus != 1:
         return
+    if doc.vfd_status == "Not Sent":
+        doc.vfd_status = "Pending"
+        doc.db_update()
+        frappe.db.commit()
+        doc.reload()
     token_data = get_token(doc.company)
     registration_doc = token_data.get("doc")
     headers = {
@@ -35,6 +40,9 @@ def posting_vfd_invoice(kwargs):
     customer_id_info = get_customer_id_info(doc.customer)
 
     if not doc.taxes_and_charges:
+        doc.vfd_status = "Failed"
+        doc.db_update()
+        frappe.db.commit()
         frappe.throw(_("Sales Taxes and Charges Template not set for Invoice Number {0}".format(doc.name)))
     rect_data = {
         "DATE": doc.posting_date,
@@ -65,9 +73,11 @@ def posting_vfd_invoice(kwargs):
         },
     }
 
-    # TODO : set DC & GC & RCTNUM mechanism
     for item in doc.items:
         if not item.item_tax_template:
+            doc.vfd_status = "Failed"
+            doc.db_update()
+            frappe.db.commit()
             frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
         item_data = {
             "ID": item.item_code,
@@ -121,9 +131,13 @@ def posting_vfd_invoice(kwargs):
     frappe.db.commit()
     if int(posting_info_doc.ackcode) == 0:
         doc.vfd_posting_info = posting_info_doc.name
+        doc.vfd_status = "Success"
         doc.db_update()
         frappe.db.commit()
-    frappe.msgprint(rctack.get("ackmsg"),alert=True)
+    else:
+        doc.vfd_status = "Failed"
+        doc.db_update()
+        frappe.db.commit()
 
 
 
