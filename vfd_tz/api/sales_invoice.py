@@ -24,14 +24,6 @@ def posting_vfd_invoice(kwargs):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
     if doc.vfd_posting_info or doc.docstatus != 1:
         return
-    if not doc.vfd_rctnum:
-        counters = get_counters(doc.company)
-        doc.vfd_gc = counters.gc
-        doc.vfd_rctnum = counters.gc
-        doc.vfd_dc = counters.dc
-        doc.db_update()
-        frappe.db.commit()
-        doc.reload()
     token_data = get_token(doc.company)
     registration_doc = token_data.get("doc")
     headers = {
@@ -42,6 +34,8 @@ def posting_vfd_invoice(kwargs):
     }
     customer_id_info = get_customer_id_info(doc.customer)
 
+    if not doc.taxes_and_charges:
+        frappe.throw(_("Sales Taxes and Charges Template not set for Invoice Number {0}".format(doc.name)))
     rect_data = {
         "DATE": doc.posting_date,
         "TIME": str(doc.posting_time)[0:-7],
@@ -73,6 +67,8 @@ def posting_vfd_invoice(kwargs):
 
     # TODO : set DC & GC & RCTNUM mechanism
     for item in doc.items:
+        if not item.item_tax_template:
+            frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
         item_data = {
             "ID": item.item_code,
             "DESC": item.item_name,
@@ -81,6 +77,19 @@ def posting_vfd_invoice(kwargs):
             "AMT": flt(item.base_amount,2)
         }
         rect_data["ITEMS"].append({"ITEM":item_data})
+
+    if not doc.vfd_rctnum:
+        counters = get_counters(doc.company)
+        doc.vfd_gc = counters.gc
+        doc.vfd_rctnum = counters.gc
+        doc.vfd_dc = counters.dc
+        doc.db_update()
+        frappe.db.commit()
+        doc.reload()
+        rect_data["RCTNUM"] = doc.vfd_gc
+        rect_data["DC"] = doc.vfd_dc
+        rect_data["GC"] = doc.vfd_gc
+        rect_data["RCTVNUM"] = str(registration_doc.receiptcode) + str(doc.vfd_gc)
 
     rect_data_xml = str(dict_to_xml(rect_data, "RCT")[39:]).replace("<None>", "").replace("</None>", "")
 
@@ -137,29 +146,23 @@ def get_customer_id_info(customer):
 
 def get_item_taxcode(item_tax_template = None):
     taxcode = 0
-    if not item_tax_template:
-        ## NOTE : how we shold handle if there no item_tax_template in item
-        taxcode = 3
-    else:
+    if item_tax_template:
         vfd_taxcode = frappe.get_value("Item Tax Template", item_tax_template, "vfd_taxcode")
         if vfd_taxcode:
             taxcode = int(vfd_taxcode[:1])
         else:
-            taxcode = 3
+            frappe.throw(_("VFD Tax Code not setup in {0}".format(item_tax_template)))
     return taxcode
 
 
 def get_vatrate(taxes_and_charges = None):
     vatrate = ""
-    if not taxes_and_charges:
-        ## NOTE : how we shold handle if there no taxes_and_charges in sales invoice
-        vatrate = "C"
-    else:
+    if taxes_and_charges:
         vfd_vatrate = frappe.get_value("Sales Taxes and Charges Template", taxes_and_charges, "vfd_vatrate")
         if vfd_vatrate:
             vatrate = vfd_vatrate[:1]
         else:
-            vatrate = "C"
+            frappe.throw(_("VFD VAT Rate not setup in {0}".format(taxes_and_charges)))
     return vatrate
 
 
@@ -167,7 +170,7 @@ def get_payments(payments, base_total):
     payments_dict = []
     total_payments_amount = 0
     for payment in payments:
-        pmttype = "CASH"
+        pmttype = ""
         vfd_pmttype = frappe.get_value("Mode of Payment", payment.mode_of_payment, "vfd_pmttype")
         if vfd_pmttype:
             pmttype = vfd_pmttype
