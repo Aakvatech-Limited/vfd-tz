@@ -92,23 +92,23 @@ doctype_js = {
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"vfd_tz.tasks.all"
-# 	],
-# 	"daily": [
-# 		"vfd_tz.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"vfd_tz.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"vfd_tz.tasks.weekly"
-# 	]
-# 	"monthly": [
-# 		"vfd_tz.tasks.monthly"
-# 	]
-# }
+scheduler_events = {
+	# "all": [
+	# 	"vfd_tz.tasks.all"
+	# ],
+	# "daily": [
+	# 	"vfd_tz.tasks.daily"
+	# ],
+	"hourly": [
+		"vfd_tz.api.sales_invoice.posting_all_vfd_invoices"
+	],
+	# "weekly": [
+	# 	"vfd_tz.tasks.weekly"
+	# ]
+	# "monthly": [
+	# 	"vfd_tz.tasks.monthly"
+	# ]
+}
 
 # Testing
 # -------

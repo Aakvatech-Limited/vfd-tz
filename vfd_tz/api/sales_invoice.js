@@ -11,7 +11,7 @@ frappe.ui.form.on("Sales Invoice", {
                     
             function() {
                 frappe.call({
-                    method: "vfd_tz.api.sales_invoice.posting_vfd_invoice",
+                    method: "vfd_tz.api.sales_invoice.enqueue_posting_vfd_invoice",
                     args: {
                         invoice_name: frm.doc.name,
                     },

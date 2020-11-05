@@ -11,10 +11,16 @@ from api.utlis import get_signature
 import requests
 from frappe.utils import flt
 from vfd_tz.vfd_tz.doctype.vfd_uin.vfd_uin import get_counters
+from frappe.utils.background_jobs import enqueue
 
 
 @frappe.whitelist()
-def posting_vfd_invoice(invoice_name):
+def enqueue_posting_vfd_invoice(invoice_name):
+        enqueue(method=posting_vfd_invoice, queue='short', timeout=10000, is_async=True , kwargs=invoice_name )
+
+
+def posting_vfd_invoice(kwargs):
+    invoice_name = kwargs
     doc = frappe.get_doc("Sales Invoice", invoice_name)
     if doc.vfd_posting_info or doc.docstatus != 1:
         return
@@ -174,3 +180,16 @@ def get_payments(payments, base_total):
         payments_dict.append({"PMTAMOUNT": flt(base_total - total_payments_amount,2)})
      
     return payments_dict
+
+
+
+def posting_all_vfd_invoices():
+    invoices_list = frappe.get_all("Sales Invoice", filters = {
+        "docstatus": 1,
+        "vfd_posting_info": ["in", ["", None]],
+        "vfd_rctnum": ["not in", ["", None]]
+    })
+    for invoice in invoices_list:
+        count_list = frappe.get_all("VFD Invoice Posting Info", filters= {"sales_invoice": invoice.name})
+        if len(count_list) < 6:
+            enqueue_posting_vfd_invoice(invoice.name)
