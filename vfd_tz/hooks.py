@@ -81,13 +81,11 @@ doctype_js = {
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-#	}
-# }
+doc_events = {
+	"Sales Invoice": {
+		"on_cancel": "vfd_tz.api.sales_invoice.validate_cancel",
+	}
+}
 
 # Scheduled Tasks
 # ---------------

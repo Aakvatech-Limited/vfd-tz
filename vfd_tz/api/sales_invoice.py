@@ -193,3 +193,7 @@ def posting_all_vfd_invoices():
         count_list = frappe.get_all("VFD Invoice Posting Info", filters= {"sales_invoice": invoice.name})
         if len(count_list) < 6:
             enqueue_posting_vfd_invoice(invoice.name)
+    
+def validate_cancel(doc, method):
+    if doc.vfd_rctnum:
+        frappe.throw(_("This invoice cannot be canceled"))
