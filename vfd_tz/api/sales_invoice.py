@@ -10,12 +10,22 @@ from api.xml import xml_to_dic, dict_to_xml
 from api.utlis import get_signature
 import requests
 from frappe.utils import flt
-from csf_tz import console
+from vfd_tz.vfd_tz.doctype.vfd_uin.vfd_uin import get_counters
 
 
 @frappe.whitelist()
 def posting_vfd_invoice(invoice_name):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
+    if doc.vfd_posting_info or doc.docstatus != 1:
+        return
+    if not doc.vfd_rctnum:
+        counters = get_counters(doc.company)
+        doc.vfd_gc = counters.gc
+        doc.vfd_rctnum = counters.gc
+        doc.vfd_dc = counters.dc
+        doc.db_update()
+        frappe.db.commit()
+        doc.reload()
     token_data = get_token(doc.company)
     registration_doc = token_data.get("doc")
     headers = {
@@ -36,11 +46,11 @@ def posting_vfd_invoice(invoice_name):
         "CUSTID": customer_id_info["cust_id"],
         "CUSTNAME": doc.customer,
         "MOBILENUM": customer_id_info["mobile_no"],
-        "RCTNUM": 4,
-        "DC": 3,
-        "GC": 4,
+        "RCTNUM": doc.vfd_gc,
+        "DC": doc.vfd_dc,
+        "GC": doc.vfd_gc,
         "ZNUM": str(doc.posting_date).replace("-", ""),
-        "RCTVNUM": str(registration_doc.receiptcode) + str(4),
+        "RCTVNUM": str(registration_doc.receiptcode) + str(doc.vfd_gc),
         "ITEMS": [],
         "TOTALS": {
             "TOTALTAXEXCL": flt(doc.base_net_total,2),
@@ -73,7 +83,6 @@ def posting_vfd_invoice(invoice_name):
         "EFDMSSIGNATURE": get_signature(rect_data_xml, registration_doc)
     }
     data = dict_to_xml(efdms_data).replace("<None>", "").replace("</None>", "")
-    console(data)
     url = registration_doc.url + "/efdmsRctApi/api/efdmsRctInfo"
     response = requests.request("POST", url, headers=headers, data = data, timeout=5)
     if not response.status_code == 200:
@@ -95,6 +104,10 @@ def posting_vfd_invoice(invoice_name):
     posting_info_doc.flags.ignore_permissions=True
     posting_info_doc.insert(ignore_permissions=True)
     frappe.db.commit()
+    if int(posting_info_doc.ackcode) == 0:
+        doc.vfd_posting_info = posting_info_doc.name
+        doc.db_update()
+        frappe.db.commit()
     frappe.msgprint(rctack.get("ackmsg"),alert=True)
 
 

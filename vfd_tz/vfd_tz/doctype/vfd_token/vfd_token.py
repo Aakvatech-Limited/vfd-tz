@@ -10,7 +10,6 @@ from frappe.utils import  now, add_to_date, now_datetime
 from api.utlis import to_base64
 import requests
 import json
-# from csf_tz import console
 
 class VFDToken(Document):
 	pass

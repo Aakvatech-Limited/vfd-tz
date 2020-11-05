@@ -136,6 +136,10 @@ fixtures = [
 		"Mode of Payment-vfd_pmttype",
 		"Sales Taxes and Charges Template-vfd_vatrate",
 		"Item Tax Template-vfd_taxcode",
+		"Sales Invoice-vfd_gc",
+		"Sales Invoice-vfd_dc",
+		"Sales Invoice-vfd_rctnum",
+		"Sales Invoice-vfd_posting_info"
 	)]]},
 	{"doctype":"Property Setter", "filters": [["name", "in", (
 	

@@ -11,7 +11,6 @@ import base64
 import requests
 from api.xml import xml_to_dic
 from api.utlis import to_base64, get_signature
-from csf_tz import console
 
 
 class VFDRegistration(Document):

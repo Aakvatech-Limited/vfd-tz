@@ -6,7 +6,7 @@ frappe.ui.form.on("Sales Invoice", {
         frm.trigger("make_vfd_btn")
     },
     make_vfd_btn: function(frm){
-        // if (frm.doc.docstatus == 1 && frm.doc.enabled_auto_create_delivery_notes == 1){
+        if (frm.doc.docstatus == 1 && !frm.doc.vfd_posting_info){
             frm.add_custom_button(__('Generate VFD'),
                     
             function() {
@@ -17,6 +17,6 @@ frappe.ui.form.on("Sales Invoice", {
                     },
                 }); 
             });               
-        // }
+        }
     },
 })
