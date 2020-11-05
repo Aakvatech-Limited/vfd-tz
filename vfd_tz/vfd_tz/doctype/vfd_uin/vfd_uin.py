@@ -6,9 +6,11 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 from frappe.utils import nowdate, getdate
+from frappe import _
 
 class VFDUIN(Document):
-	pass
+	def on_trash(self):
+		frappe.throw(_("This document cannot be deleted"))
 
 
 def get_counters(company):
