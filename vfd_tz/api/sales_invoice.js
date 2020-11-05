@@ -15,6 +15,11 @@ frappe.ui.form.on("Sales Invoice", {
                     args: {
                         invoice_name: frm.doc.name,
                     },
+                    callback: function(r) {
+                        if(!r.exc) {
+                            frm.reload_doc();
+                        }
+                    }
                 }); 
             });               
         }

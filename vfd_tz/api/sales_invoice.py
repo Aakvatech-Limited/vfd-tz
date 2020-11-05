@@ -17,6 +17,8 @@ from frappe.utils.background_jobs import enqueue
 @frappe.whitelist()
 def enqueue_posting_vfd_invoice(invoice_name):
         enqueue(method=posting_vfd_invoice, queue='short', timeout=10000, is_async=True , kwargs=invoice_name )
+        frappe.msgprint(_("Start Sending Invoice to VFD"),alert=True)
+        return True
 
 
 def posting_vfd_invoice(kwargs):
