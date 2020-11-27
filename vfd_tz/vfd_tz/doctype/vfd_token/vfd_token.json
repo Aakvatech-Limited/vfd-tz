@@ -34,10 +34,9 @@
   },
   {
    "fieldname": "vfd_registration",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "in_list_view": 1,
    "label": "VFD Registration",
-   "options": "VFD Registration",
    "reqd": 1
   },
   {
@@ -75,7 +74,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2020-11-04 22:27:02.168365",
+ "modified": "2020-11-28 00:53:31.056207",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Token",

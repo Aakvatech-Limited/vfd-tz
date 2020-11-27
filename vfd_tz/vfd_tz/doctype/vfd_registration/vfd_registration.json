@@ -73,12 +73,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "cert_serial",
-   "fieldtype": "Password",
-   "label": "Cert Serial",
-   "reqd": 1
-  },
-  {
    "fieldname": "tin",
    "fieldtype": "Data",
    "label": "TIN",
@@ -264,10 +258,16 @@
    "options": "VFD Registration",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "cert_serial",
+   "fieldtype": "Data",
+   "label": "Cert Serial",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2020-11-03 16:41:52.204653",
+ "modified": "2020-11-28 01:18:32.406537",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Registration",

@@ -10,10 +10,16 @@ from OpenSSL import crypto
 import base64
 import requests
 from api.xml import xml_to_dic
-from api.utlis import to_base64, get_signature
+from api.utlis import to_base64, get_signature, get_cert_serial
+from frappe.utils.password import set_encrypted_password
 
 
 class VFDRegistration(Document):
+	def validate(self):
+		cert_serial = get_cert_serial(self)
+		self.cert_serial = cert_serial
+
+
 	def before_submit(self):
 		self.registration()
 	
@@ -64,7 +70,7 @@ def get_registration(doc):
 	signenature = get_signature(data, doc)
 	extend_data ="<?xml version=\"1.0\" encoding=\"UTF-8\"?><EFDMS>{0}<EFDMSSIGNATURE>{1}</EFDMSSIGNATURE></EFDMS>".format(data, signenature)
 	url = doc.url + "/efdmsRctApi/api/vfdRegReq"
-	cert_serial = to_base64(doc.get_password('cert_serial'))
+	cert_serial = to_base64(doc.cert_serial)
 	headers = {
 		'Content-Type': 'application/xml',
 		'Cert-Serial': cert_serial,
