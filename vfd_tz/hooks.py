@@ -141,6 +141,7 @@ fixtures = [
 		"Sales Invoice-vfd_rctnum",
 		"Sales Invoice-vfd_posting_info",
 		"Sales Invoice-vfd_status",
+		"Sales Invoice-vfd_rctvnum",
 	)]]},
 	{"doctype":"Property Setter", "filters": [["name", "in", (
 	

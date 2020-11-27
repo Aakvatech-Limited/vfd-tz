@@ -97,13 +97,14 @@ def posting_vfd_invoice(kwargs):
         doc.vfd_gc = counters.gc
         doc.vfd_rctnum = counters.gc
         doc.vfd_dc = counters.dc
+        doc.vfd_rctvnum =str(registration_doc.receiptcode) + str(doc.vfd_gc)
         doc.db_update()
         frappe.db.commit()
         doc.reload()
         rect_data["RCTNUM"] = doc.vfd_gc
         rect_data["DC"] = doc.vfd_dc
         rect_data["GC"] = doc.vfd_gc
-        rect_data["RCTVNUM"] = str(registration_doc.receiptcode) + str(doc.vfd_gc)
+        rect_data["RCTVNUM"] = doc.vfd_rctvnum
 
     rect_data_xml = str(dict_to_xml(rect_data, "RCT")[39:]).replace("<None>", "").replace("</None>", "")
 
