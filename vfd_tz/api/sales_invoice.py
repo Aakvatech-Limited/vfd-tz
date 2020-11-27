@@ -65,7 +65,7 @@ def posting_vfd_invoice(kwargs):
         "RCTVNUM": str(registration_doc.receiptcode) + str(doc.vfd_gc),
         "ITEMS": [],
         "TOTALS": {
-            "TOTALTAXEXCL": flt(doc.base_net_total,2),
+            "TOTALTAXEXCL": flt(doc.base_grand_total,2),
             "TOTALTAXINCL": flt(doc.base_total,2),
             "DISCOUNT": flt(doc.base_discount_amount,2)
         },
@@ -162,7 +162,7 @@ def get_customer_id_info(customer):
         data["cust_id"] = cust_id
         data["cust_id_type"] = int(cust_id_type[:1])
     
-    data["mobile_no"] = int(mobile_no or 0)
+    data["mobile_no"] = int(mobile_no or "null")
     return data
 
 
