@@ -18,6 +18,18 @@ from csf_tz import console
 
 @frappe.whitelist()
 def enqueue_posting_vfd_invoice(invoice_name):
+    doc = frappe.get_doc("Sales Invoice", invoice_name)
+    token_data = get_token(doc.company)
+    registration_doc = token_data.get("doc")
+    if not doc.vfd_rctnum:
+        counters = get_counters(doc.company)
+        doc.vfd_gc = counters.gc
+        doc.vfd_rctnum = counters.gc
+        doc.vfd_dc = counters.dc
+        doc.vfd_rctvnum =str(registration_doc.receiptcode) + str(doc.vfd_gc)
+        doc.db_update()
+        frappe.db.commit()
+        doc.reload()
         enqueue(method=posting_vfd_invoice, queue='short', timeout=10000, is_async=True , kwargs=invoice_name )
         frappe.msgprint(_("Start Sending Invoice to VFD"),alert=True)
         return True
@@ -92,19 +104,11 @@ def posting_vfd_invoice(kwargs):
         }
         rect_data["ITEMS"].append({"ITEM":item_data})
 
-    if not doc.vfd_rctnum:
-        counters = get_counters(doc.company)
-        doc.vfd_gc = counters.gc
-        doc.vfd_rctnum = counters.gc
-        doc.vfd_dc = counters.dc
-        doc.vfd_rctvnum =str(registration_doc.receiptcode) + str(doc.vfd_gc)
-        doc.db_update()
-        frappe.db.commit()
-        doc.reload()
-        rect_data["RCTNUM"] = doc.vfd_gc
-        rect_data["DC"] = doc.vfd_dc
-        rect_data["GC"] = doc.vfd_gc
-        rect_data["RCTVNUM"] = doc.vfd_rctvnum
+    
+    rect_data["RCTNUM"] = doc.vfd_gc
+    rect_data["DC"] = doc.vfd_dc
+    rect_data["GC"] = doc.vfd_gc
+    rect_data["RCTVNUM"] = doc.vfd_rctvnum
 
     rect_data_xml = str(dict_to_xml(rect_data, "RCT")[39:]).replace("<None>", "").replace("</None>", "")
 
