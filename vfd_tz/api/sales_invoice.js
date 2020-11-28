@@ -6,7 +6,7 @@ frappe.ui.form.on("Sales Invoice", {
         frm.trigger("make_vfd_btn")
     },
     make_vfd_btn: function(frm){
-        if (frm.doc.docstatus == 1 && !frm.doc.vfd_posting_info){
+        if (frm.doc.docstatus == 1 && !frm.doc.vfd_rctnum && !frm.doc.is_return){
             frm.add_custom_button(__('Generate VFD'),
                     
             function() {

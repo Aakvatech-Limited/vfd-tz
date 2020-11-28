@@ -19,6 +19,8 @@ from csf_tz import console
 @frappe.whitelist()
 def enqueue_posting_vfd_invoice(invoice_name):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
+    if doc.is_return:
+        return
     token_data = get_token(doc.company)
     registration_doc = token_data.get("doc")
     if not doc.vfd_rctnum:
