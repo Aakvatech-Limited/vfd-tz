@@ -9,7 +9,7 @@ from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from api.xml import xml_to_dic, dict_to_xml
 from api.utlis import get_signature
 import requests
-from frappe.utils import flt
+from frappe.utils import flt, nowdate, nowtime
 from vfd_tz.vfd_tz.doctype.vfd_uin.vfd_uin import get_counters
 from frappe.utils.background_jobs import enqueue
 import json
@@ -26,6 +26,8 @@ def enqueue_posting_vfd_invoice(invoice_name):
         doc.vfd_gc = counters.gc
         doc.vfd_rctnum = counters.gc
         doc.vfd_dc = counters.dc
+        doc.vfd_date = nowdate()
+        doc.vfd_time = nowtime()
         doc.vfd_rctvnum =str(registration_doc.receiptcode) + str(doc.vfd_gc)
         doc.db_update()
         frappe.db.commit()
@@ -61,8 +63,8 @@ def posting_vfd_invoice(kwargs):
         frappe.db.commit()
         frappe.throw(_("Sales Taxes and Charges Template not set for Invoice Number {0}".format(doc.name)))
     rect_data = {
-        "DATE": doc.posting_date,
-        "TIME": str(doc.posting_time)[0:-7],
+        "DATE": doc.vfd_date,
+        "TIME": str(doc.vfd_time)[0:-7],
         "TIN": registration_doc.tin,
         "REGID": registration_doc.regid,
         "EFDSERIAL": registration_doc.serial,
