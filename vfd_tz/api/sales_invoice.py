@@ -7,7 +7,7 @@ import frappe, erpnext
 from frappe import _
 from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from api.xml import xml_to_dic, dict_to_xml
-from api.utlis import get_signature
+from api.utlis import get_signature, remove_special_characters
 import requests
 from frappe.utils import flt, nowdate, nowtime
 from vfd_tz.vfd_tz.doctype.vfd_uin.vfd_uin import get_counters
@@ -72,7 +72,7 @@ def posting_vfd_invoice(kwargs):
         "EFDSERIAL": registration_doc.serial,
         "CUSTIDTYPE": customer_id_info["cust_id_type"],
         "CUSTID": customer_id_info["cust_id"],
-        "CUSTNAME": doc.customer,
+        "CUSTNAME": remove_special_characters(doc.customer),
         "MOBILENUM": customer_id_info["mobile_no"],
         "RCTNUM": doc.vfd_gc,
         "DC": doc.vfd_dc,
@@ -101,7 +101,7 @@ def posting_vfd_invoice(kwargs):
             frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
         item_data = {
             "ID": item.item_code,
-            "DESC": item.item_name,
+            "DESC": remove_special_characters(item.item_name),
             "QTY": flt(item.stock_qty,2),
             "TAXCODE": get_item_taxcode(item.item_tax_template, doc.taxes_and_charges),  
             "AMT": flt(item.base_amount,2)

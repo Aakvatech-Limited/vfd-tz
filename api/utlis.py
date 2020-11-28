@@ -8,6 +8,7 @@ from frappe import _
 import base64
 import OpenSSL
 from OpenSSL import crypto
+import re
 
 
 def to_base64(value):
@@ -60,3 +61,7 @@ def get_p12_certificate(registration_doc):
     password = registration_doc.get_password('certificate_password')
     p12 = crypto.load_pkcs12(key,password)
     return p12
+
+
+def remove_special_characters(text):
+    return re.sub('[^A-Za-z0-9 ]+', '', text)
