@@ -24,12 +24,12 @@ def get_counters(company):
 		})
 		if not len(doc_list):
 			frappe.throw(_("There no active VFD Registration for company ") + company)
-		registration_doc = frappe.get_doc("VFD Registration", doc_list[0].name)
+		gc = frappe.get_value("VFD Registration", doc_list[0].name, "gc") or 0
 
 		doc = frappe.get_doc({
 			"doctype" : "VFD UIN",
 			"company": company,
-			"gc": registration_doc.gc or 0,
+			"gc": gc,
 			"dc": 0,
 			"dc_date" : nowdate()
 		})
