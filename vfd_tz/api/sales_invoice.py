@@ -24,7 +24,7 @@ def vfd_validation(doc, method):
     for item in doc.items:
         if not item.item_tax_template:
             frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
-        item_taxcode = get_item_taxcode(item.item_tax_template)
+        item_taxcode = get_item_taxcode(item.item_tax_template, item.item_code, doc.name)
 
         with_tax = 0
         other_tax = 0
@@ -62,7 +62,7 @@ def enqueue_posting_vfd_invoice(invoice_name):
             doc.vfd_status = "Pending"
         doc.db_update()
         frappe.db.commit()
-        frappe.msgprint(_("Start Sending Invoice to VFD"),alert=True)
+    frappe.msgprint(_("Start Sending Invoices to VFD"),alert=True)
     if not frappe.local.flags.vfd_posting:
         enqueue(method=posting_all_vfd_invoices, queue='short', timeout=10000, is_async=True)
     return True
@@ -107,6 +107,18 @@ def posting_vfd_invoice(invoice_name):
         'Authorization': token_data["token"]
     }
     customer_id_info = get_customer_id_info(doc.customer)
+    
+    if not doc.vfd_date or not doc.vfd_time:
+        doc.vfd_date = nowdate()
+        doc.vfd_time = nowtime()
+        doc.db_update()
+        frappe.db.commit()
+        doc.reload()
+    if not doc.vfd_rctvnum:
+        doc.vfd_rctvnum =str(registration_doc.receiptcode) + str(doc.vfd_gc)
+        doc.db_update()
+        frappe.db.commit()
+        doc.reload()
 
     rect_data = {
         "DATE": doc.vfd_date,
@@ -130,7 +142,7 @@ def posting_vfd_invoice(invoice_name):
             "DISCOUNT": flt(doc.base_discount_amount,2)
         },
         "PAYMENTS": get_payments(doc.payments, doc.base_total),
-        "VATTOTALS": get_vattotals(doc.items),
+        "VATTOTALS": get_vattotals(doc.items, doc.name),
     }
 
     for item in doc.items:
@@ -138,7 +150,7 @@ def posting_vfd_invoice(invoice_name):
             "ID": item.item_code,
             "DESC": remove_special_characters(item.item_name),
             "QTY": flt(item.stock_qty,2),
-            "TAXCODE": get_item_taxcode(item.item_tax_template),  
+            "TAXCODE": get_item_taxcode(item.item_tax_template, item.item_code, doc.name),  
             "AMT": flt(item.base_net_amount,2)
         }
         rect_data["ITEMS"].append({"ITEM":item_data})
@@ -221,8 +233,16 @@ def get_customer_id_info(customer):
     return data
 
 
-def get_item_taxcode(item_tax_template):
-    taxcode = 0
+def get_item_taxcode(item_tax_template=None, item_code=None, invoice_name=None):
+    if not item_tax_template:
+        if item_code and invoice_name:
+            frappe.throw(_("Item Taxes Template not set for item {0} in invoice {1}".format(item_code, invoice_name)))
+        elif item_code:
+            frappe.throw(_("Item Taxes Template not set for item {0}".format(item_code)))
+        else:
+            frappe.throw(_("Item Taxes Template not set"))
+
+    taxcode = None
     if item_tax_template:
         vfd_taxcode = frappe.get_value("Item Tax Template", item_tax_template, "vfd_taxcode")
         if vfd_taxcode:
@@ -230,17 +250,6 @@ def get_item_taxcode(item_tax_template):
         else:
             frappe.throw(_("VFD Tax Code not setup in {0}".format(item_tax_template)))
     return taxcode
-
-
-def get_vatrate(taxes_and_charges = None):
-    vatrate = ""
-    if taxes_and_charges:
-        vfd_vatrate = frappe.get_value("Sales Taxes and Charges Template", taxes_and_charges, "vfd_vatrate")
-        if vfd_vatrate:
-            vatrate = vfd_vatrate[:1]
-        else:
-            frappe.throw(_("VFD VAT Rate not setup in {0}".format(taxes_and_charges)))
-    return vatrate
 
 
 def get_payments(payments, base_total):
@@ -262,10 +271,10 @@ def get_payments(payments, base_total):
     return payments_dict
 
 
-def get_vattotals(items):
+def get_vattotals(items, invoice_name):
     vattotals = {}
     for item in items:
-        item_taxcode = get_item_taxcode(item.item_tax_template)
+        item_taxcode = get_item_taxcode(item.item_tax_template, item.item_code, invoice_name)
         if not vattotals.get(item_taxcode):
             vattotals[item_taxcode] = {}
             vattotals[item_taxcode]["NETTAMOUNT"] = 0
