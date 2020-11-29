@@ -22,6 +22,8 @@ def vfd_validation(doc, method):
         if not item.item_tax_template:
             frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
         item_taxcode = get_item_taxcode(item.item_tax_template, doc.taxes_and_charges)
+        if item_taxcode == 1:
+            frappe.throw(_("Taxes not set correctly"))
         
         with_tax = 0
         other_tax = 0
