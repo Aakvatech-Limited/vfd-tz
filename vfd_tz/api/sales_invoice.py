@@ -59,11 +59,6 @@ def posting_vfd_invoice(kwargs):
     }
     customer_id_info = get_customer_id_info(doc.customer)
 
-    if not doc.taxes_and_charges:
-        doc.vfd_status = "Failed"
-        doc.db_update()
-        frappe.db.commit()
-        frappe.throw(_("Sales Taxes and Charges Template not set for Invoice Number {0}".format(doc.name)))
     rect_data = {
         "DATE": doc.vfd_date,
         "TIME": str(doc.vfd_time)[0:-7],
@@ -81,30 +76,25 @@ def posting_vfd_invoice(kwargs):
         "RCTVNUM": str(registration_doc.receiptcode) + str(doc.vfd_gc),
         "ITEMS": [],
         "TOTALS": {
-            "TOTALTAXEXCL": flt(doc.base_grand_total,2),
-            "TOTALTAXINCL": flt(doc.base_total,2),
+            "TOTALTAXEXCL": flt(doc.base_net_total,2),
+            "TOTALTAXINCL": flt(doc.base_grand_total,2),
             "DISCOUNT": flt(doc.base_discount_amount,2)
         },
         "PAYMENTS": get_payments(doc.payments, doc.base_total),
         "VATTOTALS": {
             "VATRATE": get_vatrate(doc.taxes_and_charges),
             "NETTAMOUNT": flt(doc.base_net_total,2),
-            "TAXAMOUNT": flt(flt(doc.base_total,2) - flt(doc.base_net_total,2), 2)
+            "TAXAMOUNT": flt(doc.base_total - doc.base_net_total, 2)
         },
     }
 
     for item in doc.items:
-        if not item.item_tax_template:
-            doc.vfd_status = "Failed"
-            doc.db_update()
-            frappe.db.commit()
-            frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
         item_data = {
             "ID": item.item_code,
             "DESC": remove_special_characters(item.item_name),
             "QTY": flt(item.stock_qty,2),
             "TAXCODE": get_item_taxcode(item.item_tax_template, doc.taxes_and_charges),  
-            "AMT": flt(item.base_amount,2)
+            "AMT": flt(item.base_net_amount,2)
         }
         rect_data["ITEMS"].append({"ITEM":item_data})
 
