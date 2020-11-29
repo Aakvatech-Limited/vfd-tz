@@ -24,7 +24,7 @@ def vfd_validation(doc, method):
     for item in doc.items:
         if not item.item_tax_template:
             frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
-        item_taxcode = get_item_taxcode(item.item_tax_template, doc.taxes_and_charges)
+        item_taxcode = get_item_taxcode(item.item_tax_template)
 
         with_tax = 0
         other_tax = 0
@@ -116,7 +116,7 @@ def posting_vfd_invoice(kwargs):
             "ID": item.item_code,
             "DESC": remove_special_characters(item.item_name),
             "QTY": flt(item.stock_qty,2),
-            "TAXCODE": get_item_taxcode(item.item_tax_template, doc.taxes_and_charges),  
+            "TAXCODE": get_item_taxcode(item.item_tax_template),  
             "AMT": flt(item.base_net_amount,2)
         }
 
@@ -181,7 +181,7 @@ def get_customer_id_info(customer):
     return data
 
 
-def get_item_taxcode(item_tax_template=None, taxes_and_charges=None):
+def get_item_taxcode(item_tax_template):
     taxcode = 0
     if item_tax_template:
         vfd_taxcode = frappe.get_value("Item Tax Template", item_tax_template, "vfd_taxcode")
@@ -191,14 +191,7 @@ def get_item_taxcode(item_tax_template=None, taxes_and_charges=None):
             frappe.throw(_("VFD Tax Code not setup in {0}".format(item_tax_template)))
     elif taxes_and_charges:
         vatrate = get_vatrate(taxes_and_charges)
-        taxes_map = {
-            "A": "1",
-            "B": "2",
-            "C": "3",
-            "D": "4",
-            "E": "5"
-        }
-        taxcode = taxes_map.get(vatrate)
+        
     return taxcode
 
 
@@ -243,9 +236,17 @@ def get_vattotals(items):
         vattotals[item_taxcode]["NETTAMOUNT"] += flt(item.base_net_amount, 2)
         vattotals[item_taxcode]["TAXAMOUNT"] += flt(item.base_net_amount * ( (18 /100) if item_taxcode == 1 else 0), 2)
 
+    taxes_map = {
+        "1": "A",
+        "2": "B",
+        "3": "C",
+        "4": "D",
+        "5": "E"
+    }
+
     vattotals_list = []
     for key, value in vattotals.items():
-        vattotals_list.append({"VATRATE": key})
+        vattotals_list.append({"VATRATE": taxes_map.get(str(key))})
         vattotals_list.append({"NETTAMOUNT": flt(value["NETTAMOUNT"], 2)})
         vattotals_list.append({"TAXAMOUNT": flt(value["TAXAMOUNT"], 2)})
     return vattotals_list
