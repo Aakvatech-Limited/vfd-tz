@@ -189,8 +189,6 @@ def get_item_taxcode(item_tax_template):
             taxcode = int(vfd_taxcode[:1])
         else:
             frappe.throw(_("VFD Tax Code not setup in {0}".format(item_tax_template)))
-    elif taxes_and_charges:
-        vatrate = get_vatrate(taxes_and_charges)
         
     return taxcode
 
