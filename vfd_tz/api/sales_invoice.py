@@ -18,13 +18,14 @@ from csf_tz import console
 
 def vfd_validation(doc, method):
     tax_data = get_itemised_tax_breakup_html(doc)
+    if not tax_data:
+            frappe.throw(_("Taxes not set correctly"))
+
     for item in doc.items:
         if not item.item_tax_template:
             frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
         item_taxcode = get_item_taxcode(item.item_tax_template, doc.taxes_and_charges)
-        if item_taxcode == 1:
-            frappe.throw(_("Taxes not set correctly"))
-        
+
         with_tax = 0
         other_tax = 0
 
@@ -107,11 +108,7 @@ def posting_vfd_invoice(kwargs):
             "DISCOUNT": flt(doc.base_discount_amount,2)
         },
         "PAYMENTS": get_payments(doc.payments, doc.base_total),
-        "VATTOTALS": {
-            "VATRATE": get_vatrate(doc.taxes_and_charges),
-            "NETTAMOUNT": flt(doc.base_net_total,2),
-            "TAXAMOUNT": flt(doc.base_total - doc.base_net_total, 2)
-        },
+        "VATTOTALS": get_vattotals(doc.items),
     }
 
     for item in doc.items:
@@ -122,9 +119,7 @@ def posting_vfd_invoice(kwargs):
             "TAXCODE": get_item_taxcode(item.item_tax_template, doc.taxes_and_charges),  
             "AMT": flt(item.base_net_amount,2)
         }
-        rect_data["ITEMS"].append({"ITEM":item_data})
 
-    
     rect_data["RCTNUM"] = doc.vfd_gc
     rect_data["DC"] = doc.vfd_dc
     rect_data["GC"] = doc.vfd_gc
@@ -236,6 +231,24 @@ def get_payments(payments, base_total):
      
     return payments_dict
 
+
+def get_vattotals(items):
+    vattotals = {}
+    for item in items:
+        item_taxcode = get_item_taxcode(item.item_tax_template)
+        if not vattotals.get(item_taxcode):
+            vattotals[item_taxcode] = {}
+            vattotals[item_taxcode]["NETTAMOUNT"] = 0
+            vattotals[item_taxcode]["TAXAMOUNT"] = 0
+        vattotals[item_taxcode]["NETTAMOUNT"] += flt(item.base_net_amount, 2)
+        vattotals[item_taxcode]["TAXAMOUNT"] += flt(item.base_net_amount * ( (18 /100) if item_taxcode == 1 else 0), 2)
+
+    vattotals_list = []
+    for key, value in vattotals.items():
+        vattotals_list.append({"VATRATE": key})
+        vattotals_list.append({"NETTAMOUNT": flt(value["NETTAMOUNT"], 2)})
+        vattotals_list.append({"TAXAMOUNT": flt(value["TAXAMOUNT"], 2)})
+    return vattotals_list
 
 
 def posting_all_vfd_invoices():
