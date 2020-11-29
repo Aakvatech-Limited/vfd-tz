@@ -16,6 +16,30 @@ import json
 from csf_tz import console
 
 
+def vfd_validation(doc, method):
+    tax_data = get_itemised_tax_breakup_html(doc)
+    for item in doc.items:
+        if not item.item_tax_template:
+            frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
+        item_taxcode = get_item_taxcode(item.item_tax_template, doc.taxes_and_charges)
+        
+        with_tax = 0
+        other_tax = 0
+
+        for tax_name, tax_value in tax_data.get(item.item_code).items():
+            if tax_value.get("tax_rate") == 18:
+                with_tax += 1
+            else:
+                other_tax += tax_value.get("tax_amount")
+
+        if other_tax:
+            frappe.throw(_("Taxes not set correctly for item {0}".format(item.item_code)))
+        if item_taxcode == 1 and with_tax != 1:
+            frappe.throw(_("Taxes not set correctly for item {0}".format(item.item_code)))
+        elif item_taxcode != 1 and with_tax != 0:
+            frappe.throw(_("Taxes not set correctly for item {0}".format(item.item_code)))
+
+
 @frappe.whitelist()
 def enqueue_posting_vfd_invoice(invoice_name):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
@@ -143,11 +167,6 @@ def posting_vfd_invoice(kwargs):
         frappe.db.commit()
 
 
-def get_invoice_taxes(doc, method=None):
-    data = get_itemised_tax_breakup_html(doc)
-    console(data)
-    
-
 
 def get_customer_id_info(customer):
     data = {}
@@ -235,45 +254,18 @@ def validate_cancel(doc, method):
 
 
 def get_itemised_tax_breakup_html(doc):
-	if not doc.taxes:
-		return
-	frappe.flags.company = doc.company
+    if not doc.taxes:
+        return
 
-	# get headers
-	tax_accounts = []
-	for tax in doc.taxes:
-		if getattr(tax, "category", None) and tax.category=="Valuation":
-			continue
-		if tax.description not in tax_accounts:
-			tax_accounts.append(tax.description)
-
-	headers = get_itemised_tax_breakup_header(doc.doctype + " Item", tax_accounts)
-
-	# get tax breakup data
-	itemised_tax, itemised_taxable_amount = get_itemised_tax_breakup_data(doc)
-
-	get_rounded_tax_amount(itemised_tax, doc.precision("tax_amount", "taxes"))
-
-	return dict(
-			headers=headers,
-			itemised_tax=itemised_tax,
-			itemised_taxable_amount=itemised_taxable_amount,
-			tax_accounts=tax_accounts,
-		)
-
-
-@erpnext.allow_regional
-def get_itemised_tax_breakup_header(item_doctype, tax_accounts):
-	return [_("Item"), _("Taxable Amount")] + tax_accounts
+    itemised_tax = get_itemised_tax_breakup_data(doc)
+    get_rounded_tax_amount(itemised_tax, doc.precision("tax_amount", "taxes"))
+    return itemised_tax
 
 
 @erpnext.allow_regional
 def get_itemised_tax_breakup_data(doc):
 	itemised_tax = get_itemised_tax(doc.taxes)
-
-	itemised_taxable_amount = get_itemised_taxable_amount(doc.items)
-
-	return itemised_tax, itemised_taxable_amount
+	return itemised_tax
 
 
 def get_itemised_tax(taxes, with_tax_account=False):
@@ -312,13 +304,3 @@ def get_rounded_tax_amount(itemised_tax, precision):
 	for taxes in itemised_tax.values():
 		for tax_account in taxes:
 			taxes[tax_account]["tax_amount"] = flt(taxes[tax_account]["tax_amount"], precision)
-
-
-def get_itemised_taxable_amount(items):
-	itemised_taxable_amount = frappe._dict()
-	for item in items:
-		item_code = item.item_code or item.item_name
-		itemised_taxable_amount.setdefault(item_code, 0)
-		itemised_taxable_amount[item_code] += item.net_amount
-
-	return itemised_taxable_amount

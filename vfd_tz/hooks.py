@@ -85,7 +85,7 @@ doctype_js = {
 doc_events = {
 	"Sales Invoice": {
 		"on_cancel": "vfd_tz.api.sales_invoice.validate_cancel",
-		"validate": "vfd_tz.api.sales_invoice.get_invoice_taxes",
+		"on_subnit": "vfd_tz.api.sales_invoice.vfd_validation",
 	},
 }
 
