@@ -13,7 +13,7 @@ from frappe.utils import flt, nowdate, nowtime
 from vfd_tz.vfd_tz.doctype.vfd_uin.vfd_uin import get_counters
 from frappe.utils.background_jobs import enqueue
 import json
-from csf_tz import console
+
 
 
 def vfd_validation(doc, method):
@@ -58,16 +58,33 @@ def enqueue_posting_vfd_invoice(invoice_name):
         doc.vfd_date = nowdate()
         doc.vfd_time = nowtime()
         doc.vfd_rctvnum =str(registration_doc.receiptcode) + str(doc.vfd_gc)
+        if doc.vfd_status == "Not Sent":
+            doc.vfd_status = "Pending"
         doc.db_update()
         frappe.db.commit()
-        doc.reload()
-        enqueue(method=posting_vfd_invoice, queue='short', timeout=10000, is_async=True , kwargs=invoice_name )
         frappe.msgprint(_("Start Sending Invoice to VFD"),alert=True)
-        return True
+
+    enqueue(method=posting_all_vfd_invoices, queue='short', timeout=10000, is_async=True)
+    return True
 
 
-def posting_vfd_invoice(kwargs):
-    invoice_name = kwargs
+def posting_all_vfd_invoices():
+    invoices_list = frappe.get_all("Sales Invoice", 
+        filters = {
+            "docstatus": 1,
+            "vfd_posting_info": ["in", ["", None]],
+            "vfd_status": ["in", ["Failed", "Pending"]]
+        },
+        order_by='vfd_rctvnum ASC',
+    )
+    for invoice in invoices_list:
+        status = posting_vfd_invoice(invoice.name)
+        if status != "Success":
+            frappe.throw(_("Error in sending VFD Invoice {0}").format(invoice.name))
+            break
+    
+
+def posting_vfd_invoice(invoice_name):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
     if doc.vfd_posting_info or doc.docstatus != 1:
         return
@@ -119,6 +136,7 @@ def posting_vfd_invoice(kwargs):
             "TAXCODE": get_item_taxcode(item.item_tax_template),  
             "AMT": flt(item.base_net_amount,2)
         }
+        rect_data["ITEMS"].append({"ITEM":item_data})
 
     rect_data["RCTNUM"] = doc.vfd_gc
     rect_data["DC"] = doc.vfd_dc
@@ -134,8 +152,23 @@ def posting_vfd_invoice(kwargs):
     data = dict_to_xml(efdms_data).replace("<None>", "").replace("</None>", "")
     url = registration_doc.url + "/efdmsRctApi/api/efdmsRctInfo"
     response = requests.request("POST", url, headers=headers, data = data, timeout=5)
+    
     if not response.status_code == 200:
-        frappe.throw(str(response.text))
+        posting_info_doc = frappe.get_doc({
+            "doctype" : "VFD Invoice Posting Info",
+            "sales_invoice" : doc.name,
+            "ackcode" : response.status_code,
+            "ackmsg" : response.text,
+            "date" : nowdate(),
+            "time" : nowtime(),
+            "req_headers": str(headers),
+            "req_data": str(data).encode('utf8')
+        })
+        doc.vfd_status = "Failed"
+        doc.db_update()
+        frappe.db.commit()
+        return "Failed"
+
     xmldict = xml_to_dic(response.text)
     rctack = xmldict.get("rctack")
     posting_info_doc = frappe.get_doc({
@@ -158,10 +191,12 @@ def posting_vfd_invoice(kwargs):
         doc.vfd_status = "Success"
         doc.db_update()
         frappe.db.commit()
+        return "Success"
     else:
         doc.vfd_status = "Failed"
         doc.db_update()
         frappe.db.commit()
+        return "Failed"
 
 
 
@@ -189,7 +224,6 @@ def get_item_taxcode(item_tax_template):
             taxcode = int(vfd_taxcode[:1])
         else:
             frappe.throw(_("VFD Tax Code not setup in {0}".format(item_tax_template)))
-        
     return taxcode
 
 
@@ -249,18 +283,6 @@ def get_vattotals(items):
         vattotals_list.append({"TAXAMOUNT": flt(value["TAXAMOUNT"], 2)})
     return vattotals_list
 
-
-def posting_all_vfd_invoices():
-    invoices_list = frappe.get_all("Sales Invoice", filters = {
-        "docstatus": 1,
-        "vfd_posting_info": ["in", ["", None]],
-        "vfd_rctnum": ["not in", ["", None]]
-    })
-    for invoice in invoices_list:
-        count_list = frappe.get_all("VFD Invoice Posting Info", filters= {"sales_invoice": invoice.name})
-        if len(count_list) < 6:
-            enqueue_posting_vfd_invoice(invoice.name)
-    
 
 def validate_cancel(doc, method):
     if doc.vfd_rctnum:
