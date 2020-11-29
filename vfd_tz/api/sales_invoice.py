@@ -63,12 +63,15 @@ def enqueue_posting_vfd_invoice(invoice_name):
         doc.db_update()
         frappe.db.commit()
         frappe.msgprint(_("Start Sending Invoice to VFD"),alert=True)
-
-    enqueue(method=posting_all_vfd_invoices, queue='short', timeout=10000, is_async=True)
+    if not frappe.local.flags.vfd_posting:
+        enqueue(method=posting_all_vfd_invoices, queue='short', timeout=10000, is_async=True)
     return True
 
 
 def posting_all_vfd_invoices():
+    if frappe.local.flags.vfd_posting:
+        return
+    frappe.local.flags.vfd_posting = True
     invoices_list = frappe.get_all("Sales Invoice", 
         filters = {
             "docstatus": 1,
@@ -80,8 +83,10 @@ def posting_all_vfd_invoices():
     for invoice in invoices_list:
         status = posting_vfd_invoice(invoice.name)
         if status != "Success":
+            frappe.local.flags.vfd_posting = False
             frappe.throw(_("Error in sending VFD Invoice {0}").format(invoice.name))
             break
+    frappe.local.flags.vfd_posting = False
     
 
 def posting_vfd_invoice(invoice_name):
