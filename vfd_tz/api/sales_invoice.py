@@ -9,7 +9,7 @@ from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from api.xml import xml_to_dic, dict_to_xml
 from api.utlis import get_signature, remove_special_characters
 import requests
-from frappe.utils import flt, nowdate, nowtime
+from frappe.utils import flt, nowdate, nowtime, format_datetime
 from vfd_tz.vfd_tz.doctype.vfd_uin.vfd_uin import get_counters
 from frappe.utils.background_jobs import enqueue
 import json
@@ -75,6 +75,7 @@ def posting_all_vfd_invoices():
     invoices_list = frappe.get_all("Sales Invoice", 
         filters = {
             "docstatus": 1,
+            "is_return": 0,
             "vfd_posting_info": ["in", ["", None]],
             "vfd_status": ["in", ["Failed", "Pending"]]
         },
@@ -122,7 +123,7 @@ def posting_vfd_invoice(invoice_name):
 
     rect_data = {
         "DATE": doc.vfd_date,
-        "TIME": str(doc.vfd_time)[0:-7],
+        "TIME": format_datetime(str(doc.vfd_time), "HH:mm:ss"), # 0:59:30.715164
         "TIN": registration_doc.tin,
         "REGID": registration_doc.regid,
         "EFDSERIAL": registration_doc.serial,
@@ -229,7 +230,7 @@ def get_customer_id_info(customer):
         data["cust_id"] = cust_id
         data["cust_id_type"] = int(cust_id_type[:1])
     
-    data["mobile_no"] = int(mobile_no or "null")
+    data["mobile_no"] = mobile_no or ""
     return data
 
 
