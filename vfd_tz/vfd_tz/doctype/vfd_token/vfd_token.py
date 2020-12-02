@@ -17,7 +17,7 @@ class VFDToken(Document):
 
 def get_token(company):
 	token_data = {}
-	doc_list = doc_list = frappe.get_all("VFD Registration", filters = {
+	doc_list = frappe.get_all("VFD Registration", filters = {
 										"docstatus": 1,
 										"company": company,
 										"r_status": "Active"

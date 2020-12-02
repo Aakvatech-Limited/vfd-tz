@@ -3,26 +3,94 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals 
-import frappe
+import frappe, erpnext
 from frappe import _
 from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from api.xml import xml_to_dic, dict_to_xml
-from api.utlis import get_signature
+from api.utlis import get_signature, remove_special_characters
 import requests
-from frappe.utils import flt
+from frappe.utils import flt, nowdate, nowtime, format_datetime
 from vfd_tz.vfd_tz.doctype.vfd_uin.vfd_uin import get_counters
 from frappe.utils.background_jobs import enqueue
+import json
+
+
+
+def vfd_validation(doc, method):
+    tax_data = get_itemised_tax_breakup_html(doc)
+    if not tax_data:
+            frappe.throw(_("Taxes not set correctly"))
+
+    for item in doc.items:
+        if not item.item_tax_template:
+            frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
+        item_taxcode = get_item_taxcode(item.item_tax_template, item.item_code, doc.name)
+
+        with_tax = 0
+        other_tax = 0
+
+        for tax_name, tax_value in tax_data.get(item.item_code).items():
+            if tax_value.get("tax_rate") == 18:
+                with_tax += 1
+            else:
+                other_tax += tax_value.get("tax_amount")
+
+        if other_tax:
+            frappe.throw(_("Taxes not set correctly for item {0}".format(item.item_code)))
+        if item_taxcode == 1 and with_tax != 1:
+            frappe.throw(_("Taxes not set correctly for item {0}".format(item.item_code)))
+        elif item_taxcode != 1 and with_tax != 0:
+            frappe.throw(_("Taxes not set correctly for item {0}".format(item.item_code)))
 
 
 @frappe.whitelist()
 def enqueue_posting_vfd_invoice(invoice_name):
-        enqueue(method=posting_vfd_invoice, queue='short', timeout=10000, is_async=True , kwargs=invoice_name )
-        frappe.msgprint(_("Start Sending Invoice to VFD"),alert=True)
-        return True
+    doc = frappe.get_doc("Sales Invoice", invoice_name)
+    if doc.is_return:
+        return
+    token_data = get_token(doc.company)
+    registration_doc = token_data.get("doc")
+    if not doc.vfd_rctnum:
+        counters = get_counters(doc.company)
+        doc.vfd_gc = counters.gc
+        doc.vfd_rctnum = counters.gc
+        doc.vfd_dc = counters.dc
+        doc.vfd_date = nowdate()
+        doc.vfd_time = nowtime()
+        doc.vfd_rctvnum =str(registration_doc.receiptcode) + str(doc.vfd_gc)
+        if doc.vfd_status == "Not Sent":
+            doc.vfd_status = "Pending"
+        doc.db_update()
+        frappe.db.commit()
+    frappe.msgprint(_("Start Sending Invoices to VFD"),alert=True)
+    if not frappe.local.flags.vfd_posting:
+        enqueue(method=posting_all_vfd_invoices, queue='short', timeout=10000, is_async=True)
+    return True
 
 
-def posting_vfd_invoice(kwargs):
-    invoice_name = kwargs
+def posting_all_vfd_invoices():
+    if frappe.local.flags.vfd_posting:
+        return
+    frappe.local.flags.vfd_posting = True
+    invoices_list = frappe.get_all("Sales Invoice", 
+        filters = {
+            "docstatus": 1,
+            "is_return": 0,
+            "vfd_posting_info": ["in", ["", None]],
+            "vfd_status": ["in", ["Failed", "Pending"]]
+        },
+        order_by='vfd_rctvnum ASC',
+    )
+    for invoice in invoices_list:
+        status = posting_vfd_invoice(invoice.name)
+        if status != "Success":
+            frappe.local.flags.vfd_posting = False
+            frappe.throw(_("Error in sending VFD Invoice {0}").format(invoice.name))
+            break
+    frappe.local.flags.vfd_posting = False
+    
+
+def posting_vfd_invoice(invoice_name):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
     if doc.vfd_posting_info or doc.docstatus != 1:
         return
@@ -40,21 +108,28 @@ def posting_vfd_invoice(kwargs):
         'Authorization': token_data["token"]
     }
     customer_id_info = get_customer_id_info(doc.customer)
-
-    if not doc.taxes_and_charges:
-        doc.vfd_status = "Failed"
+    
+    if not doc.vfd_date or not doc.vfd_time:
+        doc.vfd_date = nowdate()
+        doc.vfd_time = nowtime()
         doc.db_update()
         frappe.db.commit()
-        frappe.throw(_("Sales Taxes and Charges Template not set for Invoice Number {0}".format(doc.name)))
+        doc.reload()
+    if not doc.vfd_rctvnum:
+        doc.vfd_rctvnum =str(registration_doc.receiptcode) + str(doc.vfd_gc)
+        doc.db_update()
+        frappe.db.commit()
+        doc.reload()
+
     rect_data = {
-        "DATE": doc.posting_date,
-        "TIME": str(doc.posting_time)[0:-7],
+        "DATE": doc.vfd_date,
+        "TIME": format_datetime(str(doc.vfd_time), "HH:mm:ss"), # 0:59:30.715164
         "TIN": registration_doc.tin,
         "REGID": registration_doc.regid,
         "EFDSERIAL": registration_doc.serial,
         "CUSTIDTYPE": customer_id_info["cust_id_type"],
         "CUSTID": customer_id_info["cust_id"],
-        "CUSTNAME": doc.customer,
+        "CUSTNAME": remove_special_characters(doc.customer),
         "MOBILENUM": customer_id_info["mobile_no"],
         "RCTNUM": doc.vfd_gc,
         "DC": doc.vfd_dc,
@@ -64,44 +139,27 @@ def posting_vfd_invoice(kwargs):
         "ITEMS": [],
         "TOTALS": {
             "TOTALTAXEXCL": flt(doc.base_net_total,2),
-            "TOTALTAXINCL": flt(doc.base_total,2),
+            "TOTALTAXINCL": flt(doc.base_grand_total,2),
             "DISCOUNT": flt(doc.base_discount_amount,2)
         },
         "PAYMENTS": get_payments(doc.payments, doc.base_total),
-        "VATTOTALS": {
-            "VATRATE": get_vatrate(doc.taxes_and_charges),
-            "NETTAMOUNT": flt(doc.base_net_total,2),
-            "TAXAMOUNT": flt(flt(doc.base_total,2) - flt(doc.base_net_total,2), 2)
-        },
+        "VATTOTALS": get_vattotals(doc.items, doc.name),
     }
 
     for item in doc.items:
-        if not item.item_tax_template:
-            doc.vfd_status = "Failed"
-            doc.db_update()
-            frappe.db.commit()
-            frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
         item_data = {
             "ID": item.item_code,
-            "DESC": item.item_name,
+            "DESC": remove_special_characters(item.item_name),
             "QTY": flt(item.stock_qty,2),
-            "TAXCODE": get_item_taxcode(item.item_tax_template),  
-            "AMT": flt(item.base_amount,2)
+            "TAXCODE": get_item_taxcode(item.item_tax_template, item.item_code, doc.name),  
+            "AMT": flt(item.base_net_amount,2)
         }
         rect_data["ITEMS"].append({"ITEM":item_data})
 
-    if not doc.vfd_rctnum:
-        counters = get_counters(doc.company)
-        doc.vfd_gc = counters.gc
-        doc.vfd_rctnum = counters.gc
-        doc.vfd_dc = counters.dc
-        doc.db_update()
-        frappe.db.commit()
-        doc.reload()
-        rect_data["RCTNUM"] = doc.vfd_gc
-        rect_data["DC"] = doc.vfd_dc
-        rect_data["GC"] = doc.vfd_gc
-        rect_data["RCTVNUM"] = str(registration_doc.receiptcode) + str(doc.vfd_gc)
+    rect_data["RCTNUM"] = doc.vfd_gc
+    rect_data["DC"] = doc.vfd_dc
+    rect_data["GC"] = doc.vfd_gc
+    rect_data["RCTVNUM"] = doc.vfd_rctvnum
 
     rect_data_xml = str(dict_to_xml(rect_data, "RCT")[39:]).replace("<None>", "").replace("</None>", "")
 
@@ -112,8 +170,23 @@ def posting_vfd_invoice(kwargs):
     data = dict_to_xml(efdms_data).replace("<None>", "").replace("</None>", "")
     url = registration_doc.url + "/efdmsRctApi/api/efdmsRctInfo"
     response = requests.request("POST", url, headers=headers, data = data, timeout=5)
+    
     if not response.status_code == 200:
-        frappe.throw(str(response.text))
+        posting_info_doc = frappe.get_doc({
+            "doctype" : "VFD Invoice Posting Info",
+            "sales_invoice" : doc.name,
+            "ackcode" : response.status_code,
+            "ackmsg" : response.text,
+            "date" : nowdate(),
+            "time" : nowtime(),
+            "req_headers": str(headers),
+            "req_data": str(data).encode('utf8')
+        })
+        doc.vfd_status = "Failed"
+        doc.db_update()
+        frappe.db.commit()
+        return "Failed"
+
     xmldict = xml_to_dic(response.text)
     rctack = xmldict.get("rctack")
     posting_info_doc = frappe.get_doc({
@@ -136,11 +209,12 @@ def posting_vfd_invoice(kwargs):
         doc.vfd_status = "Success"
         doc.db_update()
         frappe.db.commit()
+        return "Success"
     else:
         doc.vfd_status = "Failed"
         doc.db_update()
         frappe.db.commit()
-
+        return "Failed"
 
 
 
@@ -156,12 +230,20 @@ def get_customer_id_info(customer):
         data["cust_id"] = cust_id
         data["cust_id_type"] = int(cust_id_type[:1])
     
-    data["mobile_no"] = int(mobile_no or 0)
+    data["mobile_no"] = mobile_no or ""
     return data
 
 
-def get_item_taxcode(item_tax_template = None):
-    taxcode = 0
+def get_item_taxcode(item_tax_template=None, item_code=None, invoice_name=None):
+    if not item_tax_template:
+        if item_code and invoice_name:
+            frappe.throw(_("Item Taxes Template not set for item {0} in invoice {1}".format(item_code, invoice_name)))
+        elif item_code:
+            frappe.throw(_("Item Taxes Template not set for item {0}".format(item_code)))
+        else:
+            frappe.throw(_("Item Taxes Template not set"))
+
+    taxcode = None
     if item_tax_template:
         vfd_taxcode = frappe.get_value("Item Tax Template", item_tax_template, "vfd_taxcode")
         if vfd_taxcode:
@@ -169,17 +251,6 @@ def get_item_taxcode(item_tax_template = None):
         else:
             frappe.throw(_("VFD Tax Code not setup in {0}".format(item_tax_template)))
     return taxcode
-
-
-def get_vatrate(taxes_and_charges = None):
-    vatrate = ""
-    if taxes_and_charges:
-        vfd_vatrate = frappe.get_value("Sales Taxes and Charges Template", taxes_and_charges, "vfd_vatrate")
-        if vfd_vatrate:
-            vatrate = vfd_vatrate[:1]
-        else:
-            frappe.throw(_("VFD VAT Rate not setup in {0}".format(taxes_and_charges)))
-    return vatrate
 
 
 def get_payments(payments, base_total):
@@ -201,19 +272,86 @@ def get_payments(payments, base_total):
     return payments_dict
 
 
+def get_vattotals(items, invoice_name):
+    vattotals = {}
+    for item in items:
+        item_taxcode = get_item_taxcode(item.item_tax_template, item.item_code, invoice_name)
+        if not vattotals.get(item_taxcode):
+            vattotals[item_taxcode] = {}
+            vattotals[item_taxcode]["NETTAMOUNT"] = 0
+            vattotals[item_taxcode]["TAXAMOUNT"] = 0
+        vattotals[item_taxcode]["NETTAMOUNT"] += flt(item.base_net_amount, 2)
+        vattotals[item_taxcode]["TAXAMOUNT"] += flt(item.base_net_amount * ( (18 /100) if item_taxcode == 1 else 0), 2)
 
-def posting_all_vfd_invoices():
-    invoices_list = frappe.get_all("Sales Invoice", filters = {
-        "docstatus": 1,
-        "vfd_posting_info": ["in", ["", None]],
-        "vfd_rctnum": ["not in", ["", None]]
-    })
-    for invoice in invoices_list:
-        count_list = frappe.get_all("VFD Invoice Posting Info", filters= {"sales_invoice": invoice.name})
-        if len(count_list) < 6:
-            enqueue_posting_vfd_invoice(invoice.name)
-    
+    taxes_map = {
+        "1": "A",
+        "2": "B",
+        "3": "C",
+        "4": "D",
+        "5": "E"
+    }
+
+    vattotals_list = []
+    for key, value in vattotals.items():
+        vattotals_list.append({"VATRATE": taxes_map.get(str(key))})
+        vattotals_list.append({"NETTAMOUNT": flt(value["NETTAMOUNT"], 2)})
+        vattotals_list.append({"TAXAMOUNT": flt(value["TAXAMOUNT"], 2)})
+    return vattotals_list
+
 
 def validate_cancel(doc, method):
     if doc.vfd_rctnum:
         frappe.throw(_("This invoice cannot be canceled"))
+
+
+def get_itemised_tax_breakup_html(doc):
+    if not doc.taxes:
+        return
+
+    itemised_tax = get_itemised_tax_breakup_data(doc)
+    get_rounded_tax_amount(itemised_tax, doc.precision("tax_amount", "taxes"))
+    return itemised_tax
+
+
+@erpnext.allow_regional
+def get_itemised_tax_breakup_data(doc):
+	itemised_tax = get_itemised_tax(doc.taxes)
+	return itemised_tax
+
+
+def get_itemised_tax(taxes, with_tax_account=False):
+	itemised_tax = {}
+	for tax in taxes:
+		if getattr(tax, "category", None) and tax.category=="Valuation":
+			continue
+
+		item_tax_map = json.loads(tax.item_wise_tax_detail) if tax.item_wise_tax_detail else {}
+		if item_tax_map:
+			for item_code, tax_data in item_tax_map.items():
+				itemised_tax.setdefault(item_code, frappe._dict())
+
+				tax_rate = 0.0
+				tax_amount = 0.0
+
+				if isinstance(tax_data, list):
+					tax_rate = flt(tax_data[0])
+					tax_amount = flt(tax_data[1])
+				else:
+					tax_rate = flt(tax_data)
+
+				itemised_tax[item_code][tax.description] = frappe._dict(dict(
+					tax_rate = tax_rate,
+					tax_amount = tax_amount
+				))
+
+				if with_tax_account:
+					itemised_tax[item_code][tax.description].tax_account = tax.account_head
+
+	return itemised_tax
+
+
+def get_rounded_tax_amount(itemised_tax, precision):
+	# Rounding based on tax_amount precision
+	for taxes in itemised_tax.values():
+		for tax_account in taxes:
+			taxes[tax_account]["tax_amount"] = flt(taxes[tax_account]["tax_amount"], precision)

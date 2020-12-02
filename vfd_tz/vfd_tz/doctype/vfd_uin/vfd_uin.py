@@ -16,10 +16,20 @@ class VFDUIN(Document):
 def get_counters(company):
 	doc = ""
 	if not frappe.db.exists("VFD UIN", company):
+		doc_list = doc_list = frappe.get_all("VFD Registration", 
+		filters = {
+			"docstatus": 1,
+			"company": company,
+			"r_status": "Active"
+		})
+		if not len(doc_list):
+			frappe.throw(_("There no active VFD Registration for company ") + company)
+		gc = frappe.get_value("VFD Registration", doc_list[0].name, "gc") or 0
+
 		doc = frappe.get_doc({
 			"doctype" : "VFD UIN",
 			"company": company,
-			"gc": 0,
+			"gc": gc,
 			"dc": 0,
 			"dc_date" : nowdate()
 		})
