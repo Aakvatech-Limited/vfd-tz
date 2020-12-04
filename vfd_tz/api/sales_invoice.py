@@ -17,7 +17,7 @@ import json
 
 
 def vfd_validation(doc, method):
-    if doc.base_net_amount == 0:
+    if doc.base_net_total == 0:
         frappe.throw(_("Base net amount is zero. Correct the invoice and retry."))
 
     tax_data = get_itemised_tax_breakup_html(doc)
@@ -77,23 +77,54 @@ def posting_all_vfd_invoices():
     if frappe.local.flags.vfd_posting:
         return
     frappe.local.flags.vfd_posting = True
-    invoices_list = frappe.get_all("Sales Invoice", 
-        filters = {
-            "docstatus": 1,
-            "is_return": 0,
-            "vfd_posting_info": ["in", ["", None]],
-            "vfd_status": ["in", ["Failed", "Pending"]]
-        },
-        order_by='vfd_rctnum ASC',
-    )
-    for invoice in invoices_list:
-        status = posting_vfd_invoice(invoice.name)
-        if status != "Success":
-            frappe.local.flags.vfd_posting = False
-            frappe.throw(_("Error in sending VFD Invoice {0}").format(invoice.name))
-            break
-    frappe.local.flags.vfd_posting = False
-    
+    company_list= frappe.get_all("Company")
+    for company in company_list:
+        invoices_list = frappe.get_all("Sales Invoice", 
+            filters = {
+                "docstatus": 1,
+                "is_return": 0,
+                "company": company.name,
+                "vfd_posting_info": ["in", ["", None]],
+                "vfd_status": ["in", ["Failed", "Pending"]]
+            },
+            fields = {"name","vfd_rctnum","vfd_gc"},
+            order_by='vfd_gc ASC',
+        )
+        last_invoices_list = frappe.get_all("Sales Invoice", 
+            filters = {
+                "docstatus": 1,
+                "is_return": 0,
+                "company": company.name,
+                "vfd_posting_info": ["not in", ["", None]],
+                "vfd_status": ["in", ["Success"]]
+            },
+            fields = {"name","vfd_rctnum","vfd_gc"},
+            page_length=10,
+            order_by='vfd_gc DESC',
+        )
+
+        first_to_send_gc = 0
+        last_sent_success_gc = 0
+
+        if len(invoices_list) > 0:
+            first_to_send_gc = invoices_list[0].get("vfd_gc")
+        else:
+            continue
+        if len(last_invoices_list) > 0: 
+            last_sent_success_gc = last_invoices_list[0].get("vfd_gc")
+        
+        if last_sent_success_gc + 1 != first_to_send_gc:
+            frappe.throw(_("Invoice sequence out of order. Last GC Sent Seuccessfully is {0}. First to send GC is {1}. Check failed VFD Invoice Posting Info").format(last_sent_success_gc, first_to_send_gc))
+
+
+        for invoice in invoices_list:
+            status = posting_vfd_invoice(invoice.name)
+            if status != "Success":
+                frappe.local.flags.vfd_posting = False
+                frappe.throw(_("Error in sending VFD Invoice {0}").format(invoice.name))
+                break
+        frappe.local.flags.vfd_posting = False
+        
 
 def posting_vfd_invoice(invoice_name):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
