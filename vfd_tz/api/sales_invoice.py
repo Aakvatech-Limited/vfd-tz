@@ -17,11 +17,16 @@ import json
 
 
 def vfd_validation(doc, method):
+    if doc.base_net_amount == 0:
+        frappe.throw(_("Base net amount is zero. Correct the invoice and retry."))
+
     tax_data = get_itemised_tax_breakup_html(doc)
     if not tax_data:
-            frappe.throw(_("Taxes not set correctly"))
+        frappe.throw(_("Taxes not set correctly"))
 
     for item in doc.items:
+        if not item.item_code:
+            frappe.throw(_("Item Code not set for item {0}".format(item.item_name)))
         if not item.item_tax_template:
             frappe.throw(_("Item Taxes Template not set for item {0}".format(item.item_code)))
         item_taxcode = get_item_taxcode(item.item_tax_template, item.item_code, doc.name)
