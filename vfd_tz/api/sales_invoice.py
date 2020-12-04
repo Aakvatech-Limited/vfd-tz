@@ -79,7 +79,7 @@ def posting_all_vfd_invoices():
             "vfd_posting_info": ["in", ["", None]],
             "vfd_status": ["in", ["Failed", "Pending"]]
         },
-        order_by='vfd_rcvnum ASC',
+        order_by='vfd_rctnum ASC',
     )
     for invoice in invoices_list:
         status = posting_vfd_invoice(invoice.name)
