@@ -65,3 +65,16 @@ def get_p12_certificate(registration_doc):
 
 def remove_special_characters(text):
     return re.sub('[^A-Za-z0-9 ]+', '', text)
+
+
+def get_latest_registration_doc(company):
+    doc_list = frappe.get_all("VFD Registration", filters = {
+        "docstatus": 1,
+        "company": company,
+        "r_status": "Active"
+        }
+    )
+    if not len(doc_list):
+        frappe.throw(_("There no active VFD Registration for company ") + company)
+    doc = frappe.get_doc("VFD Registration", doc_list[0].name)
+    return doc

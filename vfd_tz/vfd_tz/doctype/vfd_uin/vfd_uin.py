@@ -7,6 +7,7 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import nowdate, getdate
 from frappe import _
+from api.utlis import get_latest_registration_doc
 
 class VFDUIN(Document):
 	def on_trash(self):
@@ -16,16 +17,8 @@ class VFDUIN(Document):
 def get_counters(company):
 	doc = ""
 	if not frappe.db.exists("VFD UIN", company):
-		doc_list = doc_list = frappe.get_all("VFD Registration", 
-		filters = {
-			"docstatus": 1,
-			"company": company,
-			"r_status": "Active"
-		})
-		if not len(doc_list):
-			frappe.throw(_("There no active VFD Registration for company ") + company)
-		gc = frappe.get_value("VFD Registration", doc_list[0].name, "gc") or 0
-
+		registration_doc = get_latest_registration_doc(company)
+		gc = registration_doc.gc or 0
 		doc = frappe.get_doc({
 			"doctype" : "VFD UIN",
 			"company": company,

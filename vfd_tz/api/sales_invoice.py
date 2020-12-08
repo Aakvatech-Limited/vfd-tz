@@ -7,7 +7,7 @@ import frappe, erpnext
 from frappe import _
 from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from api.xml import xml_to_dic, dict_to_xml
-from api.utlis import get_signature, remove_special_characters
+from api.utlis import get_signature, remove_special_characters, get_latest_registration_doc
 import requests
 from frappe.utils import flt, nowdate, nowtime, format_datetime
 from vfd_tz.vfd_tz.doctype.vfd_uin.vfd_uin import get_counters
@@ -53,8 +53,7 @@ def enqueue_posting_vfd_invoice(invoice_name):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
     if doc.is_return:
         return
-    token_data = get_token(doc.company)
-    registration_doc = token_data.get("doc")
+    registration_doc = get_latest_registration_doc(doc.company)
     if not doc.vfd_rctnum:
         counters = get_counters(doc.company)
         doc.vfd_gc = counters.gc
