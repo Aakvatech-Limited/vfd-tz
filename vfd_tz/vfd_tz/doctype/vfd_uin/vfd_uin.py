@@ -34,7 +34,7 @@ def get_counters(company):
 			"dc_date" : nowdate()
 		})
 		doc.insert(ignore_permissions=True)
-		frappe.db.commit()
+		doc.save()
 		doc.reload()
 	else:
 		doc = frappe.get_doc("VFD UIN", company)
@@ -46,5 +46,5 @@ def get_counters(company):
 	doc.dc += 1
 	doc.gc += 1
 	doc.save()
-	frappe.db.commit()
+	doc.reload()
 	return doc
