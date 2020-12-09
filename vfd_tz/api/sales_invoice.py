@@ -78,6 +78,9 @@ def posting_all_vfd_invoices():
     frappe.local.flags.vfd_posting = True
     company_list= frappe.get_all("Company")
     for company in company_list:
+        registration_doc = get_latest_registration_doc(company)
+        if registration_doc.do_not_send_vfd:
+            continue
         invoices_list = frappe.get_all("Sales Invoice", 
             filters = {
                 "docstatus": 1,
@@ -89,6 +92,7 @@ def posting_all_vfd_invoices():
             fields = {"name","vfd_rctnum","vfd_gc"},
             order_by='vfd_gc ASC',
         )
+        # Find out last invoice to ensure next GC is correctly sent
         last_invoices_list = frappe.get_all("Sales Invoice", 
             filters = {
                 "docstatus": 1,
@@ -143,18 +147,6 @@ def posting_vfd_invoice(invoice_name):
         'Authorization': token_data["token"]
     }
     customer_id_info = get_customer_id_info(doc.customer)
-    
-    if not doc.vfd_date or not doc.vfd_time:
-        doc.vfd_date = nowdate()
-        doc.vfd_time = nowtime()
-        doc.db_update()
-        frappe.db.commit()
-        doc.reload()
-    if not doc.vfd_rctvnum:
-        doc.vfd_rctvnum =str(registration_doc.receiptcode) + str(doc.vfd_gc)
-        doc.db_update()
-        frappe.db.commit()
-        doc.reload()
 
     rect_data = {
         "DATE": doc.vfd_date,
@@ -169,8 +161,8 @@ def posting_vfd_invoice(invoice_name):
         "RCTNUM": doc.vfd_gc,
         "DC": doc.vfd_dc,
         "GC": doc.vfd_gc,
-        "ZNUM": str(doc.posting_date).replace("-", ""),
-        "RCTVNUM": str(registration_doc.receiptcode) + str(doc.vfd_gc),
+        "ZNUM": format_datetime(str(doc.vfd_date), "YYYYMMDD"),
+        "RCTVNUM": doc.vfd_rctvnum,
         "ITEMS": [],
         "TOTALS": {
             "TOTALTAXEXCL": flt(doc.base_net_total,2),

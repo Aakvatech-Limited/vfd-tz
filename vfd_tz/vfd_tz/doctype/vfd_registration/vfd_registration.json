@@ -7,6 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "r_status",
+  "column_break_2",
+  "do_not_send_vfd",
   "section_break_2",
   "company",
   "url",
@@ -264,10 +266,21 @@
    "fieldtype": "Data",
    "label": "Cert Serial",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "do_not_send_vfd",
+   "fieldtype": "Check",
+   "label": "Do not send VFD"
   }
  ],
  "is_submittable": 1,
- "modified": "2020-11-28 01:18:32.406537",
+ "modified": "2020-12-09 16:02:27.070908",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Registration",
