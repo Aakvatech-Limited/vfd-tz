@@ -154,8 +154,8 @@ def posting_vfd_invoice(invoice_name):
         "TIN": registration_doc.tin,
         "REGID": registration_doc.regid,
         "EFDSERIAL": registration_doc.serial,
-        "CUSTIDTYPE": customer_id_info["cust_id_type"],
-        "CUSTID": customer_id_info["cust_id"],
+        "CUSTIDTYPE": doc.vfd_cust_id_type,
+        "CUSTID": doc.vfd_cust_id,
         "CUSTNAME": remove_special_characters(doc.customer),
         "MOBILENUM": customer_id_info["mobile_no"],
         "RCTNUM": doc.vfd_gc,
@@ -195,7 +195,7 @@ def posting_vfd_invoice(invoice_name):
         "EFDMSSIGNATURE": get_signature(rect_data_xml, registration_doc)
     }
     data = dict_to_xml(efdms_data).replace("<None>", "").replace("</None>", "")
-    url = registration_doc.url + "/efdmsRctApi/api/efdmsRctInfo"
+    url = registration_doc.url + "/efdmsRctApi/api/efdmsRctInfo111"
     response = requests.request("POST", url, headers=headers, data = data, timeout=5)
     
     if not response.status_code == 200:
