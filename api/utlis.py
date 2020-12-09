@@ -75,6 +75,7 @@ def get_latest_registration_doc(company):
         }
     )
     if not len(doc_list):
-        frappe.throw(_("There no active VFD Registration for company ") + company)
+        frappe.log_error(_("There no active VFD Registration for company ") + company)
+        return
     doc = frappe.get_doc("VFD Registration", doc_list[0].name)
     return doc

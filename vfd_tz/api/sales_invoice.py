@@ -78,7 +78,9 @@ def posting_all_vfd_invoices():
     frappe.local.flags.vfd_posting = True
     company_list= frappe.get_all("Company")
     for company in company_list:
-        registration_doc = get_latest_registration_doc(company)
+        registration_doc = get_latest_registration_doc(company["name"])
+        if not registration_doc:
+            continue
         if registration_doc.do_not_send_vfd:
             continue
         invoices_list = frappe.get_all("Sales Invoice", 
@@ -117,7 +119,7 @@ def posting_all_vfd_invoices():
             last_sent_success_gc = last_invoices_list[0].get("vfd_gc")
         
         if last_sent_success_gc + 1 != first_to_send_gc:
-            frappe.throw(_("Invoice sequence out of order. Last GC Sent Seuccessfully is {0}. First to send GC is {1}. Check failed VFD Invoice Posting Info").format(last_sent_success_gc, first_to_send_gc))
+            frappe.throw(_("Invoice sequence out of order. Last GC Sent Successfully is {0}. First to send GC is {1}. Check failed VFD Invoice Posting Info").format(last_sent_success_gc, first_to_send_gc))
 
 
         for invoice in invoices_list:
@@ -154,7 +156,7 @@ def posting_vfd_invoice(invoice_name):
         "TIN": registration_doc.tin,
         "REGID": registration_doc.regid,
         "EFDSERIAL": registration_doc.serial,
-        "CUSTIDTYPE": doc.vfd_cust_id_type,
+        "CUSTIDTYPE": int(doc.vfd_cust_id_type[:1]),
         "CUSTID": doc.vfd_cust_id,
         "CUSTNAME": remove_special_characters(doc.customer),
         "MOBILENUM": customer_id_info["mobile_no"],
@@ -195,7 +197,7 @@ def posting_vfd_invoice(invoice_name):
         "EFDMSSIGNATURE": get_signature(rect_data_xml, registration_doc)
     }
     data = dict_to_xml(efdms_data).replace("<None>", "").replace("</None>", "")
-    url = registration_doc.url + "/efdmsRctApi/api/efdmsRctInfo111"
+    url = registration_doc.url + "/efdmsRctApi/api/efdmsRctInfo"
     response = requests.request("POST", url, headers=headers, data = data, timeout=5)
     
     if not response.status_code == 200:
