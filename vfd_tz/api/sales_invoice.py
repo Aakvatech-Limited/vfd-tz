@@ -163,7 +163,7 @@ def posting_vfd_invoice(invoice_name):
         "RCTNUM": doc.vfd_gc,
         "DC": doc.vfd_dc,
         "GC": doc.vfd_gc,
-        "ZNUM": format_datetime(str(doc.vfd_date), "YYYYMMDD"),
+        "ZNUM": format_datetime(str(doc.vfd_date), "YYYYMMdd"),
         "RCTVNUM": doc.vfd_rctvnum,
         "ITEMS": [],
         "TOTALS": {
