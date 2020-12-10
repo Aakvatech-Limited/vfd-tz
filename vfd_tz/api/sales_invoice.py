@@ -149,6 +149,14 @@ def posting_vfd_invoice(invoice_name):
         'Authorization': token_data["token"]
     }
     customer_id_info = get_customer_id_info(doc.customer)
+    if not doc.vfd_cust_id:
+        vfd_cust_id_type = str(customer_id_info["cust_id_type"])
+        vfd_cust_id = customer_id_info["cust_id"]
+    elif doc.vfd_cust_id and not doc.vfd_cust_id_type:
+        frappe.throw(_("Please make sure to set VFD Customer ID Type in Customer Master"))
+    else:
+        vfd_cust_id_type = doc.vfd_cust_id_type
+        vfd_cust_id = doc.vfd_cust_id
 
     rect_data = {
         "DATE": doc.vfd_date,
@@ -156,8 +164,8 @@ def posting_vfd_invoice(invoice_name):
         "TIN": registration_doc.tin,
         "REGID": registration_doc.regid,
         "EFDSERIAL": registration_doc.serial,
-        "CUSTIDTYPE": int(doc.vfd_cust_id_type[:1]),
-        "CUSTID": doc.vfd_cust_id,
+        "CUSTIDTYPE": int(vfd_cust_id_type[:1]),
+        "CUSTID": vfd_cust_id,
         "CUSTNAME": remove_special_characters(doc.customer),
         "MOBILENUM": customer_id_info["mobile_no"],
         "RCTNUM": doc.vfd_gc,
