@@ -18,6 +18,7 @@
   "certkey",
   "certificate_password",
   "certificate",
+  "verification_url_path",
   "section_break_11",
   "ackcode",
   "ackmsg",
@@ -277,10 +278,17 @@
    "fieldname": "do_not_send_vfd",
    "fieldtype": "Check",
    "label": "Do not send VFD"
+  },
+  {
+   "default": "/",
+   "fieldname": "verification_url_path",
+   "fieldtype": "Data",
+   "label": "Verification URL Path",
+   "reqd": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2020-12-09 16:02:27.070908",
+ "modified": "2020-12-11 18:38:00.028804",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Registration",

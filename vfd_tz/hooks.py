@@ -148,6 +148,7 @@ fixtures = [
 		"Sales Invoice-column_break_vfd",
 		"Sales Invoice-vfd_cust_id_type",
 		"Sales Invoice-vfd_cust_id",
+		"Sales Invoice-vfd_verification_url",
 	)]]},
 	{"doctype":"Property Setter", "filters": [["name", "in", (
 	
