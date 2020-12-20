@@ -200,7 +200,7 @@ def posting_vfd_invoice(invoice_name):
         "EFDMSSIGNATURE": get_signature(rect_data_xml, registration_doc)
     }
     data = dict_to_xml(efdms_data).replace("<None>", "").replace("</None>", "")
-    url = registration_doc.url + "/efdmsRctApi/api/efdmsRctInfo"
+    url = registration_doc.url + "/api/efdmsRctInfo"
     response = requests.request("POST", url, headers=headers, data = data, timeout=5)
     
     if not response.status_code == 200:

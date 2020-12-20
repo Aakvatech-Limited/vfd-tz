@@ -35,7 +35,7 @@ def get_token(company):
 		token_data["token"] = "bearer " + token_list[0]["access_token"] 
 	
 	else:
-		url = doc.url + "/efdmsRctApi/vfdtoken"
+		url = doc.url + "/vfdtoken"
 		data = {
 			'Username': doc.get_password('username'),
 			'Password': doc.get_password('password'),

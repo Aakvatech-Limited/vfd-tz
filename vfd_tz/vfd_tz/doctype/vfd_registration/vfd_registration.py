@@ -69,7 +69,7 @@ def get_registration(doc):
 	data = "<REGDATA><TIN>{0}</TIN><CERTKEY>{1}</CERTKEY></REGDATA>".format(doc.tin, doc.get_password('certkey'))
 	signenature = get_signature(data, doc)
 	extend_data ="<?xml version=\"1.0\" encoding=\"UTF-8\"?><EFDMS>{0}<EFDMSSIGNATURE>{1}</EFDMSSIGNATURE></EFDMS>".format(data, signenature)
-	url = doc.url + "/efdmsRctApi/api/vfdRegReq"
+	url = doc.url + "/api/vfdRegReq"
 	cert_serial = to_base64(doc.cert_serial)
 	headers = {
 		'Content-Type': 'application/xml',
