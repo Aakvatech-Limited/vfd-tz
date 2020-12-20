@@ -280,7 +280,7 @@
    "label": "Do not send VFD"
   },
   {
-   "default": "/",
+   "default": "https://verify.tra.go.tz/",
    "fieldname": "verification_url_path",
    "fieldtype": "Data",
    "label": "Verification URL Path",
@@ -288,7 +288,7 @@
   }
  ],
  "is_submittable": 1,
- "modified": "2020-12-11 19:06:26.383680",
+ "modified": "2020-12-20 23:37:15.441668",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Registration",

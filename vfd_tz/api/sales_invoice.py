@@ -61,7 +61,7 @@ def enqueue_posting_vfd_invoice(invoice_name):
         doc.vfd_date = nowdate()
         doc.vfd_time = nowtime()
         doc.vfd_rctvnum =str(registration_doc.receiptcode) + str(doc.vfd_gc)
-        doc.vfd_verification_url = registration_doc.url + registration_doc.verification_url_path + doc.vfd_rctvnum
+        doc.vfd_verification_url = registration_doc.verification_url_path + doc.vfd_rctvnum
         if doc.vfd_status == "Not Sent":
             doc.vfd_status = "Pending"
         doc.db_update()
