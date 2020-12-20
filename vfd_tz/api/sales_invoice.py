@@ -15,7 +15,6 @@ from frappe.utils.background_jobs import enqueue
 import json
 
 
-
 def vfd_validation(doc, method):
     if doc.base_net_total == 0:
         frappe.throw(_("Base net amount is zero. Correct the invoice and retry."))
@@ -193,11 +192,6 @@ def posting_vfd_invoice(invoice_name):
             "AMT": flt(item.base_net_amount,2)
         }
         rect_data["ITEMS"].append({"ITEM":item_data})
-
-    rect_data["RCTNUM"] = doc.vfd_gc
-    rect_data["DC"] = doc.vfd_dc
-    rect_data["GC"] = doc.vfd_gc
-    rect_data["RCTVNUM"] = doc.vfd_rctvnum
 
     rect_data_xml = str(dict_to_xml(rect_data, "RCT")[39:]).replace("<None>", "").replace("</None>", "")
 
