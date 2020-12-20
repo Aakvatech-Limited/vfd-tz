@@ -8,6 +8,7 @@
  "field_order": [
   "r_status",
   "column_break_2",
+  "vfd_start_date",
   "do_not_send_vfd",
   "section_break_2",
   "company",
@@ -18,7 +19,7 @@
   "certkey",
   "certificate_password",
   "certificate",
-  "verification_url_path",
+  "verification_url",
   "section_break_11",
   "ackcode",
   "ackmsg",
@@ -277,18 +278,25 @@
    "default": "0",
    "fieldname": "do_not_send_vfd",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Do not send VFD"
   },
   {
+   "fieldname": "vfd_start_date",
+   "fieldtype": "Datetime",
+   "label": "VFD Start Date",
+   "reqd": 1
+  },
+  {
    "default": "https://verify.tra.go.tz/",
-   "fieldname": "verification_url_path",
+   "fieldname": "verification_url",
    "fieldtype": "Data",
-   "label": "Verification URL Path",
+   "label": "Verification URL",
    "reqd": 1
   }
  ],
  "is_submittable": 1,
- "modified": "2020-12-20 23:37:15.441668",
+ "modified": "2020-12-21 01:00:27.821388",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Registration",

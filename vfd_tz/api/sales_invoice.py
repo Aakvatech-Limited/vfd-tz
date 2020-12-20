@@ -53,6 +53,8 @@ def enqueue_posting_vfd_invoice(invoice_name):
     if doc.is_return:
         return
     registration_doc = get_latest_registration_doc(doc.company)
+    if doc.creation < registration_doc.vfd_start_date:
+        frappe.throw(_("Sales Invoice date older than VFD Registration date! Cannot submit VFD to TRA."))
     if not doc.vfd_rctnum:
         counters = get_counters(doc.company)
         doc.vfd_gc = counters.gc
@@ -61,7 +63,7 @@ def enqueue_posting_vfd_invoice(invoice_name):
         doc.vfd_date = nowdate()
         doc.vfd_time = nowtime()
         doc.vfd_rctvnum =str(registration_doc.receiptcode) + str(doc.vfd_gc)
-        doc.vfd_verification_url = registration_doc.verification_url_path + doc.vfd_rctvnum
+        doc.vfd_verification_url = registration_doc.verification_url + doc.vfd_rctvnum
         if doc.vfd_status == "Not Sent":
             doc.vfd_status = "Pending"
         doc.db_update()
