@@ -17,8 +17,13 @@ class VFDUIN(Document):
 def get_counters(company):
 	doc = ""
 	if not frappe.db.exists("VFD UIN", company):
+		gc = 0
 		registration_doc = get_latest_registration_doc(company)
-		gc = registration_doc.gc or 0
+		if registration_doc:
+			# If gc is 1 then leave gc = 0 as the next step will add 1 to it.
+			if registration_doc.gc and registration_doc.gc != 1:
+				gc = registration_doc.gc
+
 		doc = frappe.get_doc({
 			"doctype" : "VFD UIN",
 			"company": company,
@@ -27,7 +32,7 @@ def get_counters(company):
 			"dc_date" : nowdate()
 		})
 		doc.insert(ignore_permissions=True)
-		doc.save()
+		doc.save(ignore_permissions=True)
 		doc.reload()
 	else:
 		doc = frappe.get_doc("VFD UIN", company)
@@ -38,6 +43,6 @@ def get_counters(company):
 	
 	doc.dc += 1
 	doc.gc += 1
-	doc.save()
+	doc.save(ignore_permissions=True)
 	doc.reload()
 	return doc
