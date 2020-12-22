@@ -168,7 +168,7 @@ def posting_vfd_invoice(invoice_name):
         "EFDSERIAL": registration_doc.serial,
         "CUSTIDTYPE": int(vfd_cust_id_type[:1]),
         "CUSTID": vfd_cust_id,
-        "CUSTNAME": doc.customer,
+        "CUSTNAME": remove_special_characters(doc.customer),
         "MOBILENUM": customer_id_info["mobile_no"],
         "RCTNUM": doc.vfd_gc,
         "DC": doc.vfd_dc,
