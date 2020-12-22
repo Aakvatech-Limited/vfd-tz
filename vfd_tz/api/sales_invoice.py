@@ -187,7 +187,7 @@ def posting_vfd_invoice(invoice_name):
 
     for item in doc.items:
         item_data = {
-            "ID": item.item_code,
+            "ID": remove_special_characters(item.item_code),
             "DESC": remove_special_characters(item.item_name),
             "QTY": flt(item.stock_qty,2),
             "TAXCODE": get_item_taxcode(item.item_tax_template, item.item_code, doc.name),  
