@@ -66,6 +66,8 @@ def get_p12_certificate(registration_doc):
 def remove_special_characters(text):
     return re.sub('[^A-Za-z0-9 ]+', '', text)
 
+def remove_all_except_numbers(text):
+    return re.sub('[^0-9]+', '', text)
 
 def get_latest_registration_doc(company):
     doc_list = frappe.get_all("VFD Registration", filters = {

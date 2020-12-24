@@ -7,7 +7,7 @@ import frappe, erpnext
 from frappe import _
 from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from api.xml import xml_to_dic, dict_to_xml
-from api.utlis import get_signature, remove_special_characters, get_latest_registration_doc
+from api.utlis import get_signature, remove_special_characters, get_latest_registration_doc, remove_all_except_numbers
 import requests
 from frappe.utils import flt, nowdate, nowtime, format_datetime
 from vfd_tz.vfd_tz.doctype.vfd_uin.vfd_uin import get_counters
@@ -264,7 +264,7 @@ def get_customer_id_info(customer):
         data["cust_id"] = cust_id
         data["cust_id_type"] = int(cust_id_type[:1])
     
-    data["mobile_no"] = mobile_no or ""
+    data["mobile_no"] = remove_all_except_numbers(mobile_no) or ""
     return data
 
 
