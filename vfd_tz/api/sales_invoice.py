@@ -191,7 +191,7 @@ def posting_vfd_invoice(invoice_name):
             "DESC": remove_special_characters(item.item_name),
             "QTY": flt(item.stock_qty,2),
             "TAXCODE": get_item_taxcode(item.item_tax_template, item.item_code, doc.name),  
-            "AMT": flt(item.base_net_amount,2)
+            "AMT": flt(get_item_inclusive_amount(item),2)
         }
         rect_data["ITEMS"].append({"ITEM":item_data})
 
@@ -346,6 +346,16 @@ def get_itemised_tax_breakup_html(doc):
     get_rounded_tax_amount(itemised_tax, doc.precision("tax_amount", "taxes"))
     return itemised_tax
 
+def get_item_inclusive_amount(item):
+    if item.base_net_amount == item.base_amount:
+        # this is basic rate included
+        item_tax_rate = json.loads(item.item_tax_rate)
+        for key, value in item_tax_rate.items():
+            if not value or value == 0.00:
+                return item.base_amount
+            return (item.base_amount * (1 + (value / 100))) # 118% for 18% VAT
+    else:
+        return item.base_amount
 
 @erpnext.allow_regional
 def get_itemised_tax_breakup_data(doc):
