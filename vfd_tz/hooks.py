@@ -84,7 +84,7 @@ doctype_js = {
 
 doc_events = {
 	"Sales Invoice": {
-		"on_cancel": "vfd_tz.api.sales_invoice.validate_cancel",
+		"before_cancel": "vfd_tz.api.sales_invoice.validate_cancel",
 		"before_submit": "vfd_tz.api.sales_invoice.vfd_validation",
 	},
 }
