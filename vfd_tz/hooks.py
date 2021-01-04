@@ -86,6 +86,7 @@ doc_events = {
 	"Sales Invoice": {
 		"before_cancel": "vfd_tz.api.sales_invoice.validate_cancel",
 		"before_submit": "vfd_tz.api.sales_invoice.vfd_validation",
+		"before_update_after_submit": "vfd_tz.api.sales_invoice.before_update_after_submit",
 	},
 }
 
