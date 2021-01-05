@@ -401,6 +401,7 @@ def get_rounded_tax_amount(itemised_tax, precision):
 			taxes[tax_account]["tax_amount"] = flt(taxes[tax_account]["tax_amount"], precision)
 
 def before_update_after_submit(doc, method):
+    return
     if doc.vfd_status == "Success":
         frappe.throw(_("Cannot change Sales Invoice after VFD Status is Success!"))
 
