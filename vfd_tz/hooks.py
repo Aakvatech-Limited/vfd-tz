@@ -27,8 +27,8 @@ app_license = "MIT"
 
 # include js in doctype views
 doctype_js = {
-    "Sales Invoice" : "api/sales_invoice.js",
-	"Customer" : "api/customer.js"
+    "Sales Invoice": "api/sales_invoice.js",
+    "Customer": "api/customer.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -83,32 +83,33 @@ doctype_js = {
 # Hook on document methods and events
 
 doc_events = {
-	"Sales Invoice": {
-		"before_cancel": "vfd_tz.api.sales_invoice.validate_cancel",
-		"before_submit": "vfd_tz.api.sales_invoice.vfd_validation",
-		"before_update_after_submit": "vfd_tz.api.sales_invoice.before_update_after_submit",
-	},
+    "Sales Invoice": {
+        "on_submit": "vfd_tz.api.sales_invoice.auto_enqueue",
+        "before_cancel": "vfd_tz.api.sales_invoice.validate_cancel",
+        "before_submit": "vfd_tz.api.sales_invoice.vfd_validation",
+        "before_update_after_submit": "vfd_tz.api.sales_invoice.before_update_after_submit",
+    },
 }
 
 # Scheduled Tasks
 # ---------------
 
 scheduler_events = {
-	# "all": [
-	# 	"vfd_tz.tasks.all"
-	# ],
-	# "daily": [
-	# 	"vfd_tz.tasks.daily"
-	# ],
-	"hourly": [
-		"vfd_tz.api.sales_invoice.posting_all_vfd_invoices"
-	],
-	# "weekly": [
-	# 	"vfd_tz.tasks.weekly"
-	# ]
-	# "monthly": [
-	# 	"vfd_tz.tasks.monthly"
-	# ]
+    # "all": [
+    # 	"vfd_tz.tasks.all"
+    # ],
+    # "daily": [
+    # 	"vfd_tz.tasks.daily"
+    # ],
+    "hourly": [
+        "vfd_tz.api.sales_invoice.posting_all_vfd_invoices"
+    ],
+    # "weekly": [
+    # 	"vfd_tz.tasks.weekly"
+    # ]
+    # "monthly": [
+    # 	"vfd_tz.tasks.monthly"
+    # ]
 }
 
 # Testing
@@ -131,27 +132,29 @@ scheduler_events = {
 # }
 
 fixtures = [
-	{"doctype":"Custom Field", "filters": [["name", "in", (
+    {"doctype": "Custom Field", "filters": [["name", "in", (
         "Customer-vfd_custid",
         "Customer-vfd_custidtype",
-		"Mode of Payment-vfd_pmttype",
-		"Sales Taxes and Charges Template-vfd_vatrate",
-		"Item Tax Template-vfd_taxcode",
-		"Sales Invoice-vfd_gc",
-		"Sales Invoice-vfd_dc",
-		"Sales Invoice-vfd_rctnum",
-		"Sales Invoice-vfd_posting_info",
-		"Sales Invoice-vfd_status",
-		"Sales Invoice-vfd_rctvnum",
-		"Sales Invoice-vfd_date",
-		"Sales Invoice-vfd_time",
-		"Sales Invoice-vfd_details",
-		"Sales Invoice-column_break_vfd",
-		"Sales Invoice-vfd_cust_id_type",
-		"Sales Invoice-vfd_cust_id",
-		"Sales Invoice-vfd_verification_url",
-	)]]},
-	{"doctype":"Property Setter", "filters": [["name", "in", (
-	
-	)]]},
+        "Mode of Payment-vfd_pmttype",
+        "Sales Taxes and Charges Template-vfd_vatrate",
+        "Item Tax Template-vfd_taxcode",
+        "Sales Invoice-vfd_gc",
+        "Sales Invoice-vfd_dc",
+        "Sales Invoice-vfd_rctnum",
+        "Sales Invoice-vfd_posting_info",
+        "Sales Invoice-vfd_status",
+        "Sales Invoice-vfd_rctvnum",
+        "Sales Invoice-vfd_date",
+        "Sales Invoice-vfd_time",
+        "Sales Invoice-vfd_details",
+        "Sales Invoice-column_break_vfd",
+        "Sales Invoice-vfd_cust_id_type",
+        "Sales Invoice-vfd_cust_id",
+        "Sales Invoice-vfd_verification_url",
+        "Sales Invoice-is_auto_generate_vfd",
+        "POS Profile-is_auto_generate_vfd",
+    )]]},
+    {"doctype": "Property Setter", "filters": [["name", "in", (
+
+    )]]},
 ]
