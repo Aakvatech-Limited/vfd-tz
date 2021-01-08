@@ -58,7 +58,7 @@ def vfd_validation(doc, method):
 @frappe.whitelist()
 def enqueue_posting_vfd_invoice(invoice_name):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
-    if doc.is_return:
+    if doc.is_return or doc.is_not_vfd_invoice:
         return
     registration_doc = get_latest_registration_doc(doc.company)
     if doc.creation < registration_doc.vfd_start_date:

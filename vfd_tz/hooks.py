@@ -153,6 +153,8 @@ fixtures = [
         "Sales Invoice-vfd_verification_url",
         "Sales Invoice-is_auto_generate_vfd",
         "POS Profile-is_auto_generate_vfd",
+        "Sales Invoice-is_not_vfd_invoice",
+        "POS Profile-is_not_vfd_invoice",
     )]]},
     {"doctype": "Property Setter", "filters": [["name", "in", (
 
