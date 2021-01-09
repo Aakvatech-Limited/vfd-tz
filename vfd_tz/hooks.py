@@ -155,6 +155,7 @@ fixtures = [
         "POS Profile-is_auto_generate_vfd",
         "Sales Invoice-is_not_vfd_invoice",
         "POS Profile-is_not_vfd_invoice",
+        "Sales Invoice-default_item_discount",
     )]]},
     {"doctype": "Property Setter", "filters": [["name", "in", (
 
