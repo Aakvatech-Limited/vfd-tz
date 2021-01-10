@@ -24,11 +24,4 @@ frappe.ui.form.on("Sales Invoice", {
             );
         }
     },
-    default_item_discount: function (frm) {
-        frm.doc.items.forEach(item => {
-            if (item.discount_percentage) {
-                frappe.model.set_value(item.doctype, item.name, 'discount_percentage', frm.doc.default_item_discount);
-            }
-        });
-    },
 });
