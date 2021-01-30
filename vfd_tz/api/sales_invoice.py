@@ -200,16 +200,25 @@ def posting_vfd_invoice(invoice_name):
         "PAYMENTS": get_payments(doc.payments, doc.base_total),
         "VATTOTALS": get_vattotals(doc.items, doc.name),
     }
-
+    use_item_group = registration_doc.registration_doc
     for item in doc.items:
         item_data = {
-            "ID": remove_special_characters(item.item_code),
-            "DESC": remove_special_characters(item.item_name),
+            "ID": remove_special_characters(item.item_group if use_item_group else item.item_code),
+            "DESC": remove_special_characters(item.item_group if use_item_group else item.item_name),
             "QTY": flt(item.stock_qty, 2),
             "TAXCODE": get_item_taxcode(item.item_tax_template, item.item_code, doc.name),
             "AMT": flt(get_item_inclusive_amount(item), 2)
         }
-        rect_data["ITEMS"].append({"ITEM": item_data})
+        if use_item_group:
+            found_item = next(
+                i for i in rect_data["ITEMS"] if i["TAXCODE"] == item_data["TAXCODE"] and i["ID"] == item_data["ID"])
+            if found_item:
+                found_item["QTY"] += item_data["TAXCODE"]
+                found_item["AMT"] += item_data["AMT"]
+            else:
+                rect_data["ITEMS"].append({"ITEM": item_data})
+        else:
+            rect_data["ITEMS"].append({"ITEM": item_data})
 
     rect_data_xml = str(dict_to_xml(rect_data, "RCT")[39:]).replace(
         "<None>", "").replace("</None>", "")
