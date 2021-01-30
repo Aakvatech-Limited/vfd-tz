@@ -200,7 +200,7 @@ def posting_vfd_invoice(invoice_name):
         "PAYMENTS": get_payments(doc.payments, doc.base_total),
         "VATTOTALS": get_vattotals(doc.items, doc.name),
     }
-    use_item_group = registration_doc.registration_doc
+    use_item_group = registration_doc.use_item_group
     for item in doc.items:
         item_data = {
             "ID": remove_special_characters(item.item_group if use_item_group else item.item_code),
@@ -213,9 +213,10 @@ def posting_vfd_invoice(invoice_name):
             found_item = next(
                 i for i in rect_data["ITEMS"] if i["TAXCODE"] == item_data["TAXCODE"] and i["ID"] == item_data["ID"])
             if found_item:
-                found_item["QTY"] += item_data["TAXCODE"]
+                found_item["QTY"] = 1
                 found_item["AMT"] += item_data["AMT"]
             else:
+                item_data["QTY"] = 1
                 rect_data["ITEMS"].append({"ITEM": item_data})
         else:
             rect_data["ITEMS"].append({"ITEM": item_data})
