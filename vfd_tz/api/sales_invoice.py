@@ -211,7 +211,10 @@ def posting_vfd_invoice(invoice_name):
         }
         if use_item_group:
             found_item = next(
-                i for i in rect_data["ITEMS"] if i["TAXCODE"] == item_data["TAXCODE"] and i["ID"] == item_data["ID"])
+                (i for i in rect_data["ITEMS"] if i["TAXCODE"] ==
+                 item_data["TAXCODE"] and i["ID"] == item_data["ID"]),
+                ""
+            )
             if found_item:
                 found_item["QTY"] = 1
                 found_item["AMT"] += item_data["AMT"]
