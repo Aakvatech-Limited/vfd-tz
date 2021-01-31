@@ -210,11 +210,11 @@ def posting_vfd_invoice(invoice_name):
             "AMT": flt(get_item_inclusive_amount(item), 2)
         }
         if use_item_group:
-            found_item = next(
-                (i for i in rect_data["ITEMS"] if i["TAXCODE"] ==
-                 item_data["TAXCODE"] and i["ID"] == item_data["ID"]),
-                ""
-            )
+            found_item = ""
+            for i in rect_data["ITEMS"]:
+                if i["ITEM"]["TAXCODE"] == item_data["TAXCODE"] and i["ITEM"]["ID"] == item_data["ID"]:
+                    found_item = i["ITEM"]
+                    break
             if found_item:
                 found_item["QTY"] = 1
                 found_item["AMT"] += item_data["AMT"]
