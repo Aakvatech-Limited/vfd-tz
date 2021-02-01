@@ -63,7 +63,10 @@ def enqueue_posting_vfd_invoice(invoice_name):
     registration_doc = get_latest_registration_doc(doc.company)
     if doc.creation < registration_doc.vfd_start_date:
         frappe.throw(
-            _("Sales Invoice date older than VFD Registration date! Cannot submit VFD to TRA."))
+            _("Sales Invoice creation older than VFD Registration date! Cannot submit VFD to TRA."))
+    if doc.posting_date < registration_doc.vfd_start_date.date():
+        frappe.throw(
+            _("Sales Invoice posting date older than VFD Registration date! Cannot submit VFD to TRA."))
     if not doc.vfd_rctnum:
         counters = get_counters(doc.company)
         doc.vfd_gc = counters.gc
