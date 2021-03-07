@@ -399,10 +399,10 @@ def get_item_inclusive_amount(item):
         item_tax_rate = json.loads(item.item_tax_rate)
         for key, value in item_tax_rate.items():
             if not value or value == 0.00:
-                return item.base_amount
-            return (item.base_amount * (1 + (value / 100)))  # 118% for 18% VAT
+                return flt(item.base_amount, 2)
+            return flt(item.base_amount * (1 + (value / 100))), 2)  # 118% for 18% VAT
     else:
-        return item.base_amount
+        return flt(item.base_amount, 2)
 
 
 @erpnext.allow_regional
