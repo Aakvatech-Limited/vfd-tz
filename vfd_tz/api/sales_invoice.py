@@ -14,6 +14,7 @@ from frappe.utils import flt, nowdate, nowtime, format_datetime
 from vfd_tz.vfd_tz.doctype.vfd_uin.vfd_uin import get_counters
 from frappe.utils.background_jobs import enqueue
 import json
+import time
 
 
 def vfd_validation(doc, method):
@@ -80,7 +81,7 @@ def enqueue_posting_vfd_invoice(invoice_name):
             doc.vfd_status = "Pending"
         doc.db_update()
         frappe.db.commit()
-    frappe.msgprint(_("Start Sending Invoices to VFD"), alert=True)
+        frappe.msgprint(_("Registered Invoice to be sent to TRA VFD System"), alert=True)
     if not frappe.local.flags.vfd_posting:
         enqueue(method=posting_all_vfd_invoices,
                 queue='short', timeout=10000, is_async=True)
