@@ -81,7 +81,7 @@ def enqueue_posting_vfd_invoice(invoice_name):
             doc.vfd_status = "Pending"
         doc.db_update()
         frappe.db.commit()
-        frappe.msgprint(_("Registered Invoice to be sent to TRA VFD System"), alert=True)
+        frappe.msgprint(_("Registered Invoice to be sent to TRA VFD System"))
     if not frappe.local.flags.vfd_posting:
         enqueue(method=posting_all_vfd_invoices,
                 queue='short', timeout=10000, is_async=True)
