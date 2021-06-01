@@ -1,0 +1,38 @@
+{
+ "actions": [],
+ "creation": "2021-05-26 19:29:54.333778",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "pmttype",
+  "pmtamount"
+ ],
+ "fields": [
+  {
+   "fieldname": "pmttype",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "PMTTYPE",
+   "options": "CASH\nCHEQUE\nCCARD\nEMONEY\nINVOICE"
+  },
+  {
+   "description": "TOTAL sales of all receipts paid by PMTTYPE",
+   "fieldname": "pmtamount",
+   "fieldtype": "Currency",
+   "label": "PMTAMOUNT"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2021-05-26 19:29:54.333778",
+ "modified_by": "Administrator",
+ "module": "vfd-tz",
+ "name": "VFD Z Report Payments",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

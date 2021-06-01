@@ -1,0 +1,43 @@
+{
+ "actions": [],
+ "creation": "2021-05-26 19:27:58.109093",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "vatrate",
+  "nettamount",
+  "taxamount"
+ ],
+ "fields": [
+  {
+   "fieldname": "vatrate",
+   "fieldtype": "Data",
+   "label": "VATRATE"
+  },
+  {
+   "description": "TOTAL ECXLUSIVE OF TAX FOR VAT ITEMS",
+   "fieldname": "nettamount",
+   "fieldtype": "Currency",
+   "label": "NETTAMOUNT"
+  },
+  {
+   "description": "TOTAL VAT FOR THE DAY",
+   "fieldname": "taxamount",
+   "fieldtype": "Currency",
+   "label": "TAXAMOUNT"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2021-05-26 19:27:58.109093",
+ "modified_by": "Administrator",
+ "module": "vfd-tz",
+ "name": "VFD VAT Totals",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

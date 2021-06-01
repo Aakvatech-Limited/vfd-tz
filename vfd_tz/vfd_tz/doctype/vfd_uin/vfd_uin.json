@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "allow_copy": 1,
  "autoname": "field:company",
  "creation": "2020-11-04 23:33:48.082205",
@@ -9,7 +10,8 @@
   "company",
   "gc",
   "dc",
-  "dc_date"
+  "dc_date",
+  "znumber"
  ],
  "fields": [
   {
@@ -44,9 +46,16 @@
    "label": "DC Date",
    "read_only": 1,
    "reqd": 1
+  },
+  {
+   "fieldname": "znumber",
+   "fieldtype": "Int",
+   "label": "ZNUMBER"
   }
  ],
- "modified": "2020-11-05 03:29:07.052541",
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-05-26 17:42:37.785202",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD UIN",

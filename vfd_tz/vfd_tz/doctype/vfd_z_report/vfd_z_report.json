@@ -1,0 +1,296 @@
+{
+ "actions": [],
+ "creation": "2021-05-26 19:03:42.876581",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "time",
+  "vfd_z_report_header_section",
+  "line_1",
+  "line_2",
+  "line_5",
+  "line_6",
+  "column_break_8",
+  "line_3",
+  "line_4",
+  "line_7",
+  "line_8",
+  "section_break_13",
+  "vrn",
+  "tin",
+  "taxoffice",
+  "regid",
+  "column_break_18",
+  "znumber",
+  "serial",
+  "registrationdate",
+  "uin",
+  "vfd_z_report_totals_section",
+  "dailytotalamount",
+  "gross",
+  "corrections",
+  "discounts",
+  "surcharges",
+  "column_break_29",
+  "ticketsvoid",
+  "ticketsvoidtotal",
+  "ticketsfiscal",
+  "ticketsnonfiscal",
+  "section_break_34",
+  "vfd_vat_totals",
+  "section_break_36",
+  "payments",
+  "changes_section",
+  "vatchangenum",
+  "column_break_40",
+  "headchangenum"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "DATE"
+  },
+  {
+   "fieldname": "time",
+   "fieldtype": "Time",
+   "label": "TIME"
+  },
+  {
+   "fieldname": "vfd_z_report_header_section",
+   "fieldtype": "Section Break",
+   "label": "VFD Z REPORT HEADER"
+  },
+  {
+   "fieldname": "line_1",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "LINE 1",
+   "reqd": 1
+  },
+  {
+   "fieldname": "line_2",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "LINE 2",
+   "reqd": 1
+  },
+  {
+   "fieldname": "line_5",
+   "fieldtype": "Data",
+   "label": "LINE 5"
+  },
+  {
+   "fieldname": "line_6",
+   "fieldtype": "Data",
+   "label": "LINE 6"
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "line_3",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "LINE 3",
+   "reqd": 1
+  },
+  {
+   "fieldname": "line_4",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "LINE 4",
+   "reqd": 1
+  },
+  {
+   "fieldname": "line_7",
+   "fieldtype": "Data",
+   "label": "LINE 7"
+  },
+  {
+   "fieldname": "line_8",
+   "fieldtype": "Data",
+   "label": "LINE 8"
+  },
+  {
+   "fieldname": "section_break_13",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "vrn",
+   "fieldtype": "Data",
+   "label": "VRN"
+  },
+  {
+   "fieldname": "tin",
+   "fieldtype": "Data",
+   "label": "TIN"
+  },
+  {
+   "fieldname": "taxoffice",
+   "fieldtype": "Data",
+   "label": "TAXOFFICE"
+  },
+  {
+   "fieldname": "regid",
+   "fieldtype": "Data",
+   "label": "REGID"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "znumber",
+   "fieldtype": "Int",
+   "label": "ZNUMBER"
+  },
+  {
+   "fieldname": "serial",
+   "fieldtype": "Data",
+   "label": "SERIAL"
+  },
+  {
+   "fieldname": "registrationdate",
+   "fieldtype": "Data",
+   "label": "REGISTRATIONDATE"
+  },
+  {
+   "fieldname": "uin",
+   "fieldtype": "Data",
+   "label": "UIN"
+  },
+  {
+   "fieldname": "vfd_z_report_totals_section",
+   "fieldtype": "Section Break",
+   "label": "VFD Z REPORT TOTALS"
+  },
+  {
+   "description": "SUM OF ALL SALES FOR THE DAY",
+   "fieldname": "dailytotalamount",
+   "fieldtype": "Currency",
+   "label": "DAILYTOTALAMOUNT"
+  },
+  {
+   "description": "CUMMULATIVE SALES FROM DAY ONE TO PRESENT",
+   "fieldname": "gross",
+   "fieldtype": "Currency",
+   "label": "GROSS"
+  },
+  {
+   "description": "FIX CORRECTIONS TO ZERO - Instruction from API Document v3.0",
+   "fieldname": "corrections",
+   "fieldtype": "Currency",
+   "label": "CORRECTIONS"
+  },
+  {
+   "description": "TOTAL DISCOUNTS ISSUED",
+   "fieldname": "discounts",
+   "fieldtype": "Currency",
+   "label": "DISCOUNTS"
+  },
+  {
+   "fieldname": "surcharges",
+   "fieldtype": "Currency",
+   "label": "SURCHARGES"
+  },
+  {
+   "description": "TOTAL NUMBER OF TICKETS VOIDED/CANCELLED IN THE SYSTEM AND THEREFORE NOT SENT TO TRA.",
+   "fieldname": "ticketsvoid",
+   "fieldtype": "Currency",
+   "label": "TICKETSVOID"
+  },
+  {
+   "description": "TOTAL AMOUNT OF TICKETS VOIDED/CANCELLED IN THE SYSTEM AND THEREFORE NOT SENT TO TRA.",
+   "fieldname": "ticketsvoidtotal",
+   "fieldtype": "Currency",
+   "label": "TICKETSVOIDTOTAL"
+  },
+  {
+   "description": "TOTAL FISCAL RECEIPT ISSUED",
+   "fieldname": "ticketsfiscal",
+   "fieldtype": "Currency",
+   "label": "TICKETSFISCAL"
+  },
+  {
+   "description": "TOTAL NUMBER OF RECEIPTS NOT SENT TO TRA AS A RESULT OF VOID/CANCEL",
+   "fieldname": "ticketsnonfiscal",
+   "fieldtype": "Currency",
+   "label": "TICKETSNONFISCAL"
+  },
+  {
+   "fieldname": "column_break_29",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_34",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "vfd_vat_totals",
+   "fieldtype": "Table",
+   "label": "VFD VAT TOTALS",
+   "options": "VFD VAT Totals"
+  },
+  {
+   "fieldname": "section_break_36",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "payments",
+   "fieldtype": "Table",
+   "label": "PAYMENTS",
+   "options": "VFD Z Report Payments"
+  },
+  {
+   "fieldname": "changes_section",
+   "fieldtype": "Section Break",
+   "label": "CHANGES"
+  },
+  {
+   "default": "0",
+   "description": "Fix VATCHANGENUM to 0",
+   "fieldname": "vatchangenum",
+   "fieldtype": "Int",
+   "label": "VATCHANGENUM"
+  },
+  {
+   "fieldname": "column_break_40",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "Fix HEADCHANGENUM to 0",
+   "fieldname": "headchangenum",
+   "fieldtype": "Int",
+   "label": "HEADCHANGENUM"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2021-05-26 19:31:54.427810",
+ "modified_by": "Administrator",
+ "module": "vfd-tz",
+ "name": "VFD Z Report",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
