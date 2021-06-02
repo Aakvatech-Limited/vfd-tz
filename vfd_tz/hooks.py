@@ -26,10 +26,7 @@ app_license = "MIT"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {
-    "Sales Invoice": "api/sales_invoice.js",
-    "Customer": "api/customer.js"
-}
+doctype_js = {"Sales Invoice": "api/sales_invoice.js", "Customer": "api/customer.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -42,7 +39,7 @@ doctype_js = {
 
 # website user home page (by Role)
 # role_home_page = {
-#	"Role": "home_page"
+# 	"Role": "home_page"
 # }
 
 # Website user home page (by function)
@@ -101,9 +98,7 @@ scheduler_events = {
     # "daily": [
     # 	"vfd_tz.tasks.daily"
     # ],
-    "hourly": [
-        "vfd_tz.api.sales_invoice.posting_all_vfd_invoices"
-    ],
+    "hourly": ["vfd_tz.api.sales_invoice.posting_all_vfd_invoices"],
     # "weekly": [
     # 	"vfd_tz.tasks.weekly"
     # ]
@@ -132,31 +127,39 @@ scheduler_events = {
 # }
 
 fixtures = [
-    {"doctype": "Custom Field", "filters": [["name", "in", (
-        "Customer-vfd_custid",
-        "Customer-vfd_custidtype",
-        "Mode of Payment-vfd_pmttype",
-        "Sales Taxes and Charges Template-vfd_vatrate",
-        "Item Tax Template-vfd_taxcode",
-        "Sales Invoice-vfd_gc",
-        "Sales Invoice-vfd_dc",
-        "Sales Invoice-vfd_rctnum",
-        "Sales Invoice-vfd_posting_info",
-        "Sales Invoice-vfd_status",
-        "Sales Invoice-vfd_rctvnum",
-        "Sales Invoice-vfd_date",
-        "Sales Invoice-vfd_time",
-        "Sales Invoice-vfd_details",
-        "Sales Invoice-column_break_vfd",
-        "Sales Invoice-vfd_cust_id_type",
-        "Sales Invoice-vfd_cust_id",
-        "Sales Invoice-vfd_verification_url",
-        "Sales Invoice-is_auto_generate_vfd",
-        "POS Profile-is_auto_generate_vfd",
-        "Sales Invoice-is_not_vfd_invoice",
-        "POS Profile-is_not_vfd_invoice",
-    )]]},
-    {"doctype": "Property Setter", "filters": [["name", "in", (
-
-    )]]},
+    {
+        "doctype": "Custom Field",
+        "filters": [
+            [
+                "name",
+                "in",
+                (
+                    "Customer-vfd_custid",
+                    "Customer-vfd_custidtype",
+                    "Mode of Payment-vfd_pmttype",
+                    "Sales Taxes and Charges Template-vfd_vatrate",
+                    "Item Tax Template-vfd_taxcode",
+                    "Sales Invoice-vfd_gc",
+                    "Sales Invoice-vfd_dc",
+                    "Sales Invoice-vfd_rctnum",
+                    "Sales Invoice-vfd_posting_info",
+                    "Sales Invoice-vfd_status",
+                    "Sales Invoice-vfd_rctvnum",
+                    "Sales Invoice-vfd_date",
+                    "Sales Invoice-vfd_time",
+                    "Sales Invoice-vfd_details",
+                    "Sales Invoice-column_break_vfd",
+                    "Sales Invoice-vfd_cust_id_type",
+                    "Sales Invoice-vfd_cust_id",
+                    "Sales Invoice-vfd_verification_url",
+                    "Sales Invoice-is_auto_generate_vfd",
+                    "POS Profile-is_auto_generate_vfd",
+                    "Sales Invoice-is_not_vfd_invoice",
+                    "POS Profile-is_not_vfd_invoice",
+                    "Sales Invoice-vfd_z_number",
+                ),
+            ]
+        ],
+    },
+    {"doctype": "Property Setter", "filters": [["name", "in", ()]]},
 ]

@@ -1,12 +1,18 @@
 {
  "actions": [],
+ "autoname": "VFDZR-.YY.-.MM.-.###",
  "creation": "2021-05-26 19:03:42.876581",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "vfd_registration",
   "date",
   "time",
+  "column_break_4",
+  "vfd_gc_previous",
+  "vfd_gc_from",
+  "vfd_gc_to",
   "vfd_z_report_header_section",
   "line_1",
   "line_2",
@@ -67,15 +73,13 @@
    "fieldname": "line_1",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "LINE 1",
-   "reqd": 1
+   "label": "LINE 1"
   },
   {
    "fieldname": "line_2",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "LINE 2",
-   "reqd": 1
+   "label": "LINE 2"
   },
   {
    "fieldname": "line_5",
@@ -95,15 +99,13 @@
    "fieldname": "line_3",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "LINE 3",
-   "reqd": 1
+   "label": "LINE 3"
   },
   {
    "fieldname": "line_4",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "LINE 4",
-   "reqd": 1
+   "label": "LINE 4"
   },
   {
    "fieldname": "line_7",
@@ -146,7 +148,8 @@
   {
    "fieldname": "znumber",
    "fieldtype": "Int",
-   "label": "ZNUMBER"
+   "label": "ZNUMBER",
+   "reqd": 1
   },
   {
    "fieldname": "serial",
@@ -267,11 +270,38 @@
    "fieldname": "headchangenum",
    "fieldtype": "Int",
    "label": "HEADCHANGENUM"
+  },
+  {
+   "fieldname": "vfd_registration",
+   "fieldtype": "Link",
+   "label": "VFD Registration",
+   "options": "VFD Registration",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vfd_gc_from",
+   "fieldtype": "Int",
+   "label": "VFD GC From"
+  },
+  {
+   "fieldname": "vfd_gc_to",
+   "fieldtype": "Int",
+   "label": "VFD GC To"
+  },
+  {
+   "fieldname": "vfd_gc_previous",
+   "fieldtype": "Int",
+   "label": "VFD GC Previous",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2021-05-26 19:31:54.427810",
+ "modified": "2021-06-01 17:34:24.276032",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Z Report",
