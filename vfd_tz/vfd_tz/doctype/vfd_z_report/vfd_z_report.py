@@ -24,12 +24,16 @@ class VFDZReport(Document):
         invoices = get_invoices(company, z_last_gc)
         if len(invoices) > 0:
             self.vfd_gc_from = z_last_gc + 1
-            self.vfd_gc_to = get_invoices_last_gc(company)
+            self.vfd_gc_to = get_invoices_last_gc(company, z_last_gc)
             self.set_inovices(invoices)
+            self.dailytotalamount = get_gross_between(
+                company, self.vfd_gc_from, self.vfd_gc_to
+            )
         else:
             self.vfd_gc_from = None
             self.vfd_gc_to = None
-        console(invoices)
+        # self.gross = get_gross(company)
+        self.gross = get_gross_between(company, 1, self.vfd_gc_to or z_last_gc)
 
     def set_inovices(self, invoices):
         self.invoices = []
@@ -39,12 +43,16 @@ class VFDZReport(Document):
             row = self.append("invoices", {})
             row.invoice = el.name
             row.vfd_gc = el.vfd_gc
+            row.total_taxes_and_charges = el.total_taxes_and_charges
+            row.base_net_total = el.base_net_total
+            row.base_grand_total = el.base_rounded_total or el.base_grand_total
+            row.discount_amount = el.discount_amount
 
 
 def get_z_last_gc(vfd_registration):
     report_list = frappe.db.sql(
         """
-    SELECT MAX(vfd_gc_previous) as gc
+    SELECT MAX(vfd_gc_to) as to_gc
     FROM `tabVFD Z Report`
     WHERE 
         vfd_registration = '{0}'
@@ -54,13 +62,13 @@ def get_z_last_gc(vfd_registration):
         ),
         as_dict=True,
     )
-    if len(report_list) > 0 and report_list[0].get("gc"):
-        return report_list[0].get("gc")
+    if len(report_list) > 0 and report_list[0].get("to_gc"):
+        return report_list[0].get("to_gc")
     else:
         return 0
 
 
-def get_invoices_last_gc(company):
+def get_invoices_last_gc(company, last_gc):
     invoices_list = frappe.db.sql(
         """
     SELECT MAX(vfd_gc) as gc
@@ -68,8 +76,9 @@ def get_invoices_last_gc(company):
     WHERE 
         company = '{0}'
         and docstatus = 1
+        and vfd_gc > {1}
     """.format(
-            company
+            company, last_gc
         ),
         as_dict=True,
     )
@@ -87,3 +96,37 @@ def get_invoices(company, last_gc):
         order_by="vfd_gc",
     )
     return invoices
+
+
+# def get_gross(company):
+#     invoices_list = frappe.db.sql(
+#         """
+#     SELECT SUM(IF(base_rounded_total > 0, base_rounded_total, base_grand_total)) as total
+#     FROM `tabSales Invoice`
+#     WHERE
+#         company = '{0}'
+#         and docstatus = 1
+#         and vfd_gc > 0
+#     """.format(
+#             company
+#         ),
+#         as_dict=True,
+#     )
+#     return invoices_list[0].get("total")
+
+
+def get_gross_between(company, start, end):
+    invoices_list = frappe.db.sql(
+        """
+    SELECT SUM(IF(base_rounded_total > 0, base_rounded_total, base_grand_total)) as total
+    FROM `tabSales Invoice`
+    WHERE 
+        company = '{0}'
+        and docstatus = 1
+        and vfd_gc BETWEEN {1} AND {2}
+    """.format(
+            company, start, end
+        ),
+        as_dict=True,
+    )
+    return invoices_list[0].get("total")

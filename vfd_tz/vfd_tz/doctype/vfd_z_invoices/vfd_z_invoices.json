@@ -6,10 +6,15 @@
  "engine": "InnoDB",
  "field_order": [
   "invoice",
-  "vfd_gc"
+  "vfd_gc",
+  "base_net_total",
+  "total_taxes_and_charges",
+  "discount_amount",
+  "base_grand_total"
  ],
  "fields": [
   {
+   "columns": 2,
    "fieldname": "invoice",
    "fieldtype": "Link",
    "in_list_view": 1,
@@ -18,17 +23,46 @@
    "reqd": 1
   },
   {
+   "columns": 1,
    "fieldname": "vfd_gc",
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "VFD GC",
    "reqd": 1
+  },
+  {
+   "columns": 2,
+   "fieldname": "total_taxes_and_charges",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Total Taxes and Charges"
+  },
+  {
+   "columns": 2,
+   "fieldname": "base_net_total",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Base Net Total"
+  },
+  {
+   "columns": 2,
+   "fieldname": "base_grand_total",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Base Grand Total"
+  },
+  {
+   "columns": 1,
+   "fieldname": "discount_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Discount Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-06-02 16:18:18.824676",
+ "modified": "2021-06-02 22:15:20.456081",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Z Invoices",
