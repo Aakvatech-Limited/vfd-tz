@@ -24,6 +24,8 @@
   "line_7",
   "line_8",
   "section_break_13",
+  "invoices",
+  "section_break_20",
   "vrn",
   "tin",
   "taxoffice",
@@ -45,13 +47,14 @@
   "ticketsfiscal",
   "ticketsnonfiscal",
   "section_break_34",
-  "vfd_vat_totals",
+  "vats",
   "section_break_36",
   "payments",
   "changes_section",
   "vatchangenum",
   "column_break_40",
-  "headchangenum"
+  "headchangenum",
+  "amended_from"
  ],
  "fields": [
   {
@@ -233,12 +236,6 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "vfd_vat_totals",
-   "fieldtype": "Table",
-   "label": "VFD VAT TOTALS",
-   "options": "VFD VAT Totals"
-  },
-  {
    "fieldname": "section_break_36",
    "fieldtype": "Section Break"
   },
@@ -297,17 +294,45 @@
    "fieldtype": "Int",
    "label": "VFD GC Previous",
    "reqd": 1
+  },
+  {
+   "fieldname": "invoices",
+   "fieldtype": "Table",
+   "label": "Invoices",
+   "options": "VFD Z Invoices"
+  },
+  {
+   "fieldname": "section_break_20",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "vats",
+   "fieldtype": "Table",
+   "label": "VFD VAT TOTALS",
+   "options": "VFD VAT Totals"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "VFD Z Report",
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2021-06-01 17:34:24.276032",
+ "modified": "2021-06-02 21:04:30.416916",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Z Report",
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -317,6 +342,21 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],
