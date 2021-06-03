@@ -221,7 +221,8 @@ def posting_vfd_invoice(invoice_name):
                     break
             if found_item:
                 found_item["QTY"] = 1
-                found_item["AMT"] += item_data["AMT"]
+                rounded_amount = flt(found_item["AMT"], 2)
+                found_item["AMT"] = flt(rounded_amount, 2) + flt(item_data["AMT"], 2)
             else:
                 item_data["QTY"] = 1
                 rect_data["ITEMS"].append({"ITEM": item_data})
