@@ -4,6 +4,8 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
+from frappe.utils import flt
+from vfd_tz.api.sales_invoice import get_item_taxcode
 from csf_tz import console
 
 
@@ -29,6 +31,7 @@ class VFDZReport(Document):
             self.dailytotalamount = get_gross_between(
                 company, self.vfd_gc_from, self.vfd_gc_to
             )
+            self.set_vat_totals()
         else:
             self.vfd_gc_from = None
             self.vfd_gc_to = None
@@ -47,6 +50,55 @@ class VFDZReport(Document):
             row.base_net_total = el.base_net_total
             row.base_grand_total = el.base_rounded_total or el.base_grand_total
             row.discount_amount = el.discount_amount
+
+    def set_vat_totals(self):
+        self.vats = []
+        invoices_list = []
+        for row in self.invoices:
+            invoices_list.append(row.invoice)
+        if not invoices_list:
+            return
+        items = frappe.get_all(
+            "Sales Invoice Item",
+            filters={"parent": ["in", invoices_list]},
+            fields=["*"],
+        )
+        vattotals = get_vattotals(items)
+        for el in vattotals:
+            row = self.append("vats", {})
+            row.nettamount = el.get("nettamount")
+            row.taxamount = el.get("taxamount")
+            row.vatrate = el.get("vatrate")
+
+
+def get_vattotals(items):
+    vattotals = {}
+    for item in items:
+        item_taxcode = get_item_taxcode(
+            item.item_tax_template, item.item_code, item.parent
+        )
+        if not vattotals.get(item_taxcode):
+            vattotals[item_taxcode] = {}
+            vattotals[item_taxcode]["NETTAMOUNT"] = 0
+            vattotals[item_taxcode]["TAXAMOUNT"] = 0
+        vattotals[item_taxcode]["NETTAMOUNT"] += flt(item.base_net_amount, 2)
+        vattotals[item_taxcode]["TAXAMOUNT"] += flt(
+            item.base_net_amount * ((18 / 100) if item_taxcode == 1 else 0), 2
+        )
+
+    taxes_map = {"1": "A", "2": "B", "3": "C", "4": "D", "5": "E"}
+
+    vattotals_list = []
+    for key, value in vattotals.items():
+        vattotals_list.append(
+            {
+                "vatrate": taxes_map.get(str(key)),
+                "nettamount": flt(value["NETTAMOUNT"], 2),
+                "taxamount": flt(value["TAXAMOUNT"], 2),
+            }
+        )
+
+    return vattotals_list
 
 
 def get_z_last_gc(vfd_registration):
