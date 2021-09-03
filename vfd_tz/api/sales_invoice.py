@@ -31,8 +31,12 @@ def vfd_validation(doc, method):
             frappe.throw(
                 _("Item Code not set for item {0}".format(item.item_name)))
         if not item.item_tax_template:
-            frappe.throw(
-                _("Item Taxes Template not set for item {0}".format(item.item_code)))
+            item_tax_template = frappe.get_value("Item", item.item_code, "default_tax_template")
+            if not item_tax_template:
+                frappe.throw(
+                    _("Item Taxes Template not set for item {0}".format(item.item_code)))
+            else:
+                item.item_tax_template = item_tax_template
         item_taxcode = get_item_taxcode(
             item.item_tax_template, item.item_code, doc.name)
 
@@ -221,7 +225,8 @@ def posting_vfd_invoice(invoice_name):
                     break
             if found_item:
                 found_item["QTY"] = 1
-                found_item["AMT"] += item_data["AMT"]
+                rounded_amount = flt(found_item["AMT"], 2)
+                found_item["AMT"] = flt(rounded_amount, 2) + flt(item_data["AMT"], 2)
             else:
                 item_data["QTY"] = 1
                 rect_data["ITEMS"].append({"ITEM": item_data})
