@@ -4,7 +4,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import flt
+from frappe.utils import flt, nowdate
 from vfd_tz.api.sales_invoice import get_item_taxcode
 from csf_tz import console
 
@@ -23,6 +23,7 @@ class VFDZReport(Document):
         company = frappe.get_value("VFD Registration", self.vfd_registration, "company")
         z_last_gc = get_z_last_gc(self.vfd_registration)
         self.vfd_gc_previous = z_last_gc
+        self.znumber = str(nowdate()).replace("-", "")
         invoices = get_invoices(company, z_last_gc)
         if len(invoices) > 0:
             self.vfd_gc_from = z_last_gc + 1

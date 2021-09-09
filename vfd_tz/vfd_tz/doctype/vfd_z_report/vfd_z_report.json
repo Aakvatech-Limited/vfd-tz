@@ -58,6 +58,7 @@
  ],
  "fields": [
   {
+   "default": "Today",
    "fieldname": "date",
    "fieldtype": "Date",
    "label": "DATE"
@@ -151,8 +152,7 @@
   {
    "fieldname": "znumber",
    "fieldtype": "Int",
-   "label": "ZNUMBER",
-   "reqd": 1
+   "label": "ZNUMBER"
   },
   {
    "fieldname": "serial",
@@ -282,18 +282,20 @@
   {
    "fieldname": "vfd_gc_from",
    "fieldtype": "Int",
-   "label": "VFD GC From"
+   "label": "VFD GC From",
+   "read_only": 1
   },
   {
    "fieldname": "vfd_gc_to",
    "fieldtype": "Int",
-   "label": "VFD GC To"
+   "label": "VFD GC To",
+   "read_only": 1
   },
   {
    "fieldname": "vfd_gc_previous",
    "fieldtype": "Int",
    "label": "VFD GC Previous",
-   "reqd": 1
+   "read_only": 1
   },
   {
    "fieldname": "invoices",
@@ -324,7 +326,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-06-02 21:04:30.416916",
+ "modified": "2021-09-10 02:11:07.848135",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Z Report",
