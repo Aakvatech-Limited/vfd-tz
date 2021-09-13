@@ -7,8 +7,6 @@ from frappe.model.document import Document
 from frappe.utils import flt, nowdate
 from vfd_tz.api.sales_invoice import get_item_taxcode
 
-# from csf_tz import console
-
 
 class VFDZReport(Document):
     def validate(self):
@@ -48,6 +46,7 @@ class VFDZReport(Document):
             invoice["base_rounded_total"] or invoice["base_grand_total"]
             for invoice in canceled_invoices
         )
+        self.set_payments()
 
     def get_canceled_invoices(self):
         company, report_start_date = frappe.get_value(
@@ -71,6 +70,35 @@ class VFDZReport(Document):
                     "Sales Invoice", invoice.name, "vfd_z_report", self.name
                 )
         return canceled_invoices
+
+    def set_payments(self):
+        total_payments = 0
+        self.payments = []
+        payments_list = frappe.get_all(
+            "Sales Invoice Payment",
+            filters={"parent": ["in", [invoice.invoice for invoice in self.invoices]]},
+            fields=["sum(base_amount) as amount", "mode_of_payment"],
+            group_by="mode_of_payment",
+        )
+        payments_data = {}
+        for payment in payments_list:
+            total_payments += payment.amount
+            vfd_pmttype = frappe.get_value(
+                "Mode of Payment", payment.mode_of_payment, "vfd_pmttype"
+            )
+            if not payments_data.get(vfd_pmttype):
+                payments_data.setdefault(vfd_pmttype, payment.amount)
+            else:
+                payments_data[vfd_pmttype] += payment.amount
+        for key, value in payments_data.items():
+            row = self.append("payments", {})
+            row.pmttype = key
+            row.pmtamount = value
+        diff_total = self.dailytotalamount - total_payments
+        if diff_total > 0:
+            row = self.append("payments", {})
+            row.pmttype = "INVOICE"
+            row.pmtamount = diff_total
 
     def set_invoices(self, invoices):
         self.invoices = []
