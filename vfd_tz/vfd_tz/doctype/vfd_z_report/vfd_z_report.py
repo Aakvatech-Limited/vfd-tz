@@ -6,7 +6,8 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import flt, nowdate
 from vfd_tz.api.sales_invoice import get_item_taxcode
-from csf_tz import console
+
+# from csf_tz import console
 
 
 class VFDZReport(Document):
@@ -28,7 +29,7 @@ class VFDZReport(Document):
         if len(invoices) > 0:
             self.vfd_gc_from = z_last_gc + 1
             self.vfd_gc_to = get_invoices_last_gc(company, z_last_gc)
-            self.set_inovices(invoices)
+            self.set_invoices(invoices)
             self.dailytotalamount = get_gross_between(
                 company, self.vfd_gc_from, self.vfd_gc_to
             )
@@ -38,8 +39,40 @@ class VFDZReport(Document):
             self.vfd_gc_to = None
         # self.gross = get_gross(company)
         self.gross = get_gross_between(company, 1, self.vfd_gc_to or z_last_gc)
+        for invoice in self.invoices:
+            self.discounts += invoice.discount_amount
+        self.ticketsfiscal = len(self.invoices)
+        canceled_invoices = self.get_canceled_invoices()
+        self.ticketsvoid = self.ticketsnonfiscal = len(canceled_invoices)
+        self.ticketsvoidtotal = sum(
+            invoice["base_rounded_total"] or invoice["base_grand_total"]
+            for invoice in canceled_invoices
+        )
 
-    def set_inovices(self, invoices):
+    def get_canceled_invoices(self):
+        company, report_start_date = frappe.get_value(
+            "VFD Registration",
+            self.vfd_registration,
+            ["company", "vfd_z_report_start_date"],
+        )
+        canceled_invoices = frappe.get_all(
+            "Sales Invoice",
+            filters={
+                "docstatus": 2,
+                "company": company,
+                "vfd_z_report": ["in", [None, "", self.name]],
+                "posting_date": [">=", report_start_date],
+            },
+            fields=["name", "base_rounded_total", "base_grand_total", "vfd_z_report"],
+        )
+        for invoice in canceled_invoices:
+            if not invoice.vfd_z_report:
+                frappe.db.set_value(
+                    "Sales Invoice", invoice.name, "vfd_z_report", self.name
+                )
+        return canceled_invoices
+
+    def set_invoices(self, invoices):
         self.invoices = []
         if len(invoices) == 0:
             return
@@ -47,10 +80,10 @@ class VFDZReport(Document):
             row = self.append("invoices", {})
             row.invoice = el.name
             row.vfd_gc = el.vfd_gc
-            row.total_taxes_and_charges = el.total_taxes_and_charges
+            row.total_taxes_and_charges = el.base_total_taxes_and_charges
             row.base_net_total = el.base_net_total
             row.base_grand_total = el.base_rounded_total or el.base_grand_total
-            row.discount_amount = el.discount_amount
+            row.discount_amount = el.base_discount_amount
 
     def set_vat_totals(self):
         self.vats = []

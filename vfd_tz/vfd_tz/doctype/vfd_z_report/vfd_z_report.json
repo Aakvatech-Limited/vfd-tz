@@ -126,24 +126,32 @@
    "fieldtype": "Section Break"
   },
   {
+   "fetch_from": "vfd_registration.vrn",
    "fieldname": "vrn",
    "fieldtype": "Data",
-   "label": "VRN"
+   "label": "VRN",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.tin",
    "fieldname": "tin",
    "fieldtype": "Data",
-   "label": "TIN"
+   "label": "TIN",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.taxoffice",
    "fieldname": "taxoffice",
    "fieldtype": "Data",
-   "label": "TAXOFFICE"
+   "label": "TAXOFFICE",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.regid",
    "fieldname": "regid",
    "fieldtype": "Data",
-   "label": "REGID"
+   "label": "REGID",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_18",
@@ -152,22 +160,29 @@
   {
    "fieldname": "znumber",
    "fieldtype": "Int",
-   "label": "ZNUMBER"
+   "label": "ZNUMBER",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.serial",
    "fieldname": "serial",
    "fieldtype": "Data",
-   "label": "SERIAL"
+   "label": "SERIAL",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.creation",
    "fieldname": "registrationdate",
-   "fieldtype": "Data",
-   "label": "REGISTRATIONDATE"
+   "fieldtype": "Date",
+   "label": "REGISTRATIONDATE",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.uin",
    "fieldname": "uin",
    "fieldtype": "Data",
-   "label": "UIN"
+   "label": "UI",
+   "read_only": 1
   },
   {
    "fieldname": "vfd_z_report_totals_section",
@@ -326,7 +341,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-09-10 02:11:07.848135",
+ "modified": "2021-09-12 16:51:14.214538",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Z Report",
