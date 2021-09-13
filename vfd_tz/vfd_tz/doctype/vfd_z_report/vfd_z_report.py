@@ -54,6 +54,12 @@ class VFDZReport(Document):
             self.vfd_registration,
             ["company", "vfd_z_report_start_date"],
         )
+        if not report_start_date:
+            frappe.throw(
+                _("VFD Z-Report Start Date is not set in VFD Registration {0}").format(
+                    self.vfd_registration
+                )
+            )
         canceled_invoices = frappe.get_all(
             "Sales Invoice",
             filters={
