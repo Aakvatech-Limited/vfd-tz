@@ -13,7 +13,7 @@ class VFDZReport(Document):
         self.set_data()
 
     def before_submit(self):
-        pass
+        self.update_canceled_invoices()
 
     def on_submit(self):
         pass
@@ -70,11 +70,6 @@ class VFDZReport(Document):
             },
             fields=["name", "base_rounded_total", "base_grand_total", "vfd_z_report"],
         )
-        for invoice in canceled_invoices:
-            if not invoice.vfd_z_report:
-                frappe.db.set_value(
-                    "Sales Invoice", invoice.name, "vfd_z_report", self.name
-                )
         return canceled_invoices
 
     def set_payments(self):
@@ -137,6 +132,14 @@ class VFDZReport(Document):
             row.nettamount = el.get("nettamount")
             row.taxamount = el.get("taxamount")
             row.vatrate = el.get("vatrate")
+
+    def update_canceled_invoices(self):
+        canceled_invoices = self.get_canceled_invoices()
+        for invoice in canceled_invoices:
+            if not invoice.vfd_z_report:
+                frappe.db.set_value(
+                    "Sales Invoice", invoice.name, "vfd_z_report", self.name
+                )
 
 
 def get_vattotals(items):
