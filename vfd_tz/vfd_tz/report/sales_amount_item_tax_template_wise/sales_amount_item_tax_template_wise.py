@@ -79,7 +79,7 @@ def get_sales_invoice_entries(filters):
 					si.territory,
 					if(si.tax_id is null, '999999999', si.tax_id) as tax_id,
 					sii.item_tax_template,
-					sum(sii.net_amount) as net_amount
+					sum(sii.base_net_amount) as net_amount
 			FROM `tabSales Invoice` si 
 				INNER JOIN `tabSales Invoice Item` sii ON si.name = sii.parent
 			WHERE (si.posting_date >= %(from_date)s 
