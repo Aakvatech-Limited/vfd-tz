@@ -4,8 +4,12 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import flt, nowdate
+from frappe.utils import flt, nowdate, nowtime, format_datetime, get_date_str
 from vfd_tz.api.sales_invoice import get_item_taxcode
+from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
+from api.xml import xml_to_dic, dict_to_xml
+from api.utlis import get_signature
+import requests
 
 
 class VFDZReport(Document):
@@ -14,6 +18,8 @@ class VFDZReport(Document):
 
     def before_submit(self):
         self.update_canceled_invoices()
+        if not zreport_posting(self):
+            frappe.throw(_("Z-Report has not been posted! Please try again."))
 
     def on_submit(self):
         pass
@@ -24,6 +30,7 @@ class VFDZReport(Document):
         self.vfd_gc_previous = z_last_gc
         self.znumber = str(nowdate()).replace("-", "")
         invoices = get_invoices(company, z_last_gc)
+        self.dailytotalamount = 0
         if len(invoices) > 0:
             self.vfd_gc_from = z_last_gc + 1
             self.vfd_gc_to = get_invoices_last_gc(company, z_last_gc)
@@ -37,6 +44,7 @@ class VFDZReport(Document):
             self.vfd_gc_to = None
         # self.gross = get_gross(company)
         self.gross = get_gross_between(company, 1, self.vfd_gc_to or z_last_gc)
+        self.discounts = 0
         for invoice in self.invoices:
             self.discounts += invoice.discount_amount
         self.ticketsfiscal = len(self.invoices)
@@ -252,4 +260,131 @@ def get_gross_between(company, start, end):
         ),
         as_dict=True,
     )
-    return invoices_list[0].get("total")
+    gross = invoices_list[0].get("total")
+    return gross or 0
+
+
+def zreport_posting(doc):
+    registration_doc = frappe.get_doc("VFD Registration", doc.vfd_registration)
+    token_data = get_token(registration_doc.company)
+    headers = {
+        "Content-Type": "Application/xml",
+        "Routing-Key": "vfdzreport",
+        "Cert-Serial": token_data["cert_serial"],
+        "Authorization": token_data["token"],
+    }
+
+    zreport = {
+        "DATE": doc.date,
+        "TIME": format_datetime(str(doc.time), "HH:mm:ss"),
+        "HEADER": {
+            "LINE": registration_doc.company_name or " ",
+            "LINE": registration_doc.street or " ",
+            "LINE": registration_doc.mobile or " ",
+            "LINE": registration_doc.city
+            or " " + ", " + registration_doc.country
+            or " ",
+        },
+        "VRN": registration_doc.vrn,
+        "TIN": registration_doc.tin,
+        "TAXOFFICE": registration_doc.taxoffice,
+        "REGID": registration_doc.regid,
+        "ZNUMBER": doc.znumber,
+        "EFDSERIAL": registration_doc.serial,
+        "REGISTRATIONDATE": get_date_str(registration_doc.vfd_start_date),
+        "USER": registration_doc.uin,
+        "SIMIMSI": "WEBAPI",
+        "TOTALS": {
+            "DAILYTOTALAMOUNT": doc.dailytotalamount,
+            "GROSS": doc.gross,
+            "CORRECTIONS": doc.corrections,
+            "DISCOUNTS": doc.discounts,
+            "SURCHARGES": doc.surcharges,
+            "TICKETSVOID": doc.ticketsvoid,
+            "TICKETSVOIDTOTAL": doc.ticketsvoidtotal,
+            "TICKETSFISCAL": doc.ticketsfiscal,
+            "TICKETSNONFISCAL": doc.ticketsnonfiscal,
+        },
+        "VATTOTALS": [],
+        "PAYMENTS": [],
+        "CHANGES": {"VATCHANGENUM": "0", "HEADCHANGENUM": "0"},
+        "ERRORS": [],
+        "FWVERSION": "3.0",
+        "FWCHECKSUM": "WEBAPI",
+    }
+
+    for vat in doc.vats:
+        zreport["VATTOTALS"].append(
+            {
+                "VATRATE": vat.vatrate,
+                "NETTAMOUNT": vat.nettamount,
+                "TAXAMOUNT": vat.taxamount,
+            }
+        )
+
+    for payment in doc.payments:
+        zreport["PAYMENTS"].append(
+            {
+                "PMTTYPE": payment.pmttype,
+                "PMTAMOUNT": payment.pmtamount,
+            }
+        )
+
+    zreport_xml = (
+        str(dict_to_xml(zreport, "ZREPORT")[39:])
+        .replace("<None>", "")
+        .replace("</None>", "")
+    )
+
+    efdms_data = {
+        "ZREPORT": zreport,
+        "EFDMSSIGNATURE": get_signature(zreport_xml, registration_doc),
+    }
+
+    data = dict_to_xml(efdms_data).replace("<None>", "").replace("</None>", "")
+    url = registration_doc.url + "/api/efdmszreport"
+    response = requests.request("POST", url, headers=headers, data=data, timeout=5)
+
+    if not response.status_code == 200:
+        posting_info_doc = frappe.get_doc(
+            {
+                "doctype": "VFD Z Report Posting Info",
+                "vfd_z_report": doc.name,
+                "ackcode": response.status_code,
+                "ackmsg": response.text,
+                "date": nowdate(),
+                "time": nowtime(),
+                "req_headers": str(headers),
+                "req_data": str(data).encode("utf8"),
+            }
+        )
+        doc.sent_status = "Failed"
+        frappe.db.commit()
+        return False
+
+    xmldict = xml_to_dic(response.text)
+    zack = xmldict.get("zack")
+    posting_info_doc = frappe.get_doc(
+        {
+            "doctype": "VFD Z Report Posting Info",
+            "vfd_z_report": doc.name,
+            "ackcode": zack.get("ackcode"),
+            "ackmsg": zack.get("ackmsg"),
+            "date": zack.get("date"),
+            "time": zack.get("time"),
+            "znumber": zack.get("znumber"),
+            "efdmssignature": xmldict.get("efdmssignature"),
+            "req_headers": str(headers),
+            "req_data": str(data).encode("utf8"),
+        }
+    )
+    posting_info_doc.flags.ignore_permissions = True
+    posting_info_doc.insert(ignore_permissions=True)
+    frappe.db.commit()
+    if int(posting_info_doc.ackcode) == 0:
+        doc.zreport_posting_info = posting_info_doc.name
+        doc.sent_status = "Success"
+        return True
+    else:
+        doc.sent_status = "Failed"
+        return False

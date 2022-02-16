@@ -9,10 +9,12 @@
   "vfd_registration",
   "date",
   "time",
+  "zreport_posting_info",
   "column_break_4",
   "vfd_gc_previous",
   "vfd_gc_from",
   "vfd_gc_to",
+  "sent_status",
   "vfd_z_report_header_section",
   "line_1",
   "line_2",
@@ -181,7 +183,7 @@
    "fetch_from": "vfd_registration.uin",
    "fieldname": "uin",
    "fieldtype": "Data",
-   "label": "UI",
+   "label": "UIN",
    "read_only": 1
   },
   {
@@ -221,7 +223,7 @@
   {
    "description": "TOTAL NUMBER OF TICKETS VOIDED/CANCELLED IN THE SYSTEM AND THEREFORE NOT SENT TO TRA.",
    "fieldname": "ticketsvoid",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "TICKETSVOID"
   },
   {
@@ -233,13 +235,13 @@
   {
    "description": "TOTAL FISCAL RECEIPT ISSUED",
    "fieldname": "ticketsfiscal",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "TICKETSFISCAL"
   },
   {
    "description": "TOTAL NUMBER OF RECEIPTS NOT SENT TO TRA AS A RESULT OF VOID/CANCEL",
    "fieldname": "ticketsnonfiscal",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "TICKETSNONFISCAL"
   },
   {
@@ -336,12 +338,24 @@
    "options": "VFD Z Report",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "sent_status",
+   "fieldtype": "Data",
+   "label": "Sent Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "zreport_posting_info",
+   "fieldtype": "Data",
+   "label": "ZReport Posting Info"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-09-12 16:51:14.214538",
+ "modified": "2022-02-01 22:52:25.608516",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Z Report",
