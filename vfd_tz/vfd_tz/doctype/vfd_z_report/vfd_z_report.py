@@ -265,6 +265,8 @@ def get_gross_between(company, start, end):
 
 
 def zreport_posting(doc):
+    if doc.zreport_posting_info:
+        return
     registration_doc = frappe.get_doc("VFD Registration", doc.vfd_registration)
     token_data = get_token(registration_doc.company)
     headers = {
@@ -358,7 +360,7 @@ def zreport_posting(doc):
                 "req_data": str(data).encode("utf8"),
             }
         )
-        doc.sent_status = "Failed"
+        doc.db_set("sent_status", "Failed")
         frappe.db.commit()
         return False
 
@@ -382,9 +384,36 @@ def zreport_posting(doc):
     posting_info_doc.insert(ignore_permissions=True)
     frappe.db.commit()
     if int(posting_info_doc.ackcode) == 0:
-        doc.zreport_posting_info = posting_info_doc.name
-        doc.sent_status = "Success"
+        doc.db_set("zreport_posting_info", posting_info_doc.name)
+        doc.db_set("sent_status", "Success")
         return True
     else:
-        doc.sent_status = "Failed"
+        doc.db_set("sent_status", "Failed")
         return False
+
+
+def multi_zreport_posting():
+    for doc_name in frappe.get_all(
+        "VFD Z Report", filters={"zreport_posting_info": ""}, pluck="name"
+    ):
+        doc = frappe.get_doc("VFD Z Report", doc_name)
+        zreport_posting(doc)
+
+
+def make_vfd_z_report():
+    vfd_registration_list = frappe.get_all(
+        "VFD Registration", filters={"r_status": "Active"}
+    )
+    for vfd_registration in vfd_registration_list:
+        vfd_registration_doc = frappe.new_doc("VFD Z Report")
+        vfd_registration_doc.vfd_registration = vfd_registration.name
+        vfd_registration_doc.insert()
+        vfd_registration_doc.submit()
+
+
+# def make_specific_vfd_z_report(vfd_registration, date):
+#     vfd_registration_doc = frappe.new_doc("VFD Z Report")
+#     vfd_registration_doc.vfd_registration = vfd_registration
+#     vfd_registration_doc.date = date
+#     vfd_registration_doc.insert()
+#     vfd_registration_doc.submit()

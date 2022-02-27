@@ -98,6 +98,9 @@ scheduler_events = {
     # "daily": [
     # 	"vfd_tz.tasks.daily"
     # ],
+    "0 2 * * *": [
+        "vfd_tz.vfd_tz.doctype.vfd_z_report.vfd_z_report.make_vfd_z_report",
+    ],
     "hourly": ["vfd_tz.api.sales_invoice.posting_all_vfd_invoices"],
     # "weekly": [
     # 	"vfd_tz.tasks.weekly"
