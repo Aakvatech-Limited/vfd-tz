@@ -18,8 +18,6 @@ class VFDZReport(Document):
 
     def before_submit(self):
         self.update_canceled_invoices()
-        if not zreport_posting(self):
-            frappe.throw(_("Z-Report has not been posted! Please try again."))
 
     def on_submit(self):
         pass
@@ -386,10 +384,21 @@ def zreport_posting(doc):
     if int(posting_info_doc.ackcode) == 0:
         doc.db_set("zreport_posting_info", posting_info_doc.name)
         doc.db_set("sent_status", "Success")
+        doc.save()
+        frappe.db.commit()
         return True
     else:
         doc.db_set("sent_status", "Failed")
+        doc.save()
+        frappe.db.commit()
         return False
+
+
+@frappe.whitelist()
+def post(z_report_name):
+    doc = frappe.get_doc("VFD Z Report", z_report_name)
+    if not zreport_posting(doc):
+        frappe.throw(_("Z-Report has not been posted! Please try again."))
 
 
 def multi_zreport_posting():
@@ -398,6 +407,17 @@ def multi_zreport_posting():
     ):
         doc = frappe.get_doc("VFD Z Report", doc_name)
         zreport_posting(doc)
+
+
+def send_multy_vfd_z_reports():
+    reports = frappe.get_all(
+        "VFD Z Report",
+        filters={"docstatus": 1, "sent_status": ["!=", "Success"]},
+        order_by="vfd_gc_previous",
+        pluck="name",
+    )
+    for report in reports:
+        post(report)
 
 
 def make_vfd_z_report():
@@ -409,6 +429,8 @@ def make_vfd_z_report():
         vfd_registration_doc.vfd_registration = vfd_registration.name
         vfd_registration_doc.insert()
         vfd_registration_doc.submit()
+    frappe.db.commit()
+    send_multy_vfd_z_reports()
 
 
 # def make_specific_vfd_z_report(vfd_registration, date):
