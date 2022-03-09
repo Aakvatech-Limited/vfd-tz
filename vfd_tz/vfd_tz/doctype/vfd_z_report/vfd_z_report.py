@@ -1,10 +1,18 @@
 # Copyright (c) 2021, Aakvatech and contributors
 # For license information, please see license.txt
 
+from ast import While
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import flt, nowdate, nowtime, format_datetime, get_date_str
+from frappe.utils import (
+    flt,
+    nowdate,
+    nowtime,
+    format_datetime,
+    get_date_str,
+    add_to_date,
+)
 from vfd_tz.api.sales_invoice import get_item_taxcode
 from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from api.xml import xml_to_dic, dict_to_xml
@@ -13,7 +21,7 @@ import requests
 
 
 class VFDZReport(Document):
-    def validate(self):
+    def before_insert(self):
         self.set_data()
 
     def before_submit(self):
@@ -25,9 +33,11 @@ class VFDZReport(Document):
     def set_data(self):
         company = frappe.get_value("VFD Registration", self.vfd_registration, "company")
         z_last_gc = get_z_last_gc(self.vfd_registration)
+        # self.date is the date of the report
+        self.time = "23:59:59"
         self.vfd_gc_previous = z_last_gc
-        self.znumber = str(nowdate()).replace("-", "")
-        invoices = get_invoices(company, z_last_gc)
+        self.znumber = str(self.date).replace("-", "")
+        invoices = get_invoices(company, self.date)
         self.dailytotalamount = 0
         if len(invoices) > 0:
             self.vfd_gc_from = z_last_gc + 1
@@ -197,7 +207,7 @@ def get_z_last_gc(vfd_registration):
         return 0
 
 
-def get_invoices_last_gc(company, last_gc):
+def get_invoices_last_gc(company, date):
     invoices_list = frappe.db.sql(
         """
     SELECT MAX(vfd_gc) as gc
@@ -205,9 +215,9 @@ def get_invoices_last_gc(company, last_gc):
     WHERE 
         company = '{0}'
         and docstatus = 1
-        and vfd_gc > {1}
+        and vfd_date = '{1}'
     """.format(
-            company, last_gc
+            company, date
         ),
         as_dict=True,
     )
@@ -217,10 +227,10 @@ def get_invoices_last_gc(company, last_gc):
         return None
 
 
-def get_invoices(company, last_gc):
+def get_invoices(company, date):
     invoices = frappe.get_all(
         "Sales Invoice",
-        filters={"company": company, "docstatus": 1, "vfd_gc": [">", last_gc]},
+        filters={"company": company, "docstatus": 1, "vfd_date": date},
         fields=["*"],
         order_by="vfd_gc",
     )
@@ -403,13 +413,16 @@ def post(z_report_name):
 
 def multi_zreport_posting():
     for doc_name in frappe.get_all(
-        "VFD Z Report", filters={"zreport_posting_info": ""}, pluck="name"
+        "VFD Z Report",
+        filters={"zreport_posting_info": ""},
+        pluck="name",
+        order_by="date asc",
     ):
         doc = frappe.get_doc("VFD Z Report", doc_name)
         zreport_posting(doc)
 
 
-def send_multy_vfd_z_reports():
+def send_multi_vfd_z_reports():
     reports = frappe.get_all(
         "VFD Z Report",
         filters={"docstatus": 1, "sent_status": ["!=", "Success"]},
@@ -425,12 +438,18 @@ def make_vfd_z_report():
         "VFD Registration", filters={"r_status": "Active"}
     )
     for vfd_registration in vfd_registration_list:
-        vfd_registration_doc = frappe.new_doc("VFD Z Report")
-        vfd_registration_doc.vfd_registration = vfd_registration.name
-        vfd_registration_doc.insert()
-        vfd_registration_doc.submit()
+        last_z_report = frappe.get_last_doc("VFD Z Report")
+        frappe.msgprint(last_z_report.name)
+        date = add_to_date(last_z_report.date, days=1)
+        while str(date) < nowdate():
+            vfd_registration_doc = frappe.new_doc("VFD Z Report")
+            vfd_registration_doc.vfd_registration = vfd_registration.name
+            vfd_registration_doc.date = date
+            vfd_registration_doc.insert()
+            vfd_registration_doc.submit()
+            date = add_to_date(date, days=1)
     frappe.db.commit()
-    send_multy_vfd_z_reports()
+    send_multi_vfd_z_reports()
 
 
 # def make_specific_vfd_z_report(vfd_registration, date):
