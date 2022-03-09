@@ -23,11 +23,10 @@
  "fields": [
   {
    "fieldname": "vfd_z_report",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "VFD Z Report",
-   "options": "VFD Z Report",
    "read_only": 1
   },
   {
@@ -100,7 +99,7 @@
   }
  ],
  "links": [],
- "modified": "2022-02-01 22:56:02.397655",
+ "modified": "2022-03-10 00:27:11.257233",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Z Report Posting Info",

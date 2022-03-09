@@ -60,10 +60,10 @@
  ],
  "fields": [
   {
-   "default": "Today",
    "fieldname": "date",
    "fieldtype": "Date",
-   "label": "DATE"
+   "label": "DATE",
+   "reqd": 1
   },
   {
    "fieldname": "time",
@@ -350,13 +350,14 @@
    "allow_on_submit": 1,
    "fieldname": "zreport_posting_info",
    "fieldtype": "Data",
-   "label": "ZReport Posting Info"
+   "label": "ZReport Posting Info",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-02-22 08:58:00.030336",
+ "modified": "2022-03-10 00:32:14.407248",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Z Report",
