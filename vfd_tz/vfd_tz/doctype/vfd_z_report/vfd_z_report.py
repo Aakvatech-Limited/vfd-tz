@@ -117,6 +117,14 @@ class VFDZReport(Document):
             row.pmttype = "INVOICE"
             row.pmtamount = diff_total
 
+        payment_types = ["CASH", "CHEQUE", "CCARD", "EMONEY", "INVOICE"]
+        exist_types = [i.pmttype for i in self.payments]
+        for type in payment_types:
+            if type not in exist_types:
+                row = self.append("payments", {})
+                row.pmttype = type
+                row.pmtamount = 0
+
     def set_invoices(self, invoices):
         self.invoices = []
         if len(invoices) == 0:
@@ -160,20 +168,18 @@ class VFDZReport(Document):
 
 def get_vattotals(items):
     vattotals = {}
+    taxes_map = {"1": "A", "2": "B", "3": "C", "4": "D", "5": "E"}
+    for key, value in taxes_map.items():
+        vattotals.setdefault(key, {"NETTAMOUNT": 0, "TAXAMOUNT": 0})
+
     for item in items:
         item_taxcode = get_item_taxcode(
             item.item_tax_template, item.item_code, item.parent
         )
-        if not vattotals.get(item_taxcode):
-            vattotals[item_taxcode] = {}
-            vattotals[item_taxcode]["NETTAMOUNT"] = 0
-            vattotals[item_taxcode]["TAXAMOUNT"] = 0
         vattotals[item_taxcode]["NETTAMOUNT"] += flt(item.base_net_amount, 2)
         vattotals[item_taxcode]["TAXAMOUNT"] += flt(
             item.base_net_amount * ((18 / 100) if item_taxcode == 1 else 0), 2
         )
-
-    taxes_map = {"1": "A", "2": "B", "3": "C", "4": "D", "5": "E"}
 
     vattotals_list = []
     for key, value in vattotals.items():
