@@ -41,7 +41,7 @@ class VFDZReport(Document):
         self.dailytotalamount = 0
         if len(invoices) > 0:
             self.vfd_gc_from = z_last_gc + 1
-            self.vfd_gc_to = get_invoices_last_gc(company, z_last_gc)
+            self.vfd_gc_to = get_invoices_last_gc(company, self.date)
             self.set_invoices(invoices)
             self.dailytotalamount = get_gross_between(
                 company, self.vfd_gc_from, self.vfd_gc_to
@@ -97,6 +97,14 @@ class VFDZReport(Document):
             fields=["sum(base_amount) as amount", "mode_of_payment"],
             group_by="mode_of_payment",
         )
+        # Prepend the other receipt types as we only do INVOICE in ERPNext
+        payment_types = ["CASH", "CHEQUE", "CCARD", "EMONEY"]
+        exist_types = [i.pmttype for i in self.payments]
+        for type in payment_types:
+            if type not in exist_types:
+                row = self.append("payments", {})
+                row.pmttype = type
+                row.pmtamount = 0
         payments_data = {}
         for payment in payments_list:
             total_payments += payment.amount
@@ -116,14 +124,6 @@ class VFDZReport(Document):
             row = self.append("payments", {})
             row.pmttype = "INVOICE"
             row.pmtamount = diff_total
-
-        payment_types = ["CASH", "CHEQUE", "CCARD", "EMONEY", "INVOICE"]
-        exist_types = [i.pmttype for i in self.payments]
-        for type in payment_types:
-            if type not in exist_types:
-                row = self.append("payments", {})
-                row.pmttype = type
-                row.pmtamount = 0
 
     def set_invoices(self, invoices):
         self.invoices = []
@@ -168,10 +168,9 @@ class VFDZReport(Document):
 
 def get_vattotals(items):
     vattotals = {}
-    taxes_map = {"1": "A", "2": "B", "3": "C", "4": "D", "5": "E"}
+    taxes_map = {1: "A-18.00", 2: "B-0.00", 3: "C-0.00", 4: "D-0.00", 5: "E-0.00"}
     for key, value in taxes_map.items():
         vattotals.setdefault(key, {"NETTAMOUNT": 0, "TAXAMOUNT": 0})
-
     for item in items:
         item_taxcode = get_item_taxcode(
             item.item_tax_template, item.item_code, item.parent
@@ -185,7 +184,7 @@ def get_vattotals(items):
     for key, value in vattotals.items():
         vattotals_list.append(
             {
-                "vatrate": taxes_map.get(str(key)),
+                "vatrate": taxes_map.get(key),
                 "nettamount": flt(value["NETTAMOUNT"], 2),
                 "taxamount": flt(value["TAXAMOUNT"], 2),
             }
