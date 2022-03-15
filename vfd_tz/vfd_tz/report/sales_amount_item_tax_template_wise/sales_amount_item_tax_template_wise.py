@@ -71,20 +71,23 @@ def get_columns():
 def get_sales_invoice_entries(filters):
     return frappe.db.sql(
         """SELECT 	vfd_rctvnum,
+					si.vfd_status,
 					si.name as invoice_no,
-					vfd_date,
-					customer_name,
-					customer_group, 
-					territory,
-					tax_id,
+					si.vfd_date,
+					si.customer_name,
+					si.customer_group, 
+					si.territory,
+					if(si.tax_id is null, '999999999', si.tax_id) as tax_id,
 					sii.item_tax_template,
-					sum(sii.net_amount) as net_amount
+					sum(sii.base_net_amount) as net_amount
 			FROM `tabSales Invoice` si 
 				INNER JOIN `tabSales Invoice Item` sii ON si.name = sii.parent
 			WHERE (si.posting_date >= %(from_date)s 
 					and si.posting_date <= %(to_date)s) 
 					and si.is_return = 0
-			GROUP BY si.name, posting_date, customer_name, customer_group, territory, tax_id, sii.item_tax_template
+					and si.docstatus = 1
+					and si.vfd_rctvnum is not null
+			GROUP BY si.name
 			ORDER BY vfd_rctvnum""",
         filters,
         as_dict=1,
