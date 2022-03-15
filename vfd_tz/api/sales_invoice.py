@@ -58,15 +58,27 @@ def vfd_validation(doc, method):
 
         if other_tax:
             frappe.throw(
-                _("Taxes not set correctly for item {0}".format(item.item_code))
+                _(
+                    "Taxes not set correctly for Other Tax item {0}".format(
+                        item.item_code
+                    )
+                )
             )
         if item_taxcode == 1 and with_tax != 1:
             frappe.throw(
-                _("Taxes not set correctly for item {0}".format(item.item_code))
+                _(
+                    "Taxes not set correctly for Standard Rate item {0}".format(
+                        item.item_code
+                    )
+                )
             )
         elif item_taxcode != 1 and with_tax != 0:
             frappe.throw(
-                _("Taxes not set correctly for item {0}".format(item.item_code))
+                _(
+                    "Taxes not set correctly for Non Standard Rate item {0}".format(
+                        item.item_code
+                    )
+                )
             )
 
 
