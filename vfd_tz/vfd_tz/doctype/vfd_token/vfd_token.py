@@ -46,6 +46,7 @@ def get_token(company):
         response = requests.request("POST", url, data=data, timeout=5)
         if not response.status_code == 200:
             frappe.throw(str(response.text.encode("utf8")))
+        token_header = frappe._dict(response.headers)
         token_data = json.loads(response.text)
         token_doc = frappe.get_doc(
             {
@@ -58,13 +59,23 @@ def get_token(company):
                     now(), seconds=(int(token_data.get("expires_in")) - 1000)
                 ),
                 "access_token": token_data.get("access_token"),
+                "ackcode": token_header.get("ACKCODE"),
+                "ackmsg": token_header.get("ACKMSG"),
             }
         )
 
         token_doc.flags.ignore_permissions = True
         token_doc.insert(ignore_permissions=True)
         token_doc.submit()
+        if token_doc.ackcode in ["8", "18"]:
+            doc.cancel()
         frappe.db.commit()
+        if token_doc.ackcode in ["8", "18"]:
+            frappe.throw(
+                _(
+                    "TRA has rejected the token request with code {0} and message {1}"
+                ).format(token_doc.ackcode, token_doc.ackmsg)
+            )
         token_data["token"] = "bearer " + token_data.get("access_token")
 
     return token_data
