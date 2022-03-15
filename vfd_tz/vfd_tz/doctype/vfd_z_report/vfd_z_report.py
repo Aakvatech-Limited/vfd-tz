@@ -46,10 +46,10 @@ class VFDZReport(Document):
             self.dailytotalamount = get_gross_between(
                 company, self.vfd_gc_from, self.vfd_gc_to
             )
-            self.set_vat_totals()
         else:
             self.vfd_gc_from = None
             self.vfd_gc_to = None
+        self.set_vat_totals()
         # self.gross = get_gross(company)
         self.gross = get_gross_between(company, 1, self.vfd_gc_to or z_last_gc)
         self.discounts = 0
@@ -120,10 +120,9 @@ class VFDZReport(Document):
             row.pmttype = key
             row.pmtamount = value
         diff_total = self.dailytotalamount - total_payments
-        if diff_total > 0:
-            row = self.append("payments", {})
-            row.pmttype = "INVOICE"
-            row.pmtamount = diff_total
+        row = self.append("payments", {})
+        row.pmttype = "INVOICE"
+        row.pmtamount = diff_total or 0
 
     def set_invoices(self, invoices):
         self.invoices = []
@@ -143,12 +142,13 @@ class VFDZReport(Document):
         invoices_list = []
         for row in self.invoices:
             invoices_list.append(row.invoice)
-        if not invoices_list:
-            return
-        items = frappe.get_all(
-            "Sales Invoice Item",
-            filters={"parent": ["in", invoices_list]},
-            fields=["*"],
+        items = (
+            frappe.get_all(
+                "Sales Invoice Item",
+                filters={"parent": ["in", invoices_list]},
+                fields=["*"],
+            )
+            or []
         )
         vattotals = get_vattotals(items)
         for el in vattotals:
