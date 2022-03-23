@@ -23,6 +23,8 @@ import time
 
 
 def vfd_validation(doc, method):
+    if doc.is_return or doc.is_not_vfd_invoice:
+        return
     if doc.base_net_total == 0:
         frappe.throw(_("Base net amount is zero. Correct the invoice and retry."))
 
