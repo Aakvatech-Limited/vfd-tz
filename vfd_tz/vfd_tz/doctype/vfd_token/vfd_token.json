@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "allow_copy": 1,
  "autoname": "VFDT-.YY.-.######",
  "creation": "2020-11-02 17:14:37.630441",
@@ -13,6 +14,11 @@
   "expires_in",
   "expires_date",
   "access_token",
+  "section_break_8",
+  "ackcode",
+  "column_break_10",
+  "ackmsg",
+  "section_break_11",
   "amended_from"
  ],
  "fields": [
@@ -71,10 +77,33 @@
   {
    "fieldname": "column_break_4",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "ackcode",
+   "fieldtype": "Data",
+   "label": "ACKCODE"
+  },
+  {
+   "fieldname": "ackmsg",
+   "fieldtype": "Data",
+   "label": "ACKMSG"
+  },
+  {
+   "fieldname": "section_break_11",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
   }
  ],
  "is_submittable": 1,
- "modified": "2020-11-28 00:53:31.056207",
+ "links": [],
+ "modified": "2022-03-15 19:36:38.289988",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Token",

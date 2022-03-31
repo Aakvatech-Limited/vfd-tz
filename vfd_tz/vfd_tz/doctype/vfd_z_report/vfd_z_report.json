@@ -1,12 +1,20 @@
 {
  "actions": [],
+ "autoname": "VFDZR-.YY.-.MM.-.###",
  "creation": "2021-05-26 19:03:42.876581",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "vfd_registration",
   "date",
   "time",
+  "zreport_posting_info",
+  "column_break_4",
+  "vfd_gc_previous",
+  "vfd_gc_from",
+  "vfd_gc_to",
+  "sent_status",
   "vfd_z_report_header_section",
   "line_1",
   "line_2",
@@ -18,6 +26,8 @@
   "line_7",
   "line_8",
   "section_break_13",
+  "invoices",
+  "section_break_20",
   "vrn",
   "tin",
   "taxoffice",
@@ -39,19 +49,21 @@
   "ticketsfiscal",
   "ticketsnonfiscal",
   "section_break_34",
-  "vfd_vat_totals",
+  "vats",
   "section_break_36",
   "payments",
   "changes_section",
   "vatchangenum",
   "column_break_40",
-  "headchangenum"
+  "headchangenum",
+  "amended_from"
  ],
  "fields": [
   {
    "fieldname": "date",
    "fieldtype": "Date",
-   "label": "DATE"
+   "label": "DATE",
+   "reqd": 1
   },
   {
    "fieldname": "time",
@@ -67,15 +79,13 @@
    "fieldname": "line_1",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "LINE 1",
-   "reqd": 1
+   "label": "LINE 1"
   },
   {
    "fieldname": "line_2",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "LINE 2",
-   "reqd": 1
+   "label": "LINE 2"
   },
   {
    "fieldname": "line_5",
@@ -95,15 +105,13 @@
    "fieldname": "line_3",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "LINE 3",
-   "reqd": 1
+   "label": "LINE 3"
   },
   {
    "fieldname": "line_4",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "LINE 4",
-   "reqd": 1
+   "label": "LINE 4"
   },
   {
    "fieldname": "line_7",
@@ -120,24 +128,32 @@
    "fieldtype": "Section Break"
   },
   {
+   "fetch_from": "vfd_registration.vrn",
    "fieldname": "vrn",
    "fieldtype": "Data",
-   "label": "VRN"
+   "label": "VRN",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.tin",
    "fieldname": "tin",
    "fieldtype": "Data",
-   "label": "TIN"
+   "label": "TIN",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.taxoffice",
    "fieldname": "taxoffice",
    "fieldtype": "Data",
-   "label": "TAXOFFICE"
+   "label": "TAXOFFICE",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.regid",
    "fieldname": "regid",
    "fieldtype": "Data",
-   "label": "REGID"
+   "label": "REGID",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_18",
@@ -146,22 +162,29 @@
   {
    "fieldname": "znumber",
    "fieldtype": "Int",
-   "label": "ZNUMBER"
+   "label": "ZNUMBER",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.serial",
    "fieldname": "serial",
    "fieldtype": "Data",
-   "label": "SERIAL"
+   "label": "SERIAL",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.creation",
    "fieldname": "registrationdate",
-   "fieldtype": "Data",
-   "label": "REGISTRATIONDATE"
+   "fieldtype": "Date",
+   "label": "REGISTRATIONDATE",
+   "read_only": 1
   },
   {
+   "fetch_from": "vfd_registration.uin",
    "fieldname": "uin",
    "fieldtype": "Data",
-   "label": "UIN"
+   "label": "UIN",
+   "read_only": 1
   },
   {
    "fieldname": "vfd_z_report_totals_section",
@@ -200,7 +223,7 @@
   {
    "description": "TOTAL NUMBER OF TICKETS VOIDED/CANCELLED IN THE SYSTEM AND THEREFORE NOT SENT TO TRA.",
    "fieldname": "ticketsvoid",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "TICKETSVOID"
   },
   {
@@ -212,13 +235,13 @@
   {
    "description": "TOTAL FISCAL RECEIPT ISSUED",
    "fieldname": "ticketsfiscal",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "TICKETSFISCAL"
   },
   {
    "description": "TOTAL NUMBER OF RECEIPTS NOT SENT TO TRA AS A RESULT OF VOID/CANCEL",
    "fieldname": "ticketsnonfiscal",
-   "fieldtype": "Currency",
+   "fieldtype": "Int",
    "label": "TICKETSNONFISCAL"
   },
   {
@@ -228,12 +251,6 @@
   {
    "fieldname": "section_break_34",
    "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "vfd_vat_totals",
-   "fieldtype": "Table",
-   "label": "VFD VAT TOTALS",
-   "options": "VFD VAT Totals"
   },
   {
    "fieldname": "section_break_36",
@@ -267,17 +284,88 @@
    "fieldname": "headchangenum",
    "fieldtype": "Int",
    "label": "HEADCHANGENUM"
+  },
+  {
+   "fieldname": "vfd_registration",
+   "fieldtype": "Link",
+   "label": "VFD Registration",
+   "options": "VFD Registration",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vfd_gc_from",
+   "fieldtype": "Int",
+   "label": "VFD GC From",
+   "read_only": 1
+  },
+  {
+   "fieldname": "vfd_gc_to",
+   "fieldtype": "Int",
+   "label": "VFD GC To",
+   "read_only": 1
+  },
+  {
+   "fieldname": "vfd_gc_previous",
+   "fieldtype": "Int",
+   "label": "VFD GC Previous",
+   "read_only": 1
+  },
+  {
+   "fieldname": "invoices",
+   "fieldtype": "Table",
+   "label": "Invoices",
+   "options": "VFD Z Invoices"
+  },
+  {
+   "fieldname": "section_break_20",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "vats",
+   "fieldtype": "Table",
+   "label": "VFD VAT TOTALS",
+   "options": "VFD VAT Totals"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "VFD Z Report",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "sent_status",
+   "fieldtype": "Data",
+   "label": "Sent Status",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "zreport_posting_info",
+   "fieldtype": "Data",
+   "label": "ZReport Posting Info",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2021-05-26 19:31:54.427810",
+ "modified": "2022-03-10 00:32:14.407248",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Z Report",
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -287,6 +375,21 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],

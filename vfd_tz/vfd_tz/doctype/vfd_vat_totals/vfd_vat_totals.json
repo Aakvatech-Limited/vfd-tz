@@ -13,25 +13,31 @@
   {
    "fieldname": "vatrate",
    "fieldtype": "Data",
-   "label": "VATRATE"
+   "in_list_view": 1,
+   "label": "VATRATE",
+   "reqd": 1
   },
   {
    "description": "TOTAL ECXLUSIVE OF TAX FOR VAT ITEMS",
    "fieldname": "nettamount",
    "fieldtype": "Currency",
-   "label": "NETTAMOUNT"
+   "in_list_view": 1,
+   "label": "NETTAMOUNT",
+   "reqd": 1
   },
   {
    "description": "TOTAL VAT FOR THE DAY",
    "fieldname": "taxamount",
    "fieldtype": "Currency",
-   "label": "TAXAMOUNT"
+   "in_list_view": 1,
+   "label": "TAXAMOUNT",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-05-26 19:27:58.109093",
+ "modified": "2021-06-01 14:36:58.283987",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD VAT Totals",

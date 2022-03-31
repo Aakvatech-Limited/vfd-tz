@@ -1,0 +1,125 @@
+{
+ "actions": [],
+ "allow_copy": 1,
+ "autoname": "VFDZRP-.YY.-.######",
+ "creation": "2022-02-01 22:54:48.771553",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "vfd_z_report",
+  "ackcode",
+  "ackmsg",
+  "column_break_4",
+  "znumber",
+  "date",
+  "time",
+  "section_break_8",
+  "efdmssignature",
+  "section_break_10",
+  "req_headers",
+  "req_data"
+ ],
+ "fields": [
+  {
+   "fieldname": "vfd_z_report",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "VFD Z Report",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ackcode",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "ACKCODE",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ackmsg",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "ACKMSG",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "znumber",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "ZNUMBER",
+   "read_only": 1
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "DATE",
+   "read_only": 1
+  },
+  {
+   "fieldname": "time",
+   "fieldtype": "Time",
+   "label": "TIME",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "efdmssignature",
+   "fieldtype": "Small Text",
+   "label": "EFDMSSIGNATURE",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "req_headers",
+   "fieldtype": "Small Text",
+   "label": "REQ Headers",
+   "read_only": 1
+  },
+  {
+   "fieldname": "req_data",
+   "fieldtype": "Code",
+   "label": "REQ Data",
+   "read_only": 1
+  }
+ ],
+ "links": [],
+ "modified": "2022-03-10 00:27:11.257233",
+ "modified_by": "Administrator",
+ "module": "vfd-tz",
+ "name": "VFD Z Report Posting Info",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

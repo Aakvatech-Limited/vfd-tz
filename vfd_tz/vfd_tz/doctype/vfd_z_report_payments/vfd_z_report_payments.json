@@ -14,19 +14,22 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "PMTTYPE",
-   "options": "CASH\nCHEQUE\nCCARD\nEMONEY\nINVOICE"
+   "options": "\nCASH\nCHEQUE\nCCARD\nEMONEY\nINVOICE",
+   "reqd": 1
   },
   {
    "description": "TOTAL sales of all receipts paid by PMTTYPE",
    "fieldname": "pmtamount",
    "fieldtype": "Currency",
-   "label": "PMTAMOUNT"
+   "in_list_view": 1,
+   "label": "PMTAMOUNT",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-05-26 19:29:54.333778",
+ "modified": "2021-06-01 14:38:33.182344",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Z Report Payments",

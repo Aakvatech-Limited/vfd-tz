@@ -98,6 +98,14 @@ scheduler_events = {
     # "daily": [
     # 	"vfd_tz.tasks.daily"
     # ],
+    "cron": {
+        "0 2 * * *": [
+            "vfd_tz.vfd_tz.doctype.vfd_z_report.vfd_z_report.make_vfd_z_report",
+        ],
+        "0 * * * *": [
+            "vfd_tz.vfd_tz.doctype.vfd_z_report.vfd_z_report.send_multi_vfd_z_reports",
+        ],
+    },
     "hourly": ["vfd_tz.api.sales_invoice.posting_all_vfd_invoices"],
     # "weekly": [
     # 	"vfd_tz.tasks.weekly"
@@ -136,6 +144,8 @@ fixtures = [
                 (
                     "Customer-vfd_custid",
                     "Customer-vfd_custidtype",
+                    "Sales Invoice-column_break_vfd",
+                    "Sales Invoice-vfd_z_number",
                     "Item Tax Template-vfd_taxcode",
                     "Mode of Payment-vfd_pmttype",
                     "POS Profile-is_auto_generate_vfd",
@@ -156,6 +166,7 @@ fixtures = [
                     "Sales Invoice-vfd_time",
                     "Sales Invoice-vfd_verification_url",
                     "Sales Taxes and Charges Template-vfd_vatrate",
+                    "Sales Invoice-vfd_z_report",
                 ),
             ]
         ],

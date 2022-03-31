@@ -12,12 +12,14 @@ frappe.ui.form.on("Customer", {
         }
     },
     tax_id: function(frm) {
-        if (frm.doc.tax_id.length != 9){
-            frappe.throw(__("TIN Number is should be 9 numbers only"));
-        }
-        if (frm.doc.tax_id) {
-            frm.set_value("vfd_custid", frm.doc.tax_id);
-            frm.set_value("vfd_custidtype", "1- TIN");
-        }
+        frm.fields_dict.tax_id.$input.focusout(function() {
+            if (frm.doc.tax_id.length != 9){
+                frappe.throw(__("TIN Number is should be 9 numbers only"));
+            }
+            if (frm.doc.tax_id) {
+                frm.set_value("vfd_custid", frm.doc.tax_id);
+                frm.set_value("vfd_custidtype", "1- TIN");
+            }
+        });
     },
 })

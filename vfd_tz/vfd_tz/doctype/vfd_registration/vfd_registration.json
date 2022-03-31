@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "allow_copy": 1,
  "autoname": "VFDR-.YY.-.####",
  "creation": "2020-10-23 22:33:19.373605",
@@ -10,6 +11,7 @@
   "use_item_group",
   "column_break_2",
   "vfd_start_date",
+  "vfd_z_report_start_date",
   "do_not_send_vfd",
   "section_break_2",
   "company",
@@ -75,6 +77,7 @@
    "fieldname": "url",
    "fieldtype": "Data",
    "label": "URL",
+   "options": "URL",
    "reqd": 1
   },
   {
@@ -293,6 +296,7 @@
    "fieldname": "verification_url",
    "fieldtype": "Data",
    "label": "Verification URL",
+   "options": "URL",
    "reqd": 1
   },
   {
@@ -301,10 +305,17 @@
    "fieldname": "use_item_group",
    "fieldtype": "Check",
    "label": "Use Item Group Code instead of Item Name for VFD"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vfd_z_report_start_date",
+   "fieldtype": "Datetime",
+   "label": "VFD Z-Report Start Date"
   }
  ],
  "is_submittable": 1,
- "modified": "2021-01-30 15:10:51.022783",
+ "links": [],
+ "modified": "2022-02-01 23:07:07.220879",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Registration",

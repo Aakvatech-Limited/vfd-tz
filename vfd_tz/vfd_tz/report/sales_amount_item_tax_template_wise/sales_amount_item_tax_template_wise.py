@@ -35,7 +35,7 @@ def execute(filters=None):
                 #"territory",
             ],
             columns="item_tax_template",
-            fill_value=0
+            fill_value=0,
         )
         # frappe.msgprint(str(pvt))
         #
