@@ -443,6 +443,14 @@ def make_vfd_z_report():
         "VFD Registration", filters={"r_status": "Active"}
     )
     for vfd_registration in vfd_registration_list:
+        if not vfd_registration.send_vfd_z_report:
+            frappe.log_error(
+                _("Send VFD Z-Report is not set in VFD Registration {0}").format(
+                    vfd_registration.name
+                ),
+                "VFD Z Report",
+            )
+            continue
         last_z_report = frappe.get_last_doc("VFD Z Report")
         frappe.msgprint(last_z_report.name)
         date = add_to_date(last_z_report.date, days=1)
