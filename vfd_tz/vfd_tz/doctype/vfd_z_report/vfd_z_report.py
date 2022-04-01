@@ -447,11 +447,11 @@ def make_vfd_z_report():
         frappe.msgprint(last_z_report.name)
         date = add_to_date(last_z_report.date, days=1)
         while str(date) < nowdate():
-            vfd_registration_doc = frappe.new_doc("VFD Z Report")
-            vfd_registration_doc.vfd_registration = vfd_registration.name
-            vfd_registration_doc.date = date
-            vfd_registration_doc.insert()
-            vfd_registration_doc.submit()
+            vfd_z_report_doc = frappe.new_doc("VFD Z Report")
+            vfd_z_report_doc.vfd_registration = vfd_registration.name
+            vfd_z_report_doc.date = date
+            vfd_z_report_doc.insert()
+            vfd_z_report_doc.submit()
             date = add_to_date(date, days=1)
     frappe.db.commit()
     send_multi_vfd_z_reports()
