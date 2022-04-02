@@ -310,6 +310,8 @@ def posting_vfd_invoice(invoice_name):
                 "req_data": str(data).encode("utf8"),
             }
         )
+        posting_info_doc.flags.ignore_permissions = True
+        posting_info_doc.insert(ignore_permissions=True)
         doc.vfd_status = "Failed"
         doc.db_update()
         frappe.db.commit()
