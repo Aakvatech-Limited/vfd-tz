@@ -282,6 +282,9 @@ def zreport_posting(doc):
         return
     registration_doc = frappe.get_doc("VFD Registration", doc.vfd_registration)
     token_data = get_token(registration_doc.company)
+    if not token_data.get("cert_serial"):
+        frappe.log_error("No certificate serial found", "VFD Z Report posting")
+        return
     headers = {
         "Content-Type": "Application/xml",
         "Routing-Key": "vfdzreport",
@@ -412,8 +415,7 @@ def zreport_posting(doc):
 @frappe.whitelist()
 def post(z_report_name):
     doc = frappe.get_doc("VFD Z Report", z_report_name)
-    if not zreport_posting(doc):
-        frappe.throw(_("Z-Report has not been posted! Please try again."))
+    zreport_posting(doc)
 
 
 def multi_zreport_posting():
