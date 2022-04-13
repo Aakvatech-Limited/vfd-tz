@@ -103,7 +103,7 @@ def get_latest_registration_doc(company, throw=True):
         if throw:
             frappe.throw(
                 _(
-                    "Message from TRA:<br><b>{0}</b><br> for company <b>{1}</b>".format(
+                    "VFD is BLOCKED for <b>{1}</b>.<br>Message from TRA:<br><b>{0}</b>".format(
                         doc.tra_message, company
                     )
                 )
@@ -111,7 +111,7 @@ def get_latest_registration_doc(company, throw=True):
         else:
             frappe.msgprint(
                 _(
-                    "Message from TRA:<br><b>{0}</b><br> for company <b>{1}</b>".format(
+                    "VFD is BLOCKED for <b>{1}</b>.<br>Message from TRA:<br><b>{0}</b>".format(
                         doc.tra_message, company
                     )
                 )
