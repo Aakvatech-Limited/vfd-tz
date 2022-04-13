@@ -96,7 +96,7 @@ def get_token(company):
         doc.save(ignore_permissions=True)
         frappe.db.commit()
         if token_doc.ackcode in ["8", "18"]:
-            frappe.logger(
+            frappe.log_error(
                 _(
                     "TRA has rejected the token request with code {0} and message {1}"
                 ).format(token_doc.ackcode, token_doc.ackmsg),
