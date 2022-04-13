@@ -18,7 +18,7 @@ class VFDToken(Document):
 
 
 @frappe.whitelist()
-def get_token(company):
+def get_token(company, force=True):
     token_data = {}
     doc = get_latest_registration_doc(company, throw=False)
     if not doc:
@@ -37,7 +37,7 @@ def get_token(company):
         fields=["name", "access_token"],
     )
 
-    if len(token_list):
+    if len(token_list) and not force:
         token_data["token"] = "bearer " + token_list[0]["access_token"]
 
     else:

@@ -12,6 +12,7 @@ frappe.ui.form.on('VFD Registration', {
 			method: 'vfd_tz.vfd_tz.doctype.vfd_token.vfd_token.get_token',
 			args: {
 				'company': frm.doc.company,
+				'force': 1,
 			},
 			callback: function (r) {
 				console.log(r);
