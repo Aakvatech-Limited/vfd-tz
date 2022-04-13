@@ -18,7 +18,7 @@ class VFDToken(Document):
 
 
 @frappe.whitelist()
-def get_token(company, force=True):
+def get_token(company, force=False):
     token_data = {}
     doc = get_latest_registration_doc(company, throw=False)
     if not doc:
