@@ -88,11 +88,8 @@ def get_latest_registration_doc(company, throw=True):
         filters={"docstatus": 1, "company": company, "r_status": "Active"},
     )
     if not len(doc_list):
-        frappe.log_error(
-            _("No active registration found for {0}").format(company),
-            "VFD Registration Not Found",
-        )
-        frappe.throw(_("No active registration found for {0}").format(company))
+        if throw:
+            frappe.throw(_("No active registration found for {0}").format(company))
         return
     doc = frappe.get_doc("VFD Registration", doc_list[0].name)
     if doc.is_blocked:
