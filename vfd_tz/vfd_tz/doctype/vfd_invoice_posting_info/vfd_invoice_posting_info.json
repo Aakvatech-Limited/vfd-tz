@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "allow_copy": 1,
  "autoname": "VFDP-.YY.-.######",
  "creation": "2020-11-04 17:25:15.662218",
@@ -39,7 +40,7 @@
   },
   {
    "fieldname": "ackmsg",
-   "fieldtype": "Data",
+   "fieldtype": "Small Text",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "ACKMSG",
@@ -98,7 +99,8 @@
    "read_only": 1
   }
  ],
- "modified": "2020-11-05 03:47:43.604387",
+ "links": [],
+ "modified": "2022-04-13 19:01:09.581486",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Invoice Posting Info",
