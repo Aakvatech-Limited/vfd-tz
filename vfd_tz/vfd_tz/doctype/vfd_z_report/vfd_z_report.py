@@ -442,7 +442,7 @@ def send_multi_vfd_z_reports():
 
 def make_vfd_z_report():
     vfd_registration_list = frappe.get_all(
-        "VFD Registration", filters={"r_status": "Active"}
+        "VFD Registration", filters={"r_status": "Active"}, fields=["name", "send_vfd_z_report"]
     )
     for vfd_registration in vfd_registration_list:
         if not vfd_registration.send_vfd_z_report:
