@@ -121,16 +121,19 @@ def enqueue_posting_vfd_invoice(invoice_name):
         enqueue(
             method=posting_all_vfd_invoices, queue="short", timeout=10000, is_async=True
         )
+    else:
+        frappe.log_error(_("VFD Invoice posting already in progress"))
     return True
 
 
 def posting_all_vfd_invoices():
     if frappe.local.flags.vfd_posting:
+        frappe.log_error(_("VFD Posting Flag found", "VFD Posting Flag found"))
         return
     frappe.local.flags.vfd_posting = True
     company_list = frappe.get_all("Company")
     for company in company_list:
-        registration_doc = get_latest_registration_doc(company["name"])
+        registration_doc = get_latest_registration_doc(company["name"], throw=False)
         if not registration_doc:
             continue
         if registration_doc.do_not_send_vfd:
@@ -175,21 +178,28 @@ def posting_all_vfd_invoices():
             last_sent_success_gc = int(registration_doc.gc) - 1
 
         if last_sent_success_gc + 1 != first_to_send_gc:
-            frappe.throw(
+            frappe.log_error(
                 _(
                     "Invoice sequence out of order. Last GC Sent Successfully is {0}. First to send GC is {1}. Check failed VFD Invoice Posting Info"
-                ).format(last_sent_success_gc, first_to_send_gc)
+                ).format(last_sent_success_gc, first_to_send_gc), "Invoice Sequence Error"
             )
 
+        failed_receipts= 0
         for invoice in invoices_list:
             status = posting_vfd_invoice(invoice.name)
             if status != "Success":
-                frappe.local.flags.vfd_posting = False
+                # As per TRA Advice on 2022-04-13 20:08 we should not stop posting if one fails
+                # frappe.local.flags.vfd_posting = False
                 frappe.log_error(
                     _("Error in sending VFD Invoice {0}").format(invoice.name),
-                    "VFD Failed for {0}".format(company),
+                    "VFD Failed for {0}".format(company.name),
                 )
-                break
+                # As per TRA Advice on 2022-04-13 20:08 we should not stop posting if one fails
+                # break
+                failed_receipts += 1
+                if failed_receipts > 3:
+                    break
+
         frappe.local.flags.vfd_posting = False
 
 
@@ -245,7 +255,7 @@ def posting_vfd_invoice(invoice_name):
             "DISCOUNT": flt(doc.base_discount_amount, 2),
         },
         "PAYMENTS": get_payments(doc.payments, doc.base_total),
-        "VATTOTALS": get_vattotals(doc.items, doc.name),
+        "VATTOTALS": get_vattotals(doc.items, doc.name, registration_doc.vrn),
     }
     use_item_group = registration_doc.use_item_group
     for item in doc.items:
@@ -425,7 +435,7 @@ def get_payments(payments, base_total):
     return payments_dict
 
 
-def get_vattotals(items, invoice_name):
+def get_vattotals(items, invoice_name, vrn):
     vattotals = {}
     for item in items:
         item_taxcode = get_item_taxcode(
@@ -436,9 +446,12 @@ def get_vattotals(items, invoice_name):
             vattotals[item_taxcode]["NETTAMOUNT"] = 0
             vattotals[item_taxcode]["TAXAMOUNT"] = 0
         vattotals[item_taxcode]["NETTAMOUNT"] += flt(item.base_net_amount, 2)
-        vattotals[item_taxcode]["TAXAMOUNT"] += flt(
-            item.base_net_amount * ((18 / 100) if item_taxcode == 1 else 0), 2
-        )
+        if vrn == "NOT REGISTERED":
+            vattotals[item_taxcode]["TAXAMOUNT"] += 0
+        else:
+            vattotals[item_taxcode]["TAXAMOUNT"] += flt(
+                item.base_net_amount * ((18 / 100) if item_taxcode == 1 else 0), 2
+            )
 
     taxes_map = {"1": "A", "2": "B", "3": "C", "4": "D", "5": "E"}
 
