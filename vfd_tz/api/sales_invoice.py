@@ -254,7 +254,7 @@ def posting_vfd_invoice(invoice_name):
             "TOTALTAXINCL": flt(doc.base_grand_total, 2),
             "DISCOUNT": flt(doc.base_discount_amount, 2),
         },
-        "PAYMENTS": get_payments(doc.payments, doc.base_total),
+        "PAYMENTS": get_payments(doc.payments, doc.base_grand_total),
         "VATTOTALS": get_vattotals(doc.items, doc.name, registration_doc.vrn),
     }
     use_item_group = registration_doc.use_item_group
@@ -406,7 +406,7 @@ def get_item_taxcode(item_tax_template=None, item_code=None, invoice_name=None):
     return taxcode
 
 
-def get_payments(payments, base_total):
+def get_payments(payments, base_grand_total):
     payments_dict = []
     total_payments_amount = 0
     for payment in payments:
@@ -428,9 +428,9 @@ def get_payments(payments, base_total):
         payments_dict.append({"PMTTYPE": pmttype})
         payments_dict.append({"PMTAMOUNT": flt(payment.base_amount, 2)})
 
-    if base_total > total_payments_amount:
+    if base_grand_total > total_payments_amount:
         payments_dict.append({"PMTTYPE": "INVOICE"})
-        payments_dict.append({"PMTAMOUNT": flt(base_total - total_payments_amount, 2)})
+        payments_dict.append({"PMTAMOUNT": flt(base_grand_total - total_payments_amount, 2)})
 
     return payments_dict
 
