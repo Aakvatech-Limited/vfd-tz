@@ -100,10 +100,10 @@ def auto_reregistration(doc=None, doc_name=None):
     new_doc.docstatus = 0
     new_doc.insert(ignore_permissions=True)
     frappe.db.commit()
-    enqueue_doc(
-        new_doc.doctype,
-        name=new_doc.name,
-        method="submit",
-        queue="default",
-        timeout=300,
-    )
+    # enqueue_doc(
+    #     new_doc.doctype,
+    #     name=new_doc.name,
+    #     method="submit",
+    #     queue="default",
+    #     timeout=300,
+    # )
