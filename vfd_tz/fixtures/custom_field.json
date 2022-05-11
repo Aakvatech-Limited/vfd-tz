@@ -1172,6 +1172,7 @@
     "modified": "2022-05-05 21:05:12.535791",
     "modified_by": "Administrator",
     "idx": 38,
+    "doctype": "Custom Field",
     "docstatus": 0,
     "dt": "Sales Invoice",
     "label": "VFD SERIAL",
