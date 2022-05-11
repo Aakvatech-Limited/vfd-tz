@@ -28,6 +28,10 @@ def vfd_validation(doc, method):
     if doc.base_net_total == 0:
         frappe.throw(_("Base net amount is zero. Correct the invoice and retry."))
 
+    registration_doc = get_latest_registration_doc(doc.company, throw=False)
+    if not registration_doc:
+        return
+
     tax_data = get_itemised_tax_breakup_html(doc)
     if not tax_data:
         frappe.throw(_("Taxes not set correctly"))
@@ -67,13 +71,22 @@ def vfd_validation(doc, method):
                 )
             )
         if item_taxcode == 1 and with_tax != 1:
-            frappe.throw(
-                _(
-                    "Taxes not set correctly for Standard Rate item {0}".format(
-                        item.item_code
+            if registration_doc.vrn == "NOT REGISTERED":
+                frappe.msgprint(
+                    _(
+                        "Taxes is not set to 18pct for Standard Rate item {0}".format(
+                            item.item_code
+                        )
                     )
                 )
-            )
+            else:
+                frappe.throw(
+                    _(
+                        "Taxes not set correctly for Standard Rate item {0}".format(
+                            item.item_code
+                        )
+                    )
+                )
         elif item_taxcode != 1 and with_tax != 0:
             frappe.throw(
                 _(
@@ -82,7 +95,6 @@ def vfd_validation(doc, method):
                     )
                 )
             )
-    get_latest_registration_doc(doc.company)
 
 
 @frappe.whitelist()
@@ -110,8 +122,14 @@ def enqueue_posting_vfd_invoice(invoice_name):
         doc.vfd_dc = counters.dc
         doc.vfd_date = nowdate()
         doc.vfd_time = nowtime()
+        doc.vfd_serial = registration_doc.serial
         doc.vfd_rctvnum = str(registration_doc.receiptcode) + str(doc.vfd_gc)
-        doc.vfd_verification_url = registration_doc.verification_url + doc.vfd_rctvnum + '_' + format_datetime(str(doc.vfd_time), "HHmmss")
+        doc.vfd_verification_url = (
+            registration_doc.verification_url
+            + doc.vfd_rctvnum
+            + "_"
+            + format_datetime(str(doc.vfd_time), "HHmmss")
+        )
         if doc.vfd_status == "Not Sent":
             doc.vfd_status = "Pending"
         doc.db_update()
@@ -181,10 +199,11 @@ def posting_all_vfd_invoices():
             frappe.log_error(
                 _(
                     "Invoice sequence out of order. Last GC Sent Successfully is {0}. First to send GC is {1}. Check failed VFD Invoice Posting Info"
-                ).format(last_sent_success_gc, first_to_send_gc), "Invoice Sequence Error"
+                ).format(last_sent_success_gc, first_to_send_gc),
+                "Invoice Sequence Error",
             )
 
-        failed_receipts= 0
+        failed_receipts = 0
         for invoice in invoices_list:
             status = posting_vfd_invoice(invoice.name)
             if status != "Success":
@@ -430,7 +449,9 @@ def get_payments(payments, base_grand_total):
 
     if base_grand_total > total_payments_amount:
         payments_dict.append({"PMTTYPE": "INVOICE"})
-        payments_dict.append({"PMTAMOUNT": flt(base_grand_total - total_payments_amount, 2)})
+        payments_dict.append(
+            {"PMTAMOUNT": flt(base_grand_total - total_payments_amount, 2)}
+        )
 
     return payments_dict
 
