@@ -32,7 +32,7 @@ class VFDZReport(Document):
 
     def set_data(self):
         company = frappe.get_value("VFD Registration", self.vfd_registration, "company")
-        z_last_gc = get_z_last_gc(self.vfd_registration)
+        z_last_gc = get_z_last_gc(self.serial)
         # self.date is the date of the report
         self.time = "23:59:59"
         self.vfd_gc_previous = z_last_gc
@@ -44,14 +44,14 @@ class VFDZReport(Document):
             self.vfd_gc_to = get_invoices_last_gc(company, self.date)
             self.set_invoices(invoices)
             self.dailytotalamount = get_gross_between(
-                company, self.vfd_gc_from, self.vfd_gc_to
+                company, self.serial, self.vfd_gc_from, self.vfd_gc_to
             )
         else:
             self.vfd_gc_from = None
             self.vfd_gc_to = None
         self.set_vat_totals()
         # self.gross = get_gross(company)
-        self.gross = get_gross_between(company, 1, self.vfd_gc_to or z_last_gc)
+        self.gross = get_all_gross(company, self.serial) + self.dailytotalamount
         self.discounts = 0
         for invoice in self.invoices:
             self.discounts += invoice.discount_amount
@@ -81,6 +81,7 @@ class VFDZReport(Document):
             filters={
                 "docstatus": 2,
                 "company": company,
+                "vfd_status": ["=", "Not Sent"],
                 "vfd_z_report": ["in", [None, "", self.name]],
                 "posting_date": [">=", report_start_date],
             },
@@ -150,7 +151,7 @@ class VFDZReport(Document):
             )
             or []
         )
-        vattotals = get_vattotals(items)
+        vattotals = get_vattotals(items, self.vrn)
         for el in vattotals:
             row = self.append("vats", {})
             row.nettamount = el.get("nettamount")
@@ -166,7 +167,7 @@ class VFDZReport(Document):
                 )
 
 
-def get_vattotals(items):
+def get_vattotals(items, vrn):
     vattotals = {}
     taxes_map = {1: "A-18.00", 2: "B-0.00", 3: "C-0.00", 4: "D-0.00", 5: "E-0.00"}
     for key, value in taxes_map.items():
@@ -176,9 +177,12 @@ def get_vattotals(items):
             item.item_tax_template, item.item_code, item.parent
         )
         vattotals[item_taxcode]["NETTAMOUNT"] += flt(item.base_net_amount, 2)
-        vattotals[item_taxcode]["TAXAMOUNT"] += flt(
-            item.base_net_amount * ((18 / 100) if item_taxcode == 1 else 0), 2
-        )
+        if vrn == "NOT REGISTERED":
+            vattotals[item_taxcode]["TAXAMOUNT"] = 0
+        else:
+            vattotals[item_taxcode]["TAXAMOUNT"] += flt(
+                item.base_net_amount * ((18 / 100) if item_taxcode == 1 else 0), 2
+            )
 
     vattotals_list = []
     for key, value in vattotals.items():
@@ -193,16 +197,16 @@ def get_vattotals(items):
     return vattotals_list
 
 
-def get_z_last_gc(vfd_registration):
+def get_z_last_gc(serial):
     report_list = frappe.db.sql(
         """
     SELECT MAX(vfd_gc_to) as to_gc
     FROM `tabVFD Z Report`
-    WHERE 
-        vfd_registration = '{0}'
+    WHERE
+        serial = '{0}'
         and docstatus = 1
     """.format(
-            vfd_registration
+            serial
         ),
         as_dict=True,
     )
@@ -259,7 +263,7 @@ def get_invoices(company, date):
 #     return invoices_list[0].get("total")
 
 
-def get_gross_between(company, start, end):
+def get_gross_between(company, serial, start, end):
     invoices_list = frappe.db.sql(
         """
     SELECT SUM(IF(base_rounded_total > 0, base_rounded_total, base_grand_total)) as total
@@ -267,13 +271,34 @@ def get_gross_between(company, start, end):
     WHERE 
         company = '{0}'
         and docstatus = 1
-        and vfd_gc BETWEEN {1} AND {2}
+        and vfd_serial = '{1}'
+        and vfd_gc BETWEEN {2} AND {3}
     """.format(
-            company, start, end
+            company, serial, start or 0, end
         ),
         as_dict=True,
     )
     gross = invoices_list[0].get("total")
+    return gross or 0
+
+
+def get_all_gross(company, serial):
+    # invoices_list = frappe.db.sql(
+    #     """
+    # SELECT SUM(IF(base_rounded_total > 0, base_rounded_total, base_grand_total)) as total
+    # FROM `tabSales Invoice`
+    # WHERE
+    #     company = '{0}'
+    #     and vfd_serial = '{1}'
+    #     AND docstatus = 1
+    # """.format(
+    #         company, serial
+    #     ),
+    #     as_dict=True,
+    # )
+    # gross = invoices_list[0].get("total")
+    last_vfd_z_report = frappe.get_last_doc("VFD Z Report", filters={"serial": serial})
+    gross = last_vfd_z_report.gross
     return gross or 0
 
 
@@ -442,7 +467,9 @@ def send_multi_vfd_z_reports():
 
 def make_vfd_z_report():
     vfd_registration_list = frappe.get_all(
-        "VFD Registration", filters={"r_status": "Active"}, fields=["name", "send_vfd_z_report"]
+        "VFD Registration",
+        filters={"r_status": "Active"},
+        fields=["name", "send_vfd_z_report", "serial", "vrn"],
     )
     for vfd_registration in vfd_registration_list:
         if not vfd_registration.send_vfd_z_report:
@@ -453,12 +480,18 @@ def make_vfd_z_report():
                 "VFD Z Report",
             )
             continue
-        last_z_report = frappe.get_last_doc("VFD Z Report")
-        frappe.msgprint(last_z_report.name)
+        last_z_report = frappe.get_last_doc(
+            "VFD Z Report", filters={"serial": vfd_registration.serial}
+        )
+        if not last_z_report:
+            last_z_report = {}
+            last_z_report["date"] = vfd_registration.vfd_z_report_start_date
         date = add_to_date(last_z_report.date, days=1)
         while str(date) < nowdate():
             vfd_z_report_doc = frappe.new_doc("VFD Z Report")
             vfd_z_report_doc.vfd_registration = vfd_registration.name
+            vfd_z_report_doc.serial = vfd_registration.serial
+            vfd_z_report_doc.vrn = vfd_registration.vrn
             vfd_z_report_doc.date = date
             vfd_z_report_doc.insert()
             vfd_z_report_doc.submit()
