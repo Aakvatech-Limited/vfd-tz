@@ -37,7 +37,7 @@ class VFDZReport(Document):
         self.time = "23:59:59"
         self.vfd_gc_previous = z_last_gc
         self.znumber = str(self.date).replace("-", "")
-        invoices = get_invoices(company, self.date)
+        invoices = get_invoices(company, self.date, self.serial)
         self.dailytotalamount = 0
         if len(invoices) > 0:
             self.vfd_gc_from = z_last_gc + 1
@@ -63,6 +63,7 @@ class VFDZReport(Document):
             for invoice in canceled_invoices
         )
         self.set_payments()
+        self.set_z_report_lines()
 
     def get_canceled_invoices(self):
         company, report_start_date = frappe.get_value(
@@ -166,6 +167,13 @@ class VFDZReport(Document):
                     "Sales Invoice", invoice.name, "vfd_z_report", self.name
                 )
 
+    def set_z_report_lines(self):
+        registration_doc = frappe.get_doc("VFD Registration", self.vfd_registration)
+        self.line_1 = registration_doc.company_name or " "
+        self.line_2 = registration_doc.street or " "
+        self.line_3 = "TEL NO: " + (registration_doc.mobile or " ")
+        self.line_4 = (registration_doc.region or " ") + ", " + (registration_doc.country or " ")
+
 
 def get_vattotals(items, vrn):
     vattotals = {}
@@ -236,10 +244,10 @@ def get_invoices_last_gc(company, date):
         return None
 
 
-def get_invoices(company, date):
+def get_invoices(company, date, serial):
     invoices = frappe.get_all(
         "Sales Invoice",
-        filters={"company": company, "docstatus": 1, "vfd_date": date},
+        filters={"company": company, "docstatus": 1, "vfd_date": date, "vfd_serial": serial},
         fields=["*"],
         order_by="vfd_gc",
     )
@@ -297,9 +305,15 @@ def get_all_gross(company, serial):
     #     as_dict=True,
     # )
     # gross = invoices_list[0].get("total")
-    last_vfd_z_report = frappe.get_last_doc("VFD Z Report", filters={"serial": serial})
-    gross = last_vfd_z_report.gross
-    return gross or 0
+    gross = 0
+    try:
+        last_vfd_z_report = frappe.get_last_doc(
+            "VFD Z Report", filters={"serial": serial}
+        )
+        gross = last_vfd_z_report.gross
+    except Exception:
+        pass
+    return gross
 
 
 def zreport_posting(doc):
@@ -321,12 +335,14 @@ def zreport_posting(doc):
         "DATE": doc.date,
         "TIME": format_datetime(str(doc.time), "HH:mm:ss"),
         "HEADER": {
-            "LINE": registration_doc.company_name or " ",
-            "LINE": registration_doc.street or " ",
-            "LINE": registration_doc.mobile or " ",
-            "LINE": registration_doc.city
-            or " " + ", " + registration_doc.country
-            or " ",
+            "LINE": doc.line_1 or " ",
+            "LINE": doc.line_2 or " ",
+            "LINE": doc.line_3 or " ",
+            "LINE": doc.line_4 or " ",
+            "LINE": doc.line_5 or " ",
+            "LINE": doc.line_6 or " ",
+            "LINE": doc.line_7 or " ",
+            "LINE": doc.line_8 or " ",
         },
         "VRN": registration_doc.vrn,
         "TIN": registration_doc.tin,
