@@ -1,1 +1,1 @@
-csf_tz.patches.update_sales_invoice_vfd_serial
+vfd_tz.patches.update_sales_invoice_vfd_serial
