@@ -63,7 +63,6 @@ class VFDZReport(Document):
             for invoice in canceled_invoices
         )
         self.set_payments()
-        self.set_z_report_lines()
 
     def get_canceled_invoices(self):
         company, report_start_date = frappe.get_value(
@@ -167,13 +166,6 @@ class VFDZReport(Document):
                     "Sales Invoice", invoice.name, "vfd_z_report", self.name
                 )
 
-    def set_z_report_lines(self):
-        registration_doc = frappe.get_doc("VFD Registration", self.vfd_registration)
-        self.line_1 = registration_doc.company_name or " "
-        self.line_2 = registration_doc.street or " "
-        self.line_3 = "TEL NO: " + (registration_doc.mobile or " ")
-        self.line_4 = (registration_doc.region or " ") + ", " + (registration_doc.country or " ")
-
 
 def get_vattotals(items, vrn):
     vattotals = {}
@@ -247,7 +239,12 @@ def get_invoices_last_gc(company, date):
 def get_invoices(company, date, serial):
     invoices = frappe.get_all(
         "Sales Invoice",
-        filters={"company": company, "docstatus": 1, "vfd_date": date, "vfd_serial": serial},
+        filters={
+            "company": company,
+            "docstatus": 1,
+            "vfd_date": date,
+            "vfd_serial": serial,
+        },
         fields=["*"],
         order_by="vfd_gc",
     )
@@ -287,7 +284,7 @@ def get_gross_between(company, serial, start, end):
         as_dict=True,
     )
     gross = invoices_list[0].get("total")
-    return gross or 0
+    return flt(gross, 2) or 0
 
 
 def get_all_gross(company, serial):
@@ -313,7 +310,7 @@ def get_all_gross(company, serial):
         gross = last_vfd_z_report.gross
     except Exception:
         pass
-    return gross
+    return flt(gross, 2) or 0
 
 
 def zreport_posting(doc):
@@ -335,14 +332,12 @@ def zreport_posting(doc):
         "DATE": doc.date,
         "TIME": format_datetime(str(doc.time), "HH:mm:ss"),
         "HEADER": {
-            "LINE": doc.line_1 or " ",
-            "LINE": doc.line_2 or " ",
-            "LINE": doc.line_3 or " ",
-            "LINE": doc.line_4 or " ",
-            "LINE": doc.line_5 or " ",
-            "LINE": doc.line_6 or " ",
-            "LINE": doc.line_7 or " ",
-            "LINE": doc.line_8 or " ",
+            "LINE": registration_doc.company_name or " ",
+            "LINE": registration_doc.street or " ",
+            "LINE": registration_doc.mobile or " ",
+            "LINE": registration_doc.city
+            or " " + ", " + registration_doc.country
+            or " ",
         },
         "VRN": registration_doc.vrn,
         "TIN": registration_doc.tin,
@@ -354,13 +349,13 @@ def zreport_posting(doc):
         "USER": registration_doc.uin,
         "SIMIMSI": "WEBAPI",
         "TOTALS": {
-            "DAILYTOTALAMOUNT": doc.dailytotalamount,
-            "GROSS": doc.gross,
+            "DAILYTOTALAMOUNT": flt(doc.dailytotalamount, 2),
+            "GROSS": flt(doc.gross, 2),
             "CORRECTIONS": doc.corrections,
-            "DISCOUNTS": doc.discounts,
-            "SURCHARGES": doc.surcharges,
+            "DISCOUNTS": flt(doc.discounts, 2),
+            "SURCHARGES": flt(doc.surcharges, 2),
             "TICKETSVOID": doc.ticketsvoid,
-            "TICKETSVOIDTOTAL": doc.ticketsvoidtotal,
+            "TICKETSVOIDTOTAL": flt(doc.ticketsvoidtotal, 2),
             "TICKETSFISCAL": doc.ticketsfiscal,
             "TICKETSNONFISCAL": doc.ticketsnonfiscal,
         },
@@ -375,9 +370,9 @@ def zreport_posting(doc):
     for vat in doc.vats:
         zreport["VATTOTALS"].append(
             {
-                "VATRATE": vat.vatrate,
-                "NETTAMOUNT": vat.nettamount,
-                "TAXAMOUNT": vat.taxamount,
+                "VATRATE": flt(vat.vatrate, 2),
+                "NETTAMOUNT": flt(vat.nettamount, 2),
+                "TAXAMOUNT": flt(vat.taxamount, 2),
             }
         )
 
@@ -385,7 +380,7 @@ def zreport_posting(doc):
         zreport["PAYMENTS"].append(
             {
                 "PMTTYPE": payment.pmttype,
-                "PMTAMOUNT": payment.pmtamount,
+                "PMTAMOUNT": flt(payment.pmtamount, 2),
             }
         )
 
