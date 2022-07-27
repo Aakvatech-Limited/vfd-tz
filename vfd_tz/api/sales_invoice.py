@@ -502,10 +502,13 @@ def get_item_inclusive_amount(item):
     if item.base_net_amount == item.base_amount:
         # this is basic rate included
         item_tax_rate = json.loads(item.item_tax_rate)
-        for key, value in item_tax_rate.items():
-            if not value or value == 0.00:
-                return flt(item.base_amount, 2)
-            return flt(item.base_amount * (1 + (value / 100)), 2)  # 118% for 18% VAT
+        if not item_tax_rate or item_tax_rate == {}:
+            return item.base_amount
+        else:
+            for key, value in item_tax_rate.items():
+                if not value or value == 0.00:
+                    return flt(item.base_amount, 2)
+                return flt(item.base_amount * (1 + (value / 100)), 2)  # 118% for 18% VAT
     else:
         return flt(item.base_amount, 2)
 
