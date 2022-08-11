@@ -37,7 +37,7 @@ class VFDZReport(Document):
         self.time = "23:59:59"
         self.vfd_gc_previous = z_last_gc
         self.znumber = str(self.date).replace("-", "")
-        invoices = get_invoices(company, self.date)
+        invoices = get_invoices(company, self.date, self.serial)
         self.dailytotalamount = 0
         if len(invoices) > 0:
             self.vfd_gc_from = z_last_gc + 1
@@ -236,10 +236,15 @@ def get_invoices_last_gc(company, date):
         return None
 
 
-def get_invoices(company, date):
+def get_invoices(company, date, serial):
     invoices = frappe.get_all(
         "Sales Invoice",
-        filters={"company": company, "docstatus": 1, "vfd_date": date},
+        filters={
+            "company": company,
+            "docstatus": 1,
+            "vfd_date": date,
+            "vfd_serial": serial,
+        },
         fields=["*"],
         order_by="vfd_gc",
     )
@@ -279,7 +284,7 @@ def get_gross_between(company, serial, start, end):
         as_dict=True,
     )
     gross = invoices_list[0].get("total")
-    return gross or 0
+    return flt(gross, 2) or 0
 
 
 def get_all_gross(company, serial):
@@ -297,9 +302,15 @@ def get_all_gross(company, serial):
     #     as_dict=True,
     # )
     # gross = invoices_list[0].get("total")
-    last_vfd_z_report = frappe.get_last_doc("VFD Z Report", filters={"serial": serial})
-    gross = last_vfd_z_report.gross
-    return gross or 0
+    gross = 0
+    try:
+        last_vfd_z_report = frappe.get_last_doc(
+            "VFD Z Report", filters={"serial": serial}
+        )
+        gross = last_vfd_z_report.gross
+    except Exception:
+        pass
+    return flt(gross, 2) or 0
 
 
 def zreport_posting(doc):
@@ -338,13 +349,13 @@ def zreport_posting(doc):
         "USER": registration_doc.uin,
         "SIMIMSI": "WEBAPI",
         "TOTALS": {
-            "DAILYTOTALAMOUNT": doc.dailytotalamount,
-            "GROSS": doc.gross,
+            "DAILYTOTALAMOUNT": flt(doc.dailytotalamount, 2),
+            "GROSS": flt(doc.gross, 2),
             "CORRECTIONS": doc.corrections,
-            "DISCOUNTS": doc.discounts,
-            "SURCHARGES": doc.surcharges,
+            "DISCOUNTS": flt(doc.discounts, 2),
+            "SURCHARGES": flt(doc.surcharges, 2),
             "TICKETSVOID": doc.ticketsvoid,
-            "TICKETSVOIDTOTAL": doc.ticketsvoidtotal,
+            "TICKETSVOIDTOTAL": flt(doc.ticketsvoidtotal, 2),
             "TICKETSFISCAL": doc.ticketsfiscal,
             "TICKETSNONFISCAL": doc.ticketsnonfiscal,
         },
@@ -359,9 +370,9 @@ def zreport_posting(doc):
     for vat in doc.vats:
         zreport["VATTOTALS"].append(
             {
-                "VATRATE": vat.vatrate,
-                "NETTAMOUNT": vat.nettamount,
-                "TAXAMOUNT": vat.taxamount,
+                "VATRATE": flt(vat.vatrate, 2),
+                "NETTAMOUNT": flt(vat.nettamount, 2),
+                "TAXAMOUNT": flt(vat.taxamount, 2),
             }
         )
 
@@ -369,7 +380,7 @@ def zreport_posting(doc):
         zreport["PAYMENTS"].append(
             {
                 "PMTTYPE": payment.pmttype,
-                "PMTAMOUNT": payment.pmtamount,
+                "PMTAMOUNT": flt(payment.pmtamount, 2),
             }
         )
 
