@@ -1,0 +1,59 @@
+{
+ "add_total_row": 1,
+ "columns": [],
+ "creation": "2022-08-11 21:10:52.200602",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date",
+   "mandatory": 1,
+   "wildcard_filter": 0
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date",
+   "mandatory": 1,
+   "wildcard_filter": 0
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "mandatory": 1,
+   "options": "Company",
+   "wildcard_filter": 0
+  },
+  {
+   "fieldname": "vfd_status",
+   "fieldtype": "Select",
+   "label": "VFD Status",
+   "mandatory": 1,
+   "options": "Success\nNot Sent\nFailed\nPending",
+   "wildcard_filter": 0
+  }
+ ],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "Letterhead Official",
+ "modified": "2022-08-11 21:16:46.085839",
+ "modified_by": "Administrator",
+ "module": "vfd-tz",
+ "name": "VFD Reconciliation Report",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT name AS \"Sales Invoice:Link/Sales Invoice:\", posting_date AS \"Date:Date:\",\n    vfd_date AS \"VFD Date:Date:\", vfd_time AS \"VFD Time:Time:\",\n    vfd_verification_url AS \"VFD URL:Data/url:\", vfd_status AS \"VFD Status:Data:\", \n    customer AS \"Customer:Link/Customer:\", vfd_cust_id_type AS \"VFD Customer ID Type:Data:\", vfd_cust_id AS \"VFD Customer ID:Data:\",\n    base_grand_total AS \"Base Grand Total:Currency:\", base_rounded_total AS \"Base Rounded Total:Currency\",\n    base_total_taxes_and_charges AS \"Base Taxes:Currency\"\nFROM `tabSales Invoice`\nWHERE posting_date BETWEEN %(from_date)s AND %(to_date)s\n    AND company = %(company)s\n    AND vfd_status = %(vfd_status)s",
+ "ref_doctype": "Sales Invoice",
+ "report_name": "VFD Reconciliation Report",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  }
+ ]
+}
