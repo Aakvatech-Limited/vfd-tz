@@ -20,10 +20,10 @@ def execute():
         if not registration_doc:
             continue
         frappe.db.set_value(
-            "Sales Invoice", invoice.name, "vfd_serial", registration_doc.vfd_serial
+            "Sales Invoice", invoice.name, "vfd_serial", registration_doc.serial
         )
         print(
             "Updated Sales Invoice {0} with VFD Serial {1}".format(
-                invoice.name, registration_doc.vfd_serial
+                invoice.name, registration_doc.serial
             )
         )
