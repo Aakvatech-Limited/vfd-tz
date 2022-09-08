@@ -345,7 +345,7 @@ def zreport_posting(doc):
         "REGID": registration_doc.regid,
         "ZNUMBER": doc.znumber,
         "EFDSERIAL": registration_doc.serial,
-        "REGISTRATIONDATE": get_date_str(registration_doc.vfd_start_date),
+        "REGISTRATIONDATE": str(registration_doc.vfd_start_date),
         "USER": registration_doc.uin,
         "SIMIMSI": "WEBAPI",
         "TOTALS": {
