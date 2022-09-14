@@ -10,7 +10,6 @@ from frappe.utils import (
     nowdate,
     nowtime,
     format_datetime,
-    get_date_str,
     add_to_date,
 )
 from vfd_tz.api.sales_invoice import get_item_taxcode
