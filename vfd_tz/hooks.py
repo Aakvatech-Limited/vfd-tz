@@ -81,10 +81,10 @@ doctype_js = {"Sales Invoice": "api/sales_invoice.js", "Customer": "api/customer
 
 doc_events = {
     "Sales Invoice": {
-        "on_submit": "vfd_tz.api.sales_invoice.auto_enqueue",
-        "before_cancel": "vfd_tz.api.sales_invoice.validate_cancel",
-        "before_submit": "vfd_tz.api.sales_invoice.vfd_validation",
-        "before_update_after_submit": "vfd_tz.api.sales_invoice.before_update_after_submit",
+        "on_submit": "vfd_tz.vfd_tz.api.sales_invoice.auto_enqueue",
+        "before_cancel": "vfd_tz.vfd_tz.api.sales_invoice.validate_cancel",
+        "before_submit": "vfd_tz.vfd_tz.api.sales_invoice.vfd_validation",
+        "before_update_after_submit": "vfd_tz.vfd_tz.api.sales_invoice.before_update_after_submit",
     },
 }
 
@@ -107,7 +107,7 @@ scheduler_events = {
             "vfd_tz.vfd_tz.doctype.vfd_z_report.vfd_z_report.send_multi_vfd_z_reports",
         ],
     },
-    "hourly": ["vfd_tz.api.sales_invoice.posting_all_vfd_invoices"],
+    "hourly": ["vfd_tz.vfd_tz.api.sales_invoice.posting_all_vfd_invoices"],
     # "weekly": [
     # 	"vfd_tz.tasks.weekly"
     # ]
