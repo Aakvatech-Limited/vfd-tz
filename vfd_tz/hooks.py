@@ -101,7 +101,7 @@ scheduler_events = {
     "cron": {
         "0 2 * * *": [
             "vfd_tz.vfd_tz.doctype.vfd_z_report.vfd_z_report.make_vfd_z_report",
-            "vfd_tz.api.utlis.check_vfd_status",
+            "vfd_tz.api.utils.check_vfd_status",
         ],
         "0 * * * *": [
             "vfd_tz.vfd_tz.doctype.vfd_z_report.vfd_z_report.send_multi_vfd_z_reports",
