@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 import frappe
-from api.utlis import get_latest_registration_doc
+from api.utils import get_latest_registration_doc
 
 
 def execute():

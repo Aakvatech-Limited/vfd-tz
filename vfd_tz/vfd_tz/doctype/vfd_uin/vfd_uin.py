@@ -7,7 +7,7 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import nowdate, getdate
 from frappe import _
-from api.utlis import get_latest_registration_doc
+from api.utils import get_latest_registration_doc
 
 
 class VFDUIN(Document):

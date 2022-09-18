@@ -1,408 +1,408 @@
 {
-  "actions": [],
-  "allow_copy": 1,
-  "autoname": "VFDR-.YY.-.####",
-  "creation": "2020-10-23 22:33:19.373605",
-  "doctype": "DocType",
-  "editable_grid": 1,
-  "engine": "InnoDB",
-  "field_order": [
-    "r_status",
-    "use_item_group",
-    "column_break_2",
-    "vfd_start_date",
-    "vfd_z_report_start_date",
-    "do_not_send_vfd",
-    "send_vfd_z_report",
-    "vfd_commands_section",
-    "is_blocked",
-    "get_new_token",
-    "column_break_10",
-    "tra_message",
-    "section_break_2",
-    "company",
-    "url",
-    "cert_serial",
-    "tin",
-    "column_break_9",
-    "certkey",
-    "certificate_password",
-    "certificate",
-    "verification_url",
-    "section_break_11",
-    "ackcode",
-    "ackmsg",
-    "address",
-    "city",
-    "country",
-    "gc",
-    "mobile",
-    "company_name",
-    "username",
-    "password",
-    "column_break_20",
-    "receiptcode",
-    "regid",
-    "region",
-    "routingkey",
-    "serial",
-    "street",
-    "taxoffice",
-    "tokenpath",
-    "uin",
-    "vrn",
-    "section_break_32",
-    "taxcodes",
-    "efdmssignature",
-    "section_break_40",
-    "amended_from"
-  ],
-  "fields": [
-    {
-      "allow_on_submit": 1,
-      "fieldname": "r_status",
-      "fieldtype": "Select",
-      "in_list_view": 1,
-      "label": "Registration Status",
-      "options": "\nActive\nInactive",
-      "read_only": 1
-    },
-    {
-      "fieldname": "section_break_2",
-      "fieldtype": "Section Break"
-    },
-    {
-      "fieldname": "company",
-      "fieldtype": "Link",
-      "in_list_view": 1,
-      "label": "Company",
-      "options": "Company",
-      "reqd": 1
-    },
-    {
-      "fieldname": "url",
-      "fieldtype": "Data",
-      "label": "URL",
-      "options": "URL",
-      "reqd": 1
-    },
-    {
-      "fieldname": "tin",
-      "fieldtype": "Data",
-      "label": "TIN",
-      "reqd": 1
-    },
-    {
-      "fieldname": "column_break_9",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "certkey",
-      "fieldtype": "Password",
-      "label": "CERTKEY",
-      "reqd": 1
-    },
-    {
-      "fieldname": "certificate_password",
-      "fieldtype": "Password",
-      "label": "Certificate Password",
-      "reqd": 1
-    },
-    {
-      "fieldname": "certificate",
-      "fieldtype": "Attach",
-      "label": "Certificate",
-      "reqd": 1
-    },
-    {
-      "fieldname": "section_break_11",
-      "fieldtype": "Section Break"
-    },
-    {
-      "fieldname": "ackcode",
-      "fieldtype": "Data",
-      "label": "ACKCODE",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "ackmsg",
-      "fieldtype": "Data",
-      "label": "ACKMSG",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "address",
-      "fieldtype": "Data",
-      "label": "ADDRESS",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "city",
-      "fieldtype": "Data",
-      "label": "CITY",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "country",
-      "fieldtype": "Data",
-      "label": "COUNTRY",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "gc",
-      "fieldtype": "Data",
-      "label": "GC",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "mobile",
-      "fieldtype": "Data",
-      "label": "MOBILE",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "company_name",
-      "fieldtype": "Data",
-      "label": "NAME",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "username",
-      "fieldtype": "Password",
-      "label": "USERNAME",
-      "read_only": 1
-    },
-    {
-      "fieldname": "password",
-      "fieldtype": "Password",
-      "label": "PASSWORD",
-      "read_only": 1
-    },
-    {
-      "fieldname": "column_break_20",
-      "fieldtype": "Column Break"
-    },
-    {
-      "fieldname": "receiptcode",
-      "fieldtype": "Data",
-      "label": "RECEIPTCODE",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "regid",
-      "fieldtype": "Data",
-      "label": "REGID",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "region",
-      "fieldtype": "Data",
-      "label": "REGION",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "routingkey",
-      "fieldtype": "Data",
-      "label": "ROUTINGKEY",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "serial",
-      "fieldtype": "Data",
-      "label": "SERIAL",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "street",
-      "fieldtype": "Data",
-      "label": "STREET",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "taxoffice",
-      "fieldtype": "Data",
-      "label": "TAXOFFICE",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "tokenpath",
-      "fieldtype": "Data",
-      "label": "TOKENPATH",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "uin",
-      "fieldtype": "Data",
-      "label": "UIN",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "vrn",
-      "fieldtype": "Data",
-      "label": "VRN",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "section_break_32",
-      "fieldtype": "Section Break"
-    },
-    {
-      "fieldname": "taxcodes",
-      "fieldtype": "Table",
-      "label": "TAXCODES",
-      "no_copy": 1,
-      "options": "TAXCODES",
-      "read_only": 1
-    },
-    {
-      "fieldname": "efdmssignature",
-      "fieldtype": "Small Text",
-      "hidden": 1,
-      "label": "EFDMSSIGNATURE",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "section_break_40",
-      "fieldtype": "Section Break"
-    },
-    {
-      "fieldname": "amended_from",
-      "fieldtype": "Link",
-      "label": "Amended From",
-      "no_copy": 1,
-      "options": "VFD Registration",
-      "print_hide": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "cert_serial",
-      "fieldtype": "Data",
-      "label": "Cert Serial",
-      "no_copy": 1,
-      "read_only": 1
-    },
-    {
-      "fieldname": "column_break_2",
-      "fieldtype": "Column Break"
-    },
-    {
-      "allow_on_submit": 1,
-      "default": "0",
-      "fieldname": "do_not_send_vfd",
-      "fieldtype": "Check",
-      "hidden": 1,
-      "label": "Do not send VFD"
-    },
-    {
-      "fieldname": "vfd_start_date",
-      "fieldtype": "Datetime",
-      "label": "VFD Start Date",
-      "reqd": 1
-    },
-    {
-      "default": "https://verify.tra.go.tz/",
-      "fieldname": "verification_url",
-      "fieldtype": "Data",
-      "label": "Verification URL",
-      "options": "URL",
-      "reqd": 1
-    },
-    {
-      "allow_on_submit": 1,
-      "default": "0",
-      "fieldname": "use_item_group",
-      "fieldtype": "Check",
-      "label": "Use Item Group Code instead of Item Name for VFD"
-    },
-    {
-      "allow_on_submit": 1,
-      "fieldname": "vfd_z_report_start_date",
-      "fieldtype": "Datetime",
-      "label": "VFD Z-Report Start Date"
-    },
-    {
-      "allow_on_submit": 1,
-      "default": "0",
-      "fieldname": "is_blocked",
-      "fieldtype": "Check",
-      "label": "Is Blocked",
-      "read_only": 1
-    },
-    {
-      "allow_on_submit": 1,
-      "default": "0",
-      "fieldname": "send_vfd_z_report",
-      "fieldtype": "Check",
-      "hidden": 1,
-      "label": "Send VFD Z Report"
-    },
-    {
-      "allow_on_submit": 1,
-      "fieldname": "tra_message",
-      "fieldtype": "Data",
-      "label": "TRA Message",
-      "read_only": 1
-    },
-    {
-      "fieldname": "vfd_commands_section",
-      "fieldtype": "Section Break",
-      "label": "VFD Commands"
-    },
-    {
-      "fieldname": "column_break_10",
-      "fieldtype": "Column Break"
-    },
-    {
-      "depends_on": "eval: doc.is_blocked",
-      "fieldname": "get_new_token",
-      "fieldtype": "Button",
-      "label": "Get new Token"
-    }
-  ],
-  "is_submittable": 1,
-  "links": [],
-  "modified": "2022-04-08 23:53:12.693829",
-  "modified_by": "Administrator",
-  "module": "vfd-tz",
-  "name": "VFD Registration",
-  "owner": "Administrator",
-  "permissions": [
-    {
-      "cancel": 1,
-      "create": 1,
-      "delete": 1,
-      "email": 1,
-      "export": 1,
-      "print": 1,
-      "read": 1,
-      "report": 1,
-      "role": "System Manager",
-      "share": 1,
-      "submit": 1,
-      "write": 1
-    }
-  ],
-  "sort_field": "modified",
-  "sort_order": "DESC",
-  "title_field": "company",
-  "track_changes": 1
+ "actions": [],
+ "allow_copy": 1,
+ "autoname": "VFDR-.YY.-.####",
+ "creation": "2020-10-23 22:33:19.373605",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "r_status",
+  "use_item_group",
+  "column_break_2",
+  "vfd_start_date",
+  "vfd_z_report_start_date",
+  "do_not_send_vfd",
+  "send_vfd_z_report",
+  "vfd_commands_section",
+  "is_blocked",
+  "get_new_token",
+  "column_break_10",
+  "tra_message",
+  "section_break_2",
+  "company",
+  "url",
+  "cert_serial",
+  "tin",
+  "column_break_9",
+  "certkey",
+  "certificate_password",
+  "certificate",
+  "verification_url",
+  "section_break_11",
+  "ackcode",
+  "ackmsg",
+  "address",
+  "city",
+  "country",
+  "gc",
+  "mobile",
+  "company_name",
+  "username",
+  "password",
+  "column_break_20",
+  "receiptcode",
+  "regid",
+  "region",
+  "routingkey",
+  "serial",
+  "street",
+  "taxoffice",
+  "tokenpath",
+  "uin",
+  "vrn",
+  "section_break_32",
+  "taxcodes",
+  "efdmssignature",
+  "section_break_40",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "allow_on_submit": 1,
+   "fieldname": "r_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Registration Status",
+   "options": "\nActive\nInactive",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "url",
+   "fieldtype": "Data",
+   "label": "URL",
+   "options": "URL",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tin",
+   "fieldtype": "Data",
+   "label": "TIN",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "certkey",
+   "fieldtype": "Password",
+   "label": "CERTKEY",
+   "reqd": 1
+  },
+  {
+   "fieldname": "certificate_password",
+   "fieldtype": "Password",
+   "label": "Certificate Password",
+   "reqd": 1
+  },
+  {
+   "fieldname": "certificate",
+   "fieldtype": "Attach",
+   "label": "Certificate",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_11",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "ackcode",
+   "fieldtype": "Data",
+   "label": "ACKCODE",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "ackmsg",
+   "fieldtype": "Data",
+   "label": "ACKMSG",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Data",
+   "label": "ADDRESS",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "CITY",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "country",
+   "fieldtype": "Data",
+   "label": "COUNTRY",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "gc",
+   "fieldtype": "Data",
+   "label": "GC",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "mobile",
+   "fieldtype": "Data",
+   "label": "MOBILE",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "company_name",
+   "fieldtype": "Data",
+   "label": "NAME",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "username",
+   "fieldtype": "Password",
+   "label": "USERNAME",
+   "read_only": 1
+  },
+  {
+   "fieldname": "password",
+   "fieldtype": "Password",
+   "label": "PASSWORD",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "receiptcode",
+   "fieldtype": "Data",
+   "label": "RECEIPTCODE",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "regid",
+   "fieldtype": "Data",
+   "label": "REGID",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "region",
+   "fieldtype": "Data",
+   "label": "REGION",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "routingkey",
+   "fieldtype": "Data",
+   "label": "ROUTINGKEY",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "serial",
+   "fieldtype": "Data",
+   "label": "SERIAL",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "street",
+   "fieldtype": "Data",
+   "label": "STREET",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "taxoffice",
+   "fieldtype": "Data",
+   "label": "TAXOFFICE",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "tokenpath",
+   "fieldtype": "Data",
+   "label": "TOKENPATH",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "uin",
+   "fieldtype": "Data",
+   "label": "UIN",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "vrn",
+   "fieldtype": "Data",
+   "label": "VRN",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_32",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "taxcodes",
+   "fieldtype": "Table",
+   "label": "TAXCODES",
+   "no_copy": 1,
+   "options": "TAXCODES",
+   "read_only": 1
+  },
+  {
+   "fieldname": "efdmssignature",
+   "fieldtype": "Small Text",
+   "hidden": 1,
+   "label": "EFDMSSIGNATURE",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_40",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "VFD Registration",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "cert_serial",
+   "fieldtype": "Data",
+   "label": "Cert Serial",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "do_not_send_vfd",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Do not send VFD"
+  },
+  {
+   "fieldname": "vfd_start_date",
+   "fieldtype": "Datetime",
+   "label": "VFD Start Date",
+   "reqd": 1
+  },
+  {
+   "default": "https://verify.tra.go.tz/",
+   "fieldname": "verification_url",
+   "fieldtype": "Data",
+   "label": "Verification URL",
+   "options": "URL",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "use_item_group",
+   "fieldtype": "Check",
+   "label": "Use Item Group Code instead of Item Name for VFD"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vfd_z_report_start_date",
+   "fieldtype": "Datetime",
+   "label": "VFD Z-Report Start Date"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "is_blocked",
+   "fieldtype": "Check",
+   "label": "Is Blocked",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "send_vfd_z_report",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Send VFD Z Report"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "tra_message",
+   "fieldtype": "Data",
+   "label": "TRA Message",
+   "read_only": 1
+  },
+  {
+   "fieldname": "vfd_commands_section",
+   "fieldtype": "Section Break",
+   "label": "VFD Commands"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.is_blocked",
+   "fieldname": "get_new_token",
+   "fieldtype": "Button",
+   "label": "Get new Token"
+  }
+ ],
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2022-09-14 07:07:16.565214",
+ "modified_by": "Administrator",
+ "module": "vfd-tz",
+ "name": "VFD Registration",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "title_field": "company",
+ "track_changes": 1
 }

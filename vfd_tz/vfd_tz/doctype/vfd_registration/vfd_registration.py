@@ -11,7 +11,7 @@ from OpenSSL import crypto
 import base64
 import requests
 from api.xml import xml_to_dic
-from api.utlis import to_base64, get_signature, get_cert_serial
+from api.utils import to_base64, get_signature, get_cert_serial
 from frappe.utils.password import set_encrypted_password
 
 

@@ -8,7 +8,7 @@ import erpnext
 from frappe import _
 from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from api.xml import xml_to_dic, dict_to_xml
-from api.utlis import (
+from api.utils import (
     get_signature,
     remove_special_characters,
     get_latest_registration_doc,

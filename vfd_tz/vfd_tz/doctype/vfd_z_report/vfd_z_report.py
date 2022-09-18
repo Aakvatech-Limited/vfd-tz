@@ -16,7 +16,7 @@ from frappe.utils import (
 from vfd_tz.api.sales_invoice import get_item_taxcode
 from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from api.xml import xml_to_dic, dict_to_xml
-from api.utlis import get_signature
+from api.utils import get_signature
 import requests
 
 
