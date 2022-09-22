@@ -26,7 +26,10 @@ app_license = "MIT"
 # page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
-doctype_js = {"Sales Invoice": "api/sales_invoice.js", "Customer": "api/customer.js"}
+doctype_js = {
+    "Sales Invoice": "vfd_tz/api/sales_invoice.js",
+    "Customer": "vfd_tz/api/customer.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -81,10 +84,10 @@ doctype_js = {"Sales Invoice": "api/sales_invoice.js", "Customer": "api/customer
 
 doc_events = {
     "Sales Invoice": {
-        "on_submit": "vfd_tz.api.sales_invoice.auto_enqueue",
-        "before_cancel": "vfd_tz.api.sales_invoice.validate_cancel",
-        "before_submit": "vfd_tz.api.sales_invoice.vfd_validation",
-        "before_update_after_submit": "vfd_tz.api.sales_invoice.before_update_after_submit",
+        "on_submit": "vfd_tz.vfd_tz.api.sales_invoice.auto_enqueue",
+        "before_cancel": "vfd_tz.vfd_tz.api.sales_invoice.validate_cancel",
+        "before_submit": "vfd_tz.vfd_tz.api.sales_invoice.vfd_validation",
+        "before_update_after_submit": "vfd_tz.vfd_tz.api.sales_invoice.before_update_after_submit",
     },
 }
 
@@ -107,7 +110,7 @@ scheduler_events = {
             "vfd_tz.vfd_tz.doctype.vfd_z_report.vfd_z_report.send_multi_vfd_z_reports",
         ],
     },
-    "hourly": ["vfd_tz.api.sales_invoice.posting_all_vfd_invoices"],
+    "hourly": ["vfd_tz.vfd_tz.api.sales_invoice.posting_all_vfd_invoices"],
     # "weekly": [
     # 	"vfd_tz.tasks.weekly"
     # ]

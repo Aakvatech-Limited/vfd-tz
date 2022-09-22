@@ -10,7 +10,7 @@ frappe.ui.form.on("Sales Invoice", {
             frm.add_custom_button(__('Generate VFD'),
                 function () {
                     frappe.call({
-                        method: "vfd_tz.api.sales_invoice.enqueue_posting_vfd_invoice",
+                        method: "vfd_tz.vfd_tz.api.sales_invoice.enqueue_posting_vfd_invoice",
                         args: {
                             invoice_name: frm.doc.name,
                         },
