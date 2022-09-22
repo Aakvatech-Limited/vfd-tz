@@ -10,8 +10,8 @@ import OpenSSL
 from OpenSSL import crypto
 import base64
 import requests
-from api.xml import xml_to_dic
-from api.utils import to_base64, get_signature, get_cert_serial
+from vfd_tz.api.xml import xml_to_dic
+from vfd_tz.api.utils import to_base64, get_signature, get_cert_serial
 from frappe.utils.password import set_encrypted_password
 
 

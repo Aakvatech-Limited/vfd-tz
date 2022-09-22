@@ -13,10 +13,10 @@ from frappe.utils import (
     get_date_str,
     add_to_date,
 )
-from vfd_tz.api.sales_invoice import get_item_taxcode
+from vfd_tz.vfd_tz.api.sales_invoice import get_item_taxcode
 from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
-from api.xml import xml_to_dic, dict_to_xml
-from api.utils import get_signature
+from vfd_tz.api.xml import xml_to_dic, dict_to_xml
+from vfd_tz.api.utils import get_signature
 import requests
 
 
