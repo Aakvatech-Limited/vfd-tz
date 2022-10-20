@@ -144,6 +144,9 @@ def enqueue_posting_vfd_invoice(invoice_name):
     return True
 
 
+def posting_all_vfd_invoices_off_peak():
+    posting_all_vfd_invoices()
+
 def posting_all_vfd_invoices():
     if frappe.local.flags.vfd_posting:
         frappe.log_error(_("VFD Posting Flag found", "VFD Posting Flag found"))

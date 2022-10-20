@@ -109,8 +109,13 @@ scheduler_events = {
         "0 * * * *": [
             "vfd_tz.vfd_tz.doctype.vfd_z_report.vfd_z_report.send_multi_vfd_z_reports",
         ],
+        "0,15,30,45 * * * *": [
+            "vfd_tz.vfd_tz.api.sales_invoice.posting_all_vfd_invoices",
+        ],
+        "*/5 0-4 * * *": [
+            "vfd_tz.vfd_tz.api.sales_invoice.posting_all_vfd_invoices_off_peak",
+        ],
     },
-    "hourly": ["vfd_tz.vfd_tz.api.sales_invoice.posting_all_vfd_invoices"],
     # "weekly": [
     # 	"vfd_tz.tasks.weekly"
     # ]
