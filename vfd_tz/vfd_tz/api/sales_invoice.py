@@ -176,7 +176,7 @@ def posting_all_vfd_invoices():
                 "is_return": 0,
                 "company": company.name,
                 "vfd_posting_info": ["!=", ""],
-                "vfd_status": ["in", ["Success"]],
+                "vfd_status": "Success",
             },
             fields={"name", "vfd_rctnum", "vfd_gc"},
             page_length=10,
