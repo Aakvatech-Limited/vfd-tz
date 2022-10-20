@@ -279,7 +279,7 @@ def get_gross_between(company, serial, start, end):
         and vfd_serial = '{1}'
         and vfd_gc BETWEEN {2} AND {3}
     """.format(
-            company, serial, start or 0, end
+            company, serial, start or 0, end or 0
         ),
         as_dict=True,
     )
@@ -480,7 +480,7 @@ def make_vfd_z_report():
     vfd_registration_list = frappe.get_all(
         "VFD Registration",
         filters={"r_status": "Active"},
-        fields=["name", "send_vfd_z_report", "serial", "vrn"],
+        fields=["name", "send_vfd_z_report", "serial", "vrn", "vfd_z_report_start_date"],
     )
     for vfd_registration in vfd_registration_list:
         if not vfd_registration.send_vfd_z_report:
@@ -491,13 +491,13 @@ def make_vfd_z_report():
                 "VFD Z Report",
             )
             continue
-        last_z_report = frappe.get_last_doc(
-            "VFD Z Report", filters={"serial": vfd_registration.serial}
-        )
-        if not last_z_report:
-            last_z_report = {}
-            last_z_report["date"] = vfd_registration.vfd_z_report_start_date
-        date = add_to_date(last_z_report.date, days=1)
+        try:
+            last_z_report = frappe.get_last_doc(
+                "VFD Z Report", filters={"serial": vfd_registration.serial}
+            )
+            date = add_to_date(last_z_report.date, days=1)
+        except Exception:
+            date = vfd_registration.vfd_z_report_start_date
         while str(date) < nowdate():
             vfd_z_report_doc = frappe.new_doc("VFD Z Report")
             vfd_z_report_doc.vfd_registration = vfd_registration.name
@@ -506,8 +506,8 @@ def make_vfd_z_report():
             vfd_z_report_doc.date = date
             vfd_z_report_doc.insert()
             vfd_z_report_doc.submit()
+            frappe.db.commit()
             date = add_to_date(date, days=1)
-    frappe.db.commit()
     send_multi_vfd_z_reports()
 
 
