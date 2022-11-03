@@ -369,7 +369,7 @@ def posting_vfd_invoice(invoice_name):
     if int(posting_info_doc.ackcode) == 0:
         doc.vfd_posting_info = posting_info_doc.name
         doc.vfd_status = "Success"
-        doc.db_update()
+        doc.save(ignore_permissions=True)
         frappe.db.commit()
         return "Success"
     else:
