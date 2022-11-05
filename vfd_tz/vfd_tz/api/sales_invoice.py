@@ -325,7 +325,7 @@ def posting_vfd_invoice(invoice_name):
     }
     data = dict_to_xml(efdms_data).replace("<None>", "").replace("</None>", "")
     url = registration_doc.url + "/api/efdmsRctInfo"
-    response = requests.request("POST", url, headers=headers, data=data, timeout=5)
+    response = requests.request("POST", url, headers=headers, data=data, timeout=60)
 
     if not response.status_code == 200:
         posting_info_doc = frappe.get_doc(
