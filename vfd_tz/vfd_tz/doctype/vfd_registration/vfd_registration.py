@@ -80,7 +80,7 @@ def get_registration(doc):
         "Client": "WEBAPI",
     }
     response = requests.request(
-        "POST", url, headers=headers, data=extend_data, timeout=5
+        "POST", url, headers=headers, data=extend_data, timeout=60
     )
     if not response.status_code == 200:
         frappe.throw(str(response.text.encode("utf8")))
