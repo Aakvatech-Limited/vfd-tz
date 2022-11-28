@@ -86,8 +86,7 @@ doc_events = {
     "Sales Invoice": {
         "on_submit": "vfd_tz.vfd_tz.api.sales_invoice.auto_enqueue",
         "before_cancel": "vfd_tz.vfd_tz.api.sales_invoice.validate_cancel",
-        "before_submit": "vfd_tz.vfd_tz.api.sales_invoice.vfd_validation",
-        "before_update_after_submit": "vfd_tz.vfd_tz.api.sales_invoice.before_update_after_submit",
+        "before_submit": "vfd_tz.vfd_tz.api.sales_invoice.vfd_validation"
     },
 }
 
@@ -111,9 +110,11 @@ scheduler_events = {
         ],
         "0,15,30,45 * * * *": [
             "vfd_tz.vfd_tz.api.sales_invoice.posting_all_vfd_invoices",
+            "vfd_tz.vfd_tz.doctype.vfd_tax_invoice.vfd_tax_invoice.posting_all_vfd_invoices",
         ],
         "*/5 0-4 * * *": [
             "vfd_tz.vfd_tz.api.sales_invoice.posting_all_vfd_invoices_off_peak",
+            "vfd_tz.vfd_tz.doctype.vfd_tax_invoice.posting_all_vfd_invoices_off_peak",
         ],
     },
     # "weekly": [
