@@ -476,7 +476,7 @@ def send_multi_vfd_z_reports():
     )
     reports = frappe.get_all(
         "VFD Z Report",
-        filters={"docstatus": 1, "sent_status": ["!=", "Success"], "name": ["in", vfd_registration_list]},
+        filters={"docstatus": 1, "sent_status": ["!=", "Success"], "vfd_registration": ["in", vfd_registration_list]},
         order_by="vfd_gc_previous",
         pluck="name",
     )
