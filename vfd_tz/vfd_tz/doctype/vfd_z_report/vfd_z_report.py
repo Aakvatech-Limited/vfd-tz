@@ -471,12 +471,12 @@ def multi_zreport_posting():
 def send_multi_vfd_z_reports():
     vfd_registration_list = frappe.get_all(
         "VFD Registration",
-        filters={"r_status": "Active", "send_vfd_z_reports": 1},
+        filters={"r_status": "Active", "send_vfd_z_report": 1},
         pluck="name",
     )
     reports = frappe.get_all(
         "VFD Z Report",
-        filters={"docstatus": 1, "sent_status": ["!=", "Success"], "name": ["in", vfd_registration_list]},
+        filters={"docstatus": 1, "sent_status": ["!=", "Success"], "vfd_registration": ["in", vfd_registration_list]},
         order_by="vfd_gc_previous",
         pluck="name",
     )

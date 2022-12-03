@@ -336,7 +336,7 @@
   {
    "allow_on_submit": 1,
    "fieldname": "vfd_z_report_start_date",
-   "fieldtype": "Datetime",
+   "fieldtype": "Date",
    "label": "VFD Z-Report Start Date"
   },
   {
@@ -380,7 +380,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2022-09-14 07:07:16.565214",
+ "modified": "2022-12-03 14:39:03.059176",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Registration",
