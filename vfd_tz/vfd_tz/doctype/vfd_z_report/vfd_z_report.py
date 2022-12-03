@@ -18,6 +18,7 @@ from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from vfd_tz.api.xml import xml_to_dic, dict_to_xml
 from vfd_tz.api.utils import get_signature
 import requests
+from csf_tz import console
 
 
 class VFDZReport(Document):
@@ -31,7 +32,9 @@ class VFDZReport(Document):
         pass
 
     def set_data(self):
-        company = frappe.get_value("VFD Registration", self.vfd_registration, "company")
+        company, serial = frappe.get_value("VFD Registration", self.vfd_registration, ["company", "serial"])
+        if not self.serial:
+            self.serial = serial
         z_last_gc = get_z_last_gc(self.serial)
         # self.date is the date of the report
         self.time = "23:59:59"
@@ -83,7 +86,7 @@ class VFDZReport(Document):
                 "company": company,
                 "vfd_status": ["=", "Not Sent"],
                 "vfd_z_report": ["in", [None, "", self.name]],
-                "posting_date": [">=", report_start_date],
+                "posting_date": ["between", report_start_date, "and", self.date],
             },
             fields=["name", "base_rounded_total", "base_grand_total", "vfd_z_report"],
         )
@@ -224,7 +227,7 @@ def get_invoices_last_gc(company, date):
     WHERE 
         company = '{0}'
         and docstatus = 1
-        and vfd_date = '{1}'
+        and vfd_date = DATE('{1}')
     """.format(
             company, date
         ),
@@ -466,9 +469,14 @@ def multi_zreport_posting():
 
 
 def send_multi_vfd_z_reports():
+    vfd_registration_list = frappe.get_all(
+        "VFD Registration",
+        filters={"r_status": "Active", "send_vfd_z_reports": 1},
+        pluck="name",
+    )
     reports = frappe.get_all(
         "VFD Z Report",
-        filters={"docstatus": 1, "sent_status": ["!=", "Success"]},
+        filters={"docstatus": 1, "sent_status": ["!=", "Success"], "name": ["in", vfd_registration_list]},
         order_by="vfd_gc_previous",
         pluck="name",
     )
@@ -483,14 +491,6 @@ def make_vfd_z_report():
         fields=["name", "send_vfd_z_report", "serial", "vrn", "vfd_z_report_start_date"],
     )
     for vfd_registration in vfd_registration_list:
-        if not vfd_registration.send_vfd_z_report:
-            frappe.log_error(
-                _("Send VFD Z-Report is not set in VFD Registration {0}").format(
-                    vfd_registration.name
-                ),
-                "VFD Z Report",
-            )
-            continue
         try:
             last_z_report = frappe.get_last_doc(
                 "VFD Z Report", filters={"serial": vfd_registration.serial}
