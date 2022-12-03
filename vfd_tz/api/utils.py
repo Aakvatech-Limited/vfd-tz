@@ -128,3 +128,7 @@ def get_latest_registration_doc(company, throw=True):
             )
         )
     return doc
+
+def check_vfd_status():
+    from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import check_vfd_status as _check_vfd_status
+    _check_vfd_status()

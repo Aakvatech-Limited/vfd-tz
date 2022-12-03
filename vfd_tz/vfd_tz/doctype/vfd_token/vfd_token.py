@@ -7,7 +7,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from frappe.utils import now, add_to_date, now_datetime
-from api.utlis import to_base64, get_latest_registration_doc
+from vfd_tz.api.utils import to_base64, get_latest_registration_doc
 from vfd_tz.vfd_tz.doctype.vfd_registration.vfd_registration import auto_reregistration
 import requests
 import json

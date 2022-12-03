@@ -7,8 +7,8 @@ import frappe
 import erpnext
 from frappe import _
 from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
-from api.xml import xml_to_dic, dict_to_xml
-from api.utlis import (
+from vfd_tz.api.xml import xml_to_dic, dict_to_xml
+from vfd_tz.api.utils import (
     get_signature,
     remove_special_characters,
     get_latest_registration_doc,
@@ -144,6 +144,9 @@ def enqueue_posting_vfd_invoice(invoice_name):
     return True
 
 
+def posting_all_vfd_invoices_off_peak():
+    posting_all_vfd_invoices()
+
 def posting_all_vfd_invoices():
     if frappe.local.flags.vfd_posting:
         frappe.log_error(_("VFD Posting Flag found", "VFD Posting Flag found"))
@@ -162,7 +165,7 @@ def posting_all_vfd_invoices():
                 "docstatus": 1,
                 "is_return": 0,
                 "company": company.name,
-                "vfd_posting_info": ["in", ["", None]],
+                "vfd_posting_info": "",
                 "vfd_status": ["in", ["Failed", "Pending"]],
             },
             fields={"name", "vfd_rctnum", "vfd_gc"},
@@ -175,8 +178,8 @@ def posting_all_vfd_invoices():
                 "docstatus": 1,
                 "is_return": 0,
                 "company": company.name,
-                "vfd_posting_info": ["not in", ["", None]],
-                "vfd_status": ["in", ["Success"]],
+                "vfd_posting_info": ["!=", ""],
+                "vfd_status": "Success",
             },
             fields={"name", "vfd_rctnum", "vfd_gc"},
             page_length=10,
@@ -322,7 +325,7 @@ def posting_vfd_invoice(invoice_name):
     }
     data = dict_to_xml(efdms_data).replace("<None>", "").replace("</None>", "")
     url = registration_doc.url + "/api/efdmsRctInfo"
-    response = requests.request("POST", url, headers=headers, data=data, timeout=5)
+    response = requests.request("POST", url, headers=headers, data=data, timeout=60)
 
     if not response.status_code == 200:
         posting_info_doc = frappe.get_doc(
@@ -366,7 +369,7 @@ def posting_vfd_invoice(invoice_name):
     if int(posting_info_doc.ackcode) == 0:
         doc.vfd_posting_info = posting_info_doc.name
         doc.vfd_status = "Success"
-        doc.db_update()
+        doc.save(ignore_permissions=True)
         frappe.db.commit()
         return "Success"
     else:

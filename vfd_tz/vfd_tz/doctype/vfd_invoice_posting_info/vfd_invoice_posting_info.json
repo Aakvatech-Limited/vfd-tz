@@ -8,6 +8,7 @@
  "engine": "InnoDB",
  "field_order": [
   "sales_invoice",
+  "vfd_tax_invoice",
   "ackcode",
   "ackmsg",
   "column_break_4",
@@ -97,10 +98,19 @@
    "fieldtype": "Small Text",
    "label": "REQ Headers",
    "read_only": 1
+  },
+  {
+   "fieldname": "vfd_tax_invoice",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "VFD Tax Invoice",
+   "options": "VFD Tax Invoice",
+   "read_only": 1
   }
  ],
  "links": [],
- "modified": "2022-04-13 19:01:09.581486",
+ "modified": "2022-11-25 12:46:56.831624",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Invoice Posting Info",

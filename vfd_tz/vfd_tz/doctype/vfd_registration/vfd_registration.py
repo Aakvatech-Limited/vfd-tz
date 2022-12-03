@@ -10,8 +10,8 @@ import OpenSSL
 from OpenSSL import crypto
 import base64
 import requests
-from api.xml import xml_to_dic
-from api.utlis import to_base64, get_signature, get_cert_serial
+from vfd_tz.api.xml import xml_to_dic
+from vfd_tz.api.utils import to_base64, get_signature, get_cert_serial
 from frappe.utils.password import set_encrypted_password
 
 
@@ -80,7 +80,7 @@ def get_registration(doc):
         "Client": "WEBAPI",
     }
     response = requests.request(
-        "POST", url, headers=headers, data=extend_data, timeout=5
+        "POST", url, headers=headers, data=extend_data, timeout=60
     )
     if not response.status_code == 200:
         frappe.throw(str(response.text.encode("utf8")))

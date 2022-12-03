@@ -1,0 +1,334 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "TI-.YYYY.-.MM.-.######",
+ "creation": "2022-11-08 23:39:43.671492",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "column_break_2",
+  "posting_date",
+  "time",
+  "invoice_specifics_section",
+  "znum",
+  "is_return",
+  "column_break_10",
+  "is_not_vfd_invoice",
+  "is_auto_generate_vfd",
+  "vfd_specifics_section",
+  "vfd_gc",
+  "vfd_dc",
+  "vfd_rctnum",
+  "vfd_verification_url",
+  "vfd_posting_info",
+  "column_break_9",
+  "vfd_date",
+  "vfd_time",
+  "vfd_status",
+  "vfd_serial",
+  "vfd_rctvnum",
+  "section_break_4",
+  "payment_type",
+  "invoice_id",
+  "client_name",
+  "column_break_8",
+  "vfd_cust_id_type",
+  "vfd_cust_id",
+  "mobile_no",
+  "currency",
+  "section_break_12",
+  "items",
+  "section_break_14",
+  "invoice_tax",
+  "column_break_16",
+  "total_discount",
+  "net_total",
+  "grand_total",
+  "section_break_22",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Now",
+   "fieldname": "time",
+   "fieldtype": "Time",
+   "label": "Time",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "Payment types:\nCASH\nCHEQUE\nCCARD\nEMONEY\nINVOICE",
+   "fieldname": "payment_type",
+   "fieldtype": "Select",
+   "label": "Payment Type",
+   "options": "INVOICE\nCASH\nCHEQUE\nCCARD\nEMONEY",
+   "reqd": 1
+  },
+  {
+   "fieldname": "invoice_id",
+   "fieldtype": "Data",
+   "label": "Invoice ID",
+   "unique": 1
+  },
+  {
+   "fieldname": "client_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Client Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Currency",
+   "options": "TZS"
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_14",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "invoice_tax",
+   "fieldtype": "Currency",
+   "label": "Invoice Tax",
+   "options": "currency"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_discount",
+   "fieldtype": "Currency",
+   "label": "Total Discount",
+   "options": "currency"
+  },
+  {
+   "fieldname": "net_total",
+   "fieldtype": "Currency",
+   "label": "Net Total",
+   "options": "currency"
+  },
+  {
+   "fieldname": "grand_total",
+   "fieldtype": "Currency",
+   "label": "Grand Total",
+   "options": "currency"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "vfd_specifics_section",
+   "fieldtype": "Section Break",
+   "label": "VFD Specifics"
+  },
+  {
+   "fieldname": "znum",
+   "fieldtype": "Data",
+   "label": "ZNUM",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_22",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "VFD Tax Invoice",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_return",
+   "fieldtype": "Check",
+   "label": "Is Return"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_not_vfd_invoice",
+   "fieldtype": "Check",
+   "label": "Is Not VFD Invoice"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "VFD Tax Invoice Item",
+   "options": "VFD Tax Invoice Item"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_auto_generate_vfd",
+   "fieldtype": "Check",
+   "label": "Is Auto Generate VFD"
+  },
+  {
+   "default": "Today",
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vfd_gc",
+   "fieldtype": "Data",
+   "label": "VFD GC",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vfd_rctnum",
+   "fieldtype": "Data",
+   "label": "VFD RCTNUM",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vfd_dc",
+   "fieldtype": "Data",
+   "label": "VFD DC",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vfd_date",
+   "fieldtype": "Date",
+   "label": "VFD Date",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vfd_time",
+   "fieldtype": "Time",
+   "label": "VFD Time",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vfd_serial",
+   "fieldtype": "Data",
+   "label": "VFD Serial",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vfd_rctvnum",
+   "fieldtype": "Data",
+   "label": "VFD RCTVNum",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vfd_verification_url",
+   "fieldtype": "Data",
+   "label": "VFD Verification URL",
+   "options": "URL",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "Not Sent",
+   "fieldname": "vfd_status",
+   "fieldtype": "Data",
+   "label": "VFD Status",
+   "read_only": 1
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "vfd_posting_info",
+   "fieldtype": "Data",
+   "label": "VFD Posting Info",
+   "read_only": 1
+  },
+  {
+   "description": "6=NIL\n1=TIN\n2=Driving License\n3=Voters Number\n4=Passport\n5=National Identity",
+   "fieldname": "vfd_cust_id_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Client ID Type",
+   "options": "6\n1\n2\n3\n4\n5",
+   "reqd": 1
+  },
+  {
+   "fieldname": "vfd_cust_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Client ID No",
+   "reqd": 1
+  },
+  {
+   "fieldname": "mobile_no",
+   "fieldtype": "Data",
+   "label": "Mobile No"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "invoice_specifics_section",
+   "fieldtype": "Section Break",
+   "label": "Invoice Specifics"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "column_break_9",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2022-11-25 13:19:00.094842",
+ "modified_by": "Administrator",
+ "module": "vfd-tz",
+ "name": "VFD Tax Invoice",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
