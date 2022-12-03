@@ -62,6 +62,7 @@
   {
    "fieldname": "date",
    "fieldtype": "Date",
+   "in_list_view": 1,
    "label": "DATE",
    "reqd": 1
   },
@@ -78,13 +79,11 @@
   {
    "fieldname": "line_1",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "LINE 1"
   },
   {
    "fieldname": "line_2",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "LINE 2"
   },
   {
@@ -104,13 +103,11 @@
   {
    "fieldname": "line_3",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "LINE 3"
   },
   {
    "fieldname": "line_4",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "LINE 4"
   },
   {
@@ -162,6 +159,7 @@
   {
    "fieldname": "znumber",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "ZNUMBER",
    "read_only": 1
   },
@@ -195,6 +193,7 @@
    "description": "SUM OF ALL SALES FOR THE DAY",
    "fieldname": "dailytotalamount",
    "fieldtype": "Currency",
+   "in_list_view": 1,
    "label": "DAILYTOTALAMOUNT"
   },
   {
@@ -304,6 +303,7 @@
   {
    "fieldname": "vfd_gc_to",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "VFD GC To",
    "read_only": 1
   },
@@ -342,6 +342,7 @@
    "allow_on_submit": 1,
    "fieldname": "sent_status",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Sent Status",
    "read_only": 1
   },
@@ -356,7 +357,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-10-27 15:58:53.449796",
+ "modified": "2022-12-03 18:40:01.184768",
  "modified_by": "Administrator",
  "module": "vfd-tz",
  "name": "VFD Z Report",
