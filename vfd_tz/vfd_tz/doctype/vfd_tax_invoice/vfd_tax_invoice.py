@@ -361,12 +361,12 @@ def get_vattotals(items, vrn):
             vattotals[item_taxcode] = {}
             vattotals[item_taxcode]["NETTAMOUNT"] = 0
             vattotals[item_taxcode]["TAXAMOUNT"] = 0
-        vattotals[item_taxcode]["NETTAMOUNT"] += flt(item.unit_subtotal - item.unit_tax, 2)
+        vattotals[item_taxcode]["NETTAMOUNT"] += flt(item.unit_price, 2)
         if vrn == "NOT REGISTERED":
             vattotals[item_taxcode]["TAXAMOUNT"] += 0
         else:
             vattotals[item_taxcode]["TAXAMOUNT"] += flt(
-                item.unit_subtotal * (tax_rate_map.get(str(item_taxcode)) / 100), 2
+                (item.unit_price) * (tax_rate_map.get(str(item_taxcode)) / 100), 2
             )
 
     vattotals_list = []
