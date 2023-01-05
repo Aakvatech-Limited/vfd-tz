@@ -18,7 +18,6 @@ from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import get_token
 from vfd_tz.api.xml import xml_to_dic, dict_to_xml
 from vfd_tz.api.utils import get_signature
 import requests
-from csf_tz import console
 
 
 class VFDZReport(Document):
