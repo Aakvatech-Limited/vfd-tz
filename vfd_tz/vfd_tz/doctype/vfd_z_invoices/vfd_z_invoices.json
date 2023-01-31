@@ -16,10 +16,9 @@
   {
    "columns": 2,
    "fieldname": "invoice",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Invoice",
-   "options": "Sales Invoice",
    "reqd": 1
   },
   {
