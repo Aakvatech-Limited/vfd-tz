@@ -114,7 +114,7 @@ scheduler_events = {
         ],
         "*/5 0-4 * * *": [
             "vfd_tz.vfd_tz.api.sales_invoice.posting_all_vfd_invoices_off_peak",
-            "vfd_tz.vfd_tz.doctype.vfd_tax_invoice.posting_all_vfd_invoices_off_peak",
+            "vfd_tz.vfd_tz.doctype.vfd_tax_invoice.vfd_tax_invoice.posting_all_vfd_invoices_off_peak",
         ],
     },
     # "weekly": [
