@@ -1,0 +1,54 @@
+{
+ "add_total_row": 0,
+ "columns": [],
+ "creation": "2023-04-28 19:49:46.643044",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date",
+   "mandatory": 1,
+   "wildcard_filter": 0
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date",
+   "mandatory": 1,
+   "wildcard_filter": 0
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "mandatory": 1,
+   "options": "Company",
+   "wildcard_filter": 0
+  }
+ ],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "",
+ "modified": "2023-04-29 00:48:45.318299",
+ "modified_by": "Administrator",
+ "module": "vfd-tz",
+ "name": "VFD Z Report Total Verification",
+ "owner": "info@aakvatech.com",
+ "prepared_report": 0,
+ "query": "SELECT *\r\nFROM (SELECT vzi.parent, vzr.date, vzr.sent_status, SUM(vzi.base_grand_total) as base_grand_total, SUM(vzi.base_net_total) as base_net_total, SUM(vzi.total_taxes_and_charges) as total_taxes_and_charges\r\nFROM `tabVFD Z Invoices` as vzi\r\nINNER JOIN `tabVFD Z Report` as vzr ON vzr.name = vzi.parent\r\nWHERE vzr.date BETWEEN %(from_date)s AND %(to_date)s\r\n  AND vzr.docstatus = 1\r\nGROUP BY vzi.parent) as vzit\r\n\r\nINNER JOIN (SELECT vzp.parent, vzr.sent_status, vzp.pmttype, SUM(vzp.pmtamount) as pmtamount\r\nFROM `tabVFD Z Report Payments` as vzp\r\nINNER JOIN `tabVFD Z Report` as vzr ON vzr.name = vzp.parent\r\nWHERE vzr.date BETWEEN %(from_date)s AND %(to_date)s\r\n  AND vzr.docstatus = 1\r\nGROUP BY vzp.parent) as vzpt ON vzit.parent = vzpt.parent\r\n\r\nINNER JOIN (SELECT vzvt.parent, vzr.sent_status, vzvt.vatrate, SUM(vzvt.taxamount) as taxamount\r\nFROM `tabVFD VAT Totals` as vzvt\r\nINNER JOIN `tabVFD Z Report` as vzr ON vzr.name = vzvt.parent\r\nWHERE vzr.date BETWEEN %(from_date)s AND %(to_date)s\r\n  AND vzr.docstatus = 1\r\nGROUP BY vzvt.parent) as vzvtt ON vzit.parent = vzvtt.parent\r\n",
+ "ref_doctype": "VFD Z Report",
+ "report_name": "VFD Z Report Total Verification",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Accounts Manager"
+  }
+ ]
+}

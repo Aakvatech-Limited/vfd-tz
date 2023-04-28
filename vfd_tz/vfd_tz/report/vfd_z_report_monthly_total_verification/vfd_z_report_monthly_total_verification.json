@@ -1,0 +1,54 @@
+{
+ "add_total_row": 1,
+ "columns": [],
+ "creation": "2023-04-29 00:50:11.867842",
+ "disable_prepared_report": 0,
+ "disabled": 0,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date",
+   "mandatory": 1,
+   "wildcard_filter": 0
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date",
+   "mandatory": 1,
+   "wildcard_filter": 0
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "mandatory": 1,
+   "options": "Company",
+   "wildcard_filter": 0
+  }
+ ],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "",
+ "modified": "2023-04-29 00:50:47.727808",
+ "modified_by": "Administrator",
+ "module": "vfd-tz",
+ "name": "VFD Z Report Monthly Total Verification",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "query": "SELECT *\r\nFROM (SELECT YEAR(vzr.date) as year, MONTH(vzr.date) as month, vzr.sent_status, SUM(vzi.base_grand_total) as \"base_grand_total:Currency:\", SUM(vzi.base_net_total) as \"base_net_total:Currency:\",\r\n   SUM(vzi.total_taxes_and_charges) as \"total_taxes_and_charges:Currency\"\r\nFROM `tabVFD Z Invoices` as vzi\r\nINNER JOIN `tabVFD Z Report` as vzr ON vzr.name = vzi.parent\r\nWHERE vzr.date BETWEEN %(from_date)s AND %(to_date)s\r\n  AND vzr.docstatus = 1\r\nGROUP BY YEAR(vzr.date), MONTH(vzr.date)) as vzit\r\n\r\nINNER JOIN (SELECT YEAR(vzr.date) as year, MONTH(vzr.date) as month, SUM(vzp.pmtamount) as \"pmtamount:Currency:\"\r\nFROM `tabVFD Z Report Payments` as vzp\r\nINNER JOIN `tabVFD Z Report` as vzr ON vzr.name = vzp.parent\r\nWHERE vzr.date BETWEEN %(from_date)s AND %(to_date)s\r\n  AND vzr.docstatus = 1\r\nGROUP BY YEAR(vzr.date), MONTH(vzr.date)) as vzpt ON vzit.year = vzpt.year AND vzit.month = vzpt.month\r\n\r\nINNER JOIN (SELECT YEAR(vzr.date) as year, MONTH(vzr.date) as month, SUM(vzvt.taxamount) as \"taxamount:Currency:\"\r\nFROM `tabVFD VAT Totals` as vzvt\r\nINNER JOIN `tabVFD Z Report` as vzr ON vzr.name = vzvt.parent\r\nWHERE vzr.date BETWEEN %(from_date)s AND %(to_date)s\r\n  AND vzr.docstatus = 1\r\nGROUP BY YEAR(vzr.date), MONTH(vzr.date)) as vzvtt ON vzit.year = vzvtt.year AND vzit.month = vzvtt.month\r\n",
+ "ref_doctype": "VFD Z Report",
+ "report_name": "VFD Z Report Monthly Total Verification",
+ "report_type": "Query Report",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "Accounts Manager"
+  }
+ ]
+}
