@@ -102,22 +102,15 @@ class VFDZReport(Document):
             fields=["sum(base_amount) as amount", "mode_of_payment"],
             group_by="mode_of_payment",
         )
-        # Prepend the other receipt types as we only do INVOICE in ERPNext
-        payment_types = ["CASH", "CHEQUE", "CCARD", "EMONEY"]
-        exist_types = [i.pmttype for i in self.payments]
-        for type in payment_types:
-            # Append only if it does not exist
-            # This is to avoid duplicates
-            if type not in exist_types:
-                row = self.append("payments", {})
-                row.pmttype = type
-                row.pmtamount = 0
         payments_data = {}
         for payment in payments_list:
-            total_payments += payment.amount
             vfd_pmttype = frappe.get_value(
                 "Mode of Payment", payment.mode_of_payment, "vfd_pmttype"
             )
+            # Skip if it is INVOICE as we add INVOICE later
+            if vfd_pmttype == "INVOICE":
+                continue
+            total_payments += payment.amount
             if not payments_data.get(vfd_pmttype):
                 payments_data.setdefault(vfd_pmttype, payment.amount)
             else:
@@ -130,6 +123,16 @@ class VFDZReport(Document):
         row = self.append("payments", {})
         row.pmttype = "INVOICE"
         row.pmtamount = diff_total or 0
+        # Prepend the other receipt types as we only do INVOICE in ERPNext
+        payment_types = ["CASH", "CHEQUE", "CCARD", "EMONEY"]
+        exist_types = [i.pmttype for i in self.payments]
+        for type in payment_types:
+            # Append only if it does not exist
+            # This is to avoid duplicates
+            if type not in exist_types:
+                row = self.append("payments", {})
+                row.pmttype = type
+                row.pmtamount = 0
 
     def set_invoices(self, invoices):
         self.invoices = []
