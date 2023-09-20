@@ -85,9 +85,9 @@ class VFDZReport(Document):
             filters={
                 "docstatus": 2,
                 "company": company,
-                "vfd_status": ["=", "Not Sent"],
+                "vfd_status": "Not Sent",
                 "vfd_z_report": ["in", [None, "", self.name]],
-                "posting_date": ["between", report_start_date, "and", self.date],
+                "posting_date": self.date,
             },
             fields=["name", "base_rounded_total", "base_grand_total", "vfd_z_report"],
         )
@@ -152,6 +152,8 @@ class VFDZReport(Document):
             row.discount_amount = el.base_discount_amount or el.total_discount
 
     def set_vat_totals(self):
+        if not self.invoices:
+            return
         self.vats = []
         invoices_list = []
         for row in self.invoices:
