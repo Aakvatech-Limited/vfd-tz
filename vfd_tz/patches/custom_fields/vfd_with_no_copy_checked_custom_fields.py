@@ -13,7 +13,7 @@ def execute():
                 "translatable": 1,
                 "fieldname": "vfd_cust_id",
                 "fieldtype": "Data",
-                "module_def": "VFD Providers",
+                "module_def": "vfd-tz",
             },
             {
                 "reqd": 1,
@@ -24,7 +24,7 @@ def execute():
                 "fieldname": "vfd_cust_id_type",
                 "fieldtype": "Select",
                 "options": "\n1- TIN\n2- Passport\n3- Driving License\n4- Voter ID\n5- Aadhaar\n6- Other",
-                "module_def": "VFD Providers",
+                "module_def": "vfd-tz",
             },
             {
                 "label": "VFD Customer ID",
@@ -49,7 +49,7 @@ def execute():
                 "insert_after": "csf_tz_close_dn_after",
                 "fieldname": "vfd_details",
                 "fieldtype": "Section Break",
-                "module_def": "VFD Providers",
+                "module_def": "vfd-tz",
             },
         ],
         "Sales Invoice": [
@@ -199,7 +199,7 @@ def execute():
                 "translatable": 1,
                 "fieldname": "vfd_tax_code",
                 "fieldtype": "Data",
-                "module_def": "VFD Providers",
+                "module_def": "vfd-tz",
             },
             {
                 "label": "VFD TAXCODE",
@@ -219,7 +219,7 @@ def execute():
                 "translatable": 1,
                 "fieldname": "vfd_payment_type",
                 "fieldtype": "Data",
-                "module_def": "VFD Providers",
+                "module_def": "vfd-tz",
             },
             {
                 "label": "VFD PMTTYPE",
