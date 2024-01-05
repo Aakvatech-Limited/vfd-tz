@@ -6,7 +6,6 @@ def execute():
     fields = {
         "Customer": [
             {
-                "reqd": 1,
                 "label": "VFD Customer ID",
                 "no_copy": 1,
                 "insert_after": "vfd_details",
@@ -16,7 +15,6 @@ def execute():
                 "module_def": "vfd-tz",
             },
             {
-                "reqd": 1,
                 "label": "VFD Customer ID Type",
                 "no_copy": 1,
                 "insert_after": "vfd_cust_id",
