@@ -2,13 +2,16 @@
 # Copyright (c) 2020, Aakvatech and contributors
 # For license information, please see license.txt
 
-from __future__ import unicode_literals
 import frappe
 from frappe import _
 import base64
-import OpenSSL
-from OpenSSL import crypto
 import re
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.serialization.pkcs12 import (
+    load_key_and_certificates,
+)
+from cryptography.hazmat.backends import default_backend
 
 
 def to_base64(value):
@@ -24,9 +27,9 @@ def get_signature(data, doc):
     if not doc.certificate:
         return
     p12 = get_p12_certificate(doc)
-    pkey = p12.get_privatekey()
+    pkey = p12[0]
 
-    sign = OpenSSL.crypto.sign(pkey, data, "sha1")
+    sign = pkey.sign(data.encode(), padding.PKCS1v15(), hashes.SHA1())
     data_base64 = base64.b64encode(sign)
     signature = str(data_base64)[2:-1]
 
@@ -37,8 +40,8 @@ def get_cert_serial(registration_doc):
     if not registration_doc.certificate:
         return
     p12 = get_p12_certificate(registration_doc)
-    cert = p12.get_certificate()
-    cert_serial = cert.get_serial_number()
+    cert = p12[1]
+    cert_serial = cert.serial_number
     cert_serial_hex = "{0:#0{1}x}".format(cert_serial, 4)[2:]
     t = iter(cert_serial_hex)
     cert_serial_hex_spaced = " ".join(a + b for a, b in zip(t, t))
@@ -63,12 +66,12 @@ def get_absolute_path(file_name, is_private=False):
 
 
 def get_p12_certificate(registration_doc):
-    link = get_absolute_path(registration_doc.certificate, True)
+    link = get_absolute_path(registration_doc.certificate)
     key_file = open(link, "rb")
     key = key_file.read()
     key_file.close()
-    password = registration_doc.get_password("certificate_password")
-    p12 = crypto.load_pkcs12(key, password)
+    password = registration_doc.get_password("certificate_password").encode()
+    p12 = load_key_and_certificates(key, password, default_backend())
     return p12
 
 
@@ -129,6 +132,10 @@ def get_latest_registration_doc(company, throw=True):
         )
     return doc
 
+
 def check_vfd_status():
-    from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import check_vfd_status as _check_vfd_status
+    from vfd_tz.vfd_tz.doctype.vfd_token.vfd_token import (
+        check_vfd_status as _check_vfd_status,
+    )
+
     _check_vfd_status()
