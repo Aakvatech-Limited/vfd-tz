@@ -86,10 +86,12 @@ doc_events = {
     "Sales Invoice": {
         "on_submit": "vfd_tz.vfd_tz.api.sales_invoice.auto_enqueue",
         "before_cancel": "vfd_tz.vfd_tz.api.sales_invoice.validate_cancel",
-        "before_submit": "vfd_tz.vfd_tz.api.sales_invoice.vfd_validation"
+        "before_submit": "vfd_tz.vfd_tz.api.sales_invoice.vfd_validation",
+    },
+    "Customer": {
+        "validate": "vfd_tz.vfd_tz.api.utils.clean_and_update_tax_id_info",
     },
 }
-
 # Scheduled Tasks
 # ---------------
 
