@@ -20,6 +20,7 @@ frappe.ui.form.on("Sales Invoice", {
               label: "Proceed",
               action(values) {
                 generate_vfd(frm);
+                cur_dialog.cancel();
               },
             },
           });
@@ -34,6 +35,7 @@ frappe.ui.form.on("Sales Invoice", {
               label: "Proceed",
               action(values) {
                 generate_vfd(frm);
+                cur_dialog.cancel();
               },
             },
           });
@@ -55,6 +57,10 @@ function generate_vfd(frm) {
     callback: function (r) {
       if (!r.exc) {
         frm.reload_doc();
+        frappe.show_alert({
+          message: __("VFD Generated"),
+          indicator: "green",
+        });
       } else {
         frappe.msgprint(__("Error generating VFD"));
       }
