@@ -102,7 +102,13 @@ def enqueue_posting_vfd_invoice(invoice_name):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
     if doc.is_return or doc.is_not_vfd_invoice:
         return
-    registration_doc = get_latest_registration_doc(doc.company)
+    registration_doc = get_latest_registration_doc(doc.company, throw=False)
+    if not registration_doc:
+        frappe.log_error(
+            _("No Registration Document found for {0}".format(doc.company)),
+            "VFD Posting Error",
+        )
+        return
     if doc.creation < registration_doc.vfd_start_date:
         frappe.throw(
             _(
@@ -146,6 +152,7 @@ def enqueue_posting_vfd_invoice(invoice_name):
 
 def posting_all_vfd_invoices_off_peak():
     posting_all_vfd_invoices()
+
 
 def posting_all_vfd_invoices():
     if frappe.local.flags.vfd_posting:
@@ -511,7 +518,9 @@ def get_item_inclusive_amount(item):
             for key, value in item_tax_rate.items():
                 if not value or value == 0.00:
                     return flt(item.base_amount, 2)
-                return flt(item.base_amount * (1 + (value / 100)), 2)  # 118% for 18% VAT
+                return flt(
+                    item.base_amount * (1 + (value / 100)), 2
+                )  # 118% for 18% VAT
     else:
         return flt(item.base_amount, 2)
 
