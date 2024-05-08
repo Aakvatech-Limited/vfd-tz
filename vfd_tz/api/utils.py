@@ -142,7 +142,7 @@ def check_vfd_status():
 
 
 def clean_and_update_tax_id_info(doc, method):
-    cleaned_tax_id = "".join(char for char in doc.tax_id if char.isdigit())
+    cleaned_tax_id = "".join(char for char in (doc.tax_id or "") if char.isdigit())
     doc.tax_id = cleaned_tax_id
     if doc.tax_id:
         doc.vfd_cust_id_type = "1- TIN"
