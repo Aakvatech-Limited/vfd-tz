@@ -389,7 +389,7 @@ def posting_vfd_invoice(invoice_name):
 def get_customer_id_info(customer):
     data = {}
     cust_id, cust_id_type, mobile_no = frappe.get_value(
-        "Customer", customer, ["vfd_custid", "vfd_custidtype", "mobile_no"]
+        "Customer", customer, ["vfd_cust_id", "vfd_cust_id_type", "mobile_no"]
     )
     if not cust_id:
         data["cust_id"] = ""
