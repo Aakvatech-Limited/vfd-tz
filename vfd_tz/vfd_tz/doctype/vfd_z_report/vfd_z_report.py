@@ -31,7 +31,9 @@ class VFDZReport(Document):
         pass
 
     def set_data(self):
-        company, serial = frappe.get_value("VFD Registration", self.vfd_registration, ["company", "serial"])
+        company, serial = frappe.get_value(
+            "VFD Registration", self.vfd_registration, ["company", "serial"]
+        )
         if not self.serial:
             self.serial = serial
         z_last_gc = get_z_last_gc(self.serial)
@@ -56,7 +58,7 @@ class VFDZReport(Document):
         self.gross = get_all_gross(company, self.serial) + self.dailytotalamount
         self.discounts = 0
         for invoice in self.invoices:
-            self.discounts += invoice.discount_amount
+            self.discounts += invoice.discount_amount or 0
         self.ticketsfiscal = len(self.invoices)
         canceled_invoices = self.get_canceled_invoices()
         self.ticketsvoid = self.ticketsnonfiscal = len(canceled_invoices)
@@ -83,9 +85,9 @@ class VFDZReport(Document):
             filters={
                 "docstatus": 2,
                 "company": company,
-                "vfd_status": ["=", "Not Sent"],
+                "vfd_status": "Not Sent",
                 "vfd_z_report": ["in", [None, "", self.name]],
-                "posting_date": ["between", report_start_date, "and", self.date],
+                "posting_date": self.date,
             },
             fields=["name", "base_rounded_total", "base_grand_total", "vfd_z_report"],
         )
@@ -100,20 +102,15 @@ class VFDZReport(Document):
             fields=["sum(base_amount) as amount", "mode_of_payment"],
             group_by="mode_of_payment",
         )
-        # Prepend the other receipt types as we only do INVOICE in ERPNext
-        payment_types = ["CASH", "CHEQUE", "CCARD", "EMONEY"]
-        exist_types = [i.pmttype for i in self.payments]
-        for type in payment_types:
-            if type not in exist_types:
-                row = self.append("payments", {})
-                row.pmttype = type
-                row.pmtamount = 0
         payments_data = {}
         for payment in payments_list:
-            total_payments += payment.amount
             vfd_pmttype = frappe.get_value(
                 "Mode of Payment", payment.mode_of_payment, "vfd_pmttype"
             )
+            # Skip if it is INVOICE as we add INVOICE later
+            if vfd_pmttype == "INVOICE":
+                continue
+            total_payments += payment.amount
             if not payments_data.get(vfd_pmttype):
                 payments_data.setdefault(vfd_pmttype, payment.amount)
             else:
@@ -126,6 +123,16 @@ class VFDZReport(Document):
         row = self.append("payments", {})
         row.pmttype = "INVOICE"
         row.pmtamount = diff_total or 0
+        # Prepend the other receipt types as we only do INVOICE in ERPNext
+        payment_types = ["CASH", "CHEQUE", "CCARD", "EMONEY"]
+        exist_types = [i.pmttype for i in self.payments]
+        for type in payment_types:
+            # Append only if it does not exist
+            # This is to avoid duplicates
+            if type not in exist_types:
+                row = self.append("payments", {})
+                row.pmttype = type
+                row.pmtamount = 0
 
     def set_invoices(self, invoices):
         self.invoices = []
@@ -135,30 +142,38 @@ class VFDZReport(Document):
             row = self.append("invoices", {})
             row.invoice = el.name
             row.vfd_gc = el.vfd_gc
-            row.total_taxes_and_charges = el.base_total_taxes_and_charges
-            row.base_net_total = el.base_net_total
-            row.base_grand_total = el.base_rounded_total or el.base_grand_total
-            row.discount_amount = el.base_discount_amount
+            row.total_taxes_and_charges = (
+                el.base_total_taxes_and_charges or el.invoice_tax
+            )
+            row.base_net_total = el.base_net_total or el.net_total
+            row.base_grand_total = (
+                el.base_rounded_total or el.base_grand_total or el.grand_total
+            )
+            row.discount_amount = el.base_discount_amount or el.total_discount
 
     def set_vat_totals(self):
+        if not self.invoices:
+            return
         self.vats = []
         invoices_list = []
         for row in self.invoices:
             invoices_list.append(row.invoice)
-        items = (
-            frappe.get_all(
-                "Sales Invoice Item",
-                filters={"parent": ["in", invoices_list]},
-                fields=["*"],
-            )
-            or []
+        items = frappe.get_all(
+            "Sales Invoice Item",
+            filters={"parent": ["in", invoices_list]},
+            fields=["*"],
+        ) or frappe.get_all(
+            "VFD Tax Invoice Item",
+            filters={"parent": ["in", invoices_list]},
+            fields=["*"],
         )
-        vattotals = get_vattotals(items, self.vrn)
-        for el in vattotals:
-            row = self.append("vats", {})
-            row.nettamount = el.get("nettamount")
-            row.taxamount = el.get("taxamount")
-            row.vatrate = el.get("vatrate")
+        if items:
+            vattotals = get_vattotals(items, self.vrn)
+            for el in vattotals:
+                row = self.append("vats", {})
+                row.nettamount = el.get("nettamount")
+                row.taxamount = el.get("taxamount")
+                row.vatrate = el.get("vatrate")
 
     def update_canceled_invoices(self):
         canceled_invoices = self.get_canceled_invoices()
@@ -171,20 +186,32 @@ class VFDZReport(Document):
 
 def get_vattotals(items, vrn):
     vattotals = {}
-    taxes_map = {1: "A-18.00", 2: "B-0.00", 3: "C-0.00", 4: "D-0.00", 5: "E-0.00"}
-    for key, value in taxes_map.items():
-        vattotals.setdefault(key, {"NETTAMOUNT": 0, "TAXAMOUNT": 0})
-    for item in items:
-        item_taxcode = get_item_taxcode(
-            item.item_tax_template, item.item_code, item.parent
-        )
-        vattotals[item_taxcode]["NETTAMOUNT"] += flt(item.base_net_amount, 2)
-        if vrn == "NOT REGISTERED":
-            vattotals[item_taxcode]["TAXAMOUNT"] = 0
-        else:
-            vattotals[item_taxcode]["TAXAMOUNT"] += flt(
-                item.base_net_amount * ((18 / 100) if item_taxcode == 1 else 0), 2
+    if items[0].parenttype == "VFD Tax Invoice":
+        taxes_map = {"1": "A", "2": "B", "3": "C", "4": "D", "5": "E"}
+        for key, value in taxes_map.items():
+            vattotals.setdefault(key, {"NETTAMOUNT": 0, "TAXAMOUNT": 0})
+        for item in items:
+            vattotals[item.item_taxcode]["NETTAMOUNT"] += flt(item.unit_price, 2)
+            if vrn == "NOT REGISTERED":
+                vattotals[item.item_taxcode]["TAXAMOUNT"] = 0
+            else:
+                vattotals[item.item_taxcode]["TAXAMOUNT"] += flt(item.unit_tax, 2)
+
+    else:
+        taxes_map = {1: "A-18.00", 2: "B-0.00", 3: "C-0.00", 4: "D-0.00", 5: "E-0.00"}
+        for key, value in taxes_map.items():
+            vattotals.setdefault(key, {"NETTAMOUNT": 0, "TAXAMOUNT": 0})
+        for item in items:
+            item_taxcode = get_item_taxcode(
+                item.item_tax_template, item.item_code, item.parent
             )
+            vattotals[item_taxcode]["NETTAMOUNT"] += flt(item.base_net_amount, 2)
+            if vrn == "NOT REGISTERED":
+                vattotals[item_taxcode]["TAXAMOUNT"] = 0
+            else:
+                vattotals[item_taxcode]["TAXAMOUNT"] += flt(
+                    item.base_net_amount * ((18 / 100) if item_taxcode == 1 else 0), 2
+                )
 
     vattotals_list = []
     for key, value in vattotals.items():
@@ -232,6 +259,20 @@ def get_invoices_last_gc(company, date):
         ),
         as_dict=True,
     )
+    if not invoices_list[0].get("gc"):
+        invoices_list = frappe.db.sql(
+            """
+        SELECT MAX(CONVERT(vfd_gc, INTEGER)) as gc
+        FROM `tabVFD Tax Invoice`
+        WHERE 
+            company = '{0}'
+            and docstatus = 1
+            and vfd_date = DATE('{1}')
+        """.format(
+                company, date
+            ),
+            as_dict=True,
+        )
     if len(invoices_list) > 0 and invoices_list[0].get("gc"):
         return invoices_list[0].get("gc")
     else:
@@ -250,6 +291,18 @@ def get_invoices(company, date, serial):
         fields=["*"],
         order_by="vfd_gc",
     )
+    if not invoices:
+        invoices = frappe.get_all(
+            "VFD Tax Invoice",
+            filters={
+                "company": company,
+                "docstatus": 1,
+                "vfd_date": date,
+                "vfd_serial": serial,
+            },
+            fields=["*"],
+            order_by="vfd_gc",
+        )
     return invoices
 
 
@@ -285,6 +338,21 @@ def get_gross_between(company, serial, start, end):
         ),
         as_dict=True,
     )
+    if not invoices_list[0].get("total"):
+        invoices_list = frappe.db.sql(
+            """
+        SELECT SUM(grand_total) as total
+        FROM `tabVFD Tax Invoice`
+        WHERE 
+            company = '{0}'
+            and docstatus = 1
+            and vfd_serial = '{1}'
+            and vfd_gc BETWEEN {2} AND {3}
+        """.format(
+                company, serial, start or 0, end or 0
+            ),
+            as_dict=True,
+        )
     gross = invoices_list[0].get("total")
     return flt(gross, 2) or 0
 
@@ -475,7 +543,11 @@ def send_multi_vfd_z_reports():
     )
     reports = frappe.get_all(
         "VFD Z Report",
-        filters={"docstatus": 1, "sent_status": ["!=", "Success"], "vfd_registration": ["in", vfd_registration_list]},
+        filters={
+            "docstatus": 1,
+            "sent_status": ["!=", "Success"],
+            "vfd_registration": ["in", vfd_registration_list],
+        },
         order_by="vfd_gc_previous",
         pluck="name",
     )
@@ -487,7 +559,13 @@ def make_vfd_z_report():
     vfd_registration_list = frappe.get_all(
         "VFD Registration",
         filters={"r_status": "Active"},
-        fields=["name", "send_vfd_z_report", "serial", "vrn", "vfd_z_report_start_date"],
+        fields=[
+            "name",
+            "send_vfd_z_report",
+            "serial",
+            "vrn",
+            "vfd_z_report_start_date",
+        ],
     )
     for vfd_registration in vfd_registration_list:
         try:
