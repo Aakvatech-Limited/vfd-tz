@@ -1,13 +1,13 @@
 frappe.ui.form.on("Customer", {
-    vfd_custidtype: function(frm) {
-        if (frm.doc.vfd_custidtype == "1- TIN") {
-            frm.set_value("vfd_custid", frm.doc.tax_id)
+    vfd_cust_id_type: function(frm) {
+        if (frm.doc.vfd_cust_id_type == "1- TIN") {
+            frm.set_value("vfd_cust_id", frm.doc.tax_id)
         }
     },
-    vfd_custid: function(frm) {
-        frappe.msgprint(string(frm.doc.vfd_custid.length))
-        frappe.msgprint(frm.doc.vfd_custidtype.startsWith('1'))
-        if (frm.doc.vfd_custid.length != 9 && frm.doc.vfd_custidtype.startsWith('1')){
+    vfd_cust_id: function(frm) {
+        frappe.msgprint(string(frm.doc.vfd_cust_id.length))
+        frappe.msgprint(frm.doc.vfd_cust_id_type.startsWith('1'))
+        if (frm.doc.vfd_cust_id.length != 9 && frm.doc.vfd_cust_id_type.startsWith('1')){
             frappe.throw(__("TIN Number is should be 9 numbers only"));
         }
     },
@@ -17,8 +17,8 @@ frappe.ui.form.on("Customer", {
                 frappe.throw(__("TIN Number is should be 9 numbers only"));
             }
             if (frm.doc.tax_id) {
-                frm.set_value("vfd_custid", frm.doc.tax_id);
-                frm.set_value("vfd_custidtype", "1- TIN");
+                frm.set_value("vfd_cust_id", frm.doc.tax_id);
+                frm.set_value("vfd_cust_id_type", "1- TIN");
             }
         });
     },
