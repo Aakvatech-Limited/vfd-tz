@@ -58,7 +58,7 @@ doctype_js = {
 # ------------
 
 # before_install = "vfd_tz.install.before_install"
-# after_install = "vfd_tz.install.after_install"
+after_migrate = "vfd_tz.patches.migrate_vfd_customer_data.delete"
 
 # Desk Notifications
 # ------------------
