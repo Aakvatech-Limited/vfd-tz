@@ -84,6 +84,7 @@ doctype_js = {
 
 doc_events = {
     "Sales Invoice": {
+        "before_validate": "vfd_tz.vfd_tz.api.sales_invoice.set_send_serial_no_to_tra_default",
         "on_submit": "vfd_tz.vfd_tz.api.sales_invoice.auto_enqueue",
         "before_cancel": "vfd_tz.vfd_tz.api.sales_invoice.validate_cancel",
         "before_submit": "vfd_tz.vfd_tz.api.sales_invoice.vfd_validation",

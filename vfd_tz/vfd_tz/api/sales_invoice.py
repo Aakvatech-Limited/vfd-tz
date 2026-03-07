@@ -15,14 +15,82 @@ from vfd_tz.api.utils import (
     remove_all_except_numbers,
 )
 import requests
-from frappe.utils import flt, nowdate, nowtime, format_datetime
+from frappe.utils import cint, flt, nowdate, nowtime, format_datetime
 from vfd_tz.vfd_tz.doctype.vfd_uin.vfd_uin import get_counters
 from frappe.utils.background_jobs import enqueue
+from erpnext.stock.doctype.serial_no.serial_no import get_serial_nos
+from erpnext.stock.serial_batch_bundle import get_serial_nos as get_serial_nos_from_bundle
 import json
 import time
 
 
+def set_send_serial_no_to_tra_default(doc, method=None):
+    if not doc.company:
+        return
+    if doc.get("send_serial_no_to_tra") not in (None, ""):
+        return
+
+    registration_doc = get_latest_registration_doc(doc.company, throw=False)
+    if not registration_doc:
+        return
+
+    doc.send_serial_no_to_tra = cint(registration_doc.get("send_serial_no_to_tra") or 0)
+
+
+def _is_serial_tracked_stock_item(item_code):
+    if not item_code:
+        return False
+
+    maintain_stock, has_serial_no = frappe.get_cached_value(
+        "Item", item_code, ["maintain_stock", "has_serial_no"]
+    ) or (0, 0)
+    return bool(cint(maintain_stock) and cint(has_serial_no))
+
+
+def _get_serial_nos_for_item(item):
+    serial_nos = []
+    if item.serial_and_batch_bundle:
+        serial_nos = get_serial_nos_from_bundle(item.serial_and_batch_bundle) or []
+    if not serial_nos and item.serial_no:
+        serial_nos = get_serial_nos(item.serial_no) or []
+
+    # Keep order and drop duplicates
+    return list(dict.fromkeys(serial_nos))
+
+
+def validate_serial_no_for_tra(doc):
+    if not cint(doc.get("send_serial_no_to_tra")):
+        return {}
+
+    serial_nos_by_item = {}
+    for item in doc.items:
+        if not _is_serial_tracked_stock_item(item.item_code):
+            continue
+
+        serial_nos = _get_serial_nos_for_item(item)
+        if not serial_nos:
+            frappe.throw(
+                _(
+                    "Serial No (Chassis No) is required for Item Row {0} ({1}). "
+                    "Please set Serial No or Serial and Batch Bundle."
+                ).format(item.idx, item.item_code)
+            )
+        if len(serial_nos) > 2:
+            frappe.throw(
+                _(
+                    "Item Row {0} ({1}) has {2} serial numbers. "
+                    "Maximum allowed to send to TRA is 2. "
+                    "Please split this item into separate rows."
+                ).format(item.idx, item.item_code, len(serial_nos))
+            )
+
+        serial_nos_by_item[item.name] = serial_nos
+
+    return serial_nos_by_item
+
+
 def vfd_validation(doc, method):
+    set_send_serial_no_to_tra_default(doc, method)
     if doc.is_return or doc.is_not_vfd_invoice:
         return
     if doc.base_net_total == 0:
@@ -95,6 +163,8 @@ def vfd_validation(doc, method):
                     )
                 )
             )
+
+    validate_serial_no_for_tra(doc)
 
 
 @frappe.whitelist()
@@ -243,6 +313,8 @@ def posting_vfd_invoice(invoice_name):
         doc.reload()
     token_data = get_token(doc.company)
     registration_doc = token_data.get("doc")
+    send_serial_no_to_tra = cint(doc.get("send_serial_no_to_tra"))
+    serial_nos_by_item = validate_serial_no_for_tra(doc)
     headers = {
         "Content-Type": "Application/xml",
         "Routing-Key": "vfdrct",
@@ -286,15 +358,20 @@ def posting_vfd_invoice(invoice_name):
         "PAYMENTS": get_payments(doc.payments, doc.base_grand_total),
         "VATTOTALS": get_vattotals(doc.items, doc.name, registration_doc.vrn),
     }
-    use_item_group = registration_doc.use_item_group
+    # Keep one item per row when serial no is sent as item description.
+    use_item_group = bool(registration_doc.use_item_group) and not bool(
+        send_serial_no_to_tra
+    )
     for item in doc.items:
+        description = item.item_group if use_item_group else item.item_name
+        if send_serial_no_to_tra and item.name in serial_nos_by_item:
+            description = " / ".join(serial_nos_by_item[item.name])
+
         item_data = {
             "ID": remove_special_characters(
                 item.item_group if use_item_group else item.item_code
             ),
-            "DESC": remove_special_characters(
-                item.item_group if use_item_group else item.item_name
-            ),
+            "DESC": remove_special_characters(description),
             "QTY": flt(item.stock_qty, 2),
             "TAXCODE": get_item_taxcode(
                 item.item_tax_template, item.item_code, doc.name
