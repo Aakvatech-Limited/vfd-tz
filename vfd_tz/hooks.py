@@ -119,6 +119,10 @@ scheduler_events = {
             "vfd_tz.vfd_tz.api.sales_invoice.posting_all_vfd_invoices_off_peak",
             "vfd_tz.vfd_tz.doctype.vfd_tax_invoice.vfd_tax_invoice.posting_all_vfd_invoices_off_peak",
         ],
+        "0 9 * * *": [
+            # Check for pending VFD invoices daily at 9 AM
+            "vfd_tz.api.vfd_monitoring.check_and_alert_pending_vfd_invoices",
+        ],
     },
     # "weekly": [
     # 	"vfd_tz.tasks.weekly"
