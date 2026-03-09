@@ -13,6 +13,7 @@
   "vfd_start_date",
   "vfd_z_report_start_date",
   "do_not_send_vfd",
+  "send_serial_no_to_tra",
   "send_vfd_z_report",
   "vfd_commands_section",
   "is_blocked",
@@ -311,6 +312,13 @@
    "fieldtype": "Check",
    "hidden": 1,
    "label": "Do not send VFD"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "send_serial_no_to_tra",
+   "fieldtype": "Check",
+   "label": "Send Serial No as Item Description to TRA"
   },
   {
    "fieldname": "vfd_start_date",
