@@ -1,4 +1,5 @@
 vfd_tz.patches.create_custom_fields_for_vfd_serial
 vfd_tz.patches.update_sales_invoice_vfd_serial
 vfd_tz.patches.custom_fields.vfd_with_no_copy_checked_custom_fields
-vfd_tz.patches.custom_fields.add_send_serial_no_to_tra_fields
+vfd_tz.patches.migrate_vfd_customer_data 
+vfd_tz.patches.update_vfd_custom_fields
