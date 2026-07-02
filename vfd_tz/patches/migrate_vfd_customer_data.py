@@ -11,17 +11,11 @@ def execute():
     ):
         return
 
-    filters = [
-        ["vfd_custidtype", "not in", (None, "")],
-        ["vfd_custid", "not in", (None, "")],
-    ]
-
     start = 0
     while True:
         customers = frappe.get_all(
             "Customer",
             fields=["name", "vfd_custidtype", "vfd_custid"],
-            filters=filters,
             limit_start=start,
             limit_page_length=BATCH_SIZE,
             order_by="creation desc",
@@ -30,15 +24,16 @@ def execute():
             break
 
         for customer in customers:
-            frappe.db.set_value(
-                "Customer",
-                customer.name,
-                {
-                    "vfd_cust_id_type": customer.vfd_custidtype,
-                    "vfd_cust_id": customer.vfd_custid,
-                },
-                update_modified=False,
-            )
+            values = {}
+            if customer.vfd_custidtype not in (None, ""):
+                values["vfd_cust_id_type"] = customer.vfd_custidtype
+            if customer.vfd_custid not in (None, ""):
+                values["vfd_cust_id"] = customer.vfd_custid
+
+            if values:
+                frappe.db.set_value(
+                    "Customer", customer.name, values, update_modified=False
+                )
 
         frappe.db.commit()
         start += BATCH_SIZE
