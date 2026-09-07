@@ -16,6 +16,7 @@ def execute():
         customers = frappe.get_all(
             "Customer",
             fields=["name", "vfd_custidtype", "vfd_custid", "vfd_cust_id_type", "vfd_cust_id"],
+            filters={"vfd_custidtype": ("is", "set"), "vfd_custid": ("is", "set")},
             limit_start=start,
             limit_page_length=BATCH_SIZE,
             order_by="creation desc",
@@ -38,8 +39,6 @@ def execute():
         frappe.db.commit()
         start += BATCH_SIZE
 
-
-def delete():
     for fieldname in ("vfd_custidtype", "vfd_custid"):
         custom_field_name = f"Customer-{fieldname}"
         if frappe.db.exists("Custom Field", custom_field_name):
