@@ -612,13 +612,13 @@ def get_item_inclusive_amount(item):
 @erpnext.allow_regional
 def get_itemised_tax_breakup_data(doc):
     if doc.get("item_wise_tax_details"):
-        return get_itemised_tax_v16(doc)
+        return get_itemised_tax_from_details(doc)
 
     return get_itemised_tax(doc.taxes)
 
 
-def get_itemised_tax_v16(doc, with_tax_account=False):
-    """Build the legacy VFD tax map from ERPNext v16 Item Wise Tax Detail rows."""
+def get_itemised_tax_from_details(doc, with_tax_account=False):
+    """Build the legacy VFD tax map from Item Wise Tax Detail rows."""
     itemised_tax = {}
     items_by_name = {item.name: item for item in doc.items}
     taxes_by_name = {tax.name: tax for tax in doc.taxes}
@@ -628,9 +628,6 @@ def get_itemised_tax_v16(doc, with_tax_account=False):
         tax = taxes_by_name.get(detail.tax_row)
 
         if not item or not tax:
-            continue
-
-        if getattr(tax, "category", None) and tax.category == "Valuation":
             continue
 
         item_code = item.item_code
@@ -650,9 +647,6 @@ def get_itemised_tax_v16(doc, with_tax_account=False):
 def get_itemised_tax(taxes, with_tax_account=False):
     itemised_tax = {}
     for tax in taxes:
-        if getattr(tax, "category", None) and tax.category == "Valuation":
-            continue
-
         item_tax_map = (
             json.loads(tax.item_wise_tax_detail) if tax.item_wise_tax_detail else {}
         )
