@@ -5,12 +5,12 @@ from frappe.tests.utils import FrappeTestCase
 
 from vfd_tz.vfd_tz.api.sales_invoice import (
     get_itemised_tax_breakup_data,
-    get_itemised_tax_v16,
+    get_itemised_tax_from_details,
 )
 
 
 class TestSalesInvoiceTaxBreakup(FrappeTestCase):
-    def _make_v16_doc(self, tax_category="Total", rate=18, amount=180):
+    def _make_tax_doc(self, rate=18, amount=180):
         return frappe._dict(
             items=[
                 frappe._dict(
@@ -23,7 +23,7 @@ class TestSalesInvoiceTaxBreakup(FrappeTestCase):
                     name="TAX-ROW-1",
                     description="VAT 18%",
                     account_head="VAT - TEST",
-                    category=tax_category,
+                    category="Total",
                 )
             ],
             item_wise_tax_details=[
@@ -36,8 +36,8 @@ class TestSalesInvoiceTaxBreakup(FrappeTestCase):
             ],
         )
 
-    def test_v16_item_wise_tax_details_are_mapped_to_item_code(self):
-        doc = self._make_v16_doc()
+    def test_item_wise_tax_details_are_mapped_to_item_code(self):
+        doc = self._make_tax_doc()
 
         tax_data = get_itemised_tax_breakup_data(doc)
 
@@ -45,17 +45,10 @@ class TestSalesInvoiceTaxBreakup(FrappeTestCase):
         self.assertEqual(tax_data["TEST-ITEM-1"]["VAT 18%"].tax_rate, 18)
         self.assertEqual(tax_data["TEST-ITEM-1"]["VAT 18%"].tax_amount, 180)
 
-    def test_v16_valuation_only_tax_is_ignored(self):
-        doc = self._make_v16_doc(tax_category="Valuation")
+    def test_tax_account_can_be_included(self):
+        doc = self._make_tax_doc()
 
-        tax_data = get_itemised_tax_breakup_data(doc)
-
-        self.assertEqual(tax_data, {})
-
-    def test_v16_tax_account_can_be_included(self):
-        doc = self._make_v16_doc()
-
-        tax_data = get_itemised_tax_v16(doc, with_tax_account=True)
+        tax_data = get_itemised_tax_from_details(doc, with_tax_account=True)
 
         self.assertEqual(
             tax_data["TEST-ITEM-1"]["VAT 18%"].tax_account,
