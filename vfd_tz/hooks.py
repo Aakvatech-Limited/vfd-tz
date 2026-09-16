@@ -18,7 +18,7 @@ app_license = "MIT"
 # app_include_css = "/assets/vfd_tz/css/vfd_tz.css"
 # app_include_js = "/assets/vfd_tz/js/vfd_tz.js"
 
-# include js, css files in header of web template
+# include js, css files in web template
 # web_include_css = "/assets/vfd_tz/css/vfd_tz.css"
 # web_include_js = "/assets/vfd_tz/js/vfd_tz.js"
 
@@ -87,7 +87,7 @@ doc_events = {
         "before_validate": "vfd_tz.vfd_tz.api.sales_invoice.set_send_serial_no_to_tra_default",
         "on_submit": "vfd_tz.vfd_tz.api.sales_invoice.auto_enqueue",
         "before_cancel": "vfd_tz.vfd_tz.api.sales_invoice.validate_cancel",
-        "before_submit": "vfd_tz.vfd_tz.api.sales_invoice.vfd_validation",
+        "before_submit": "vfd_tz.vfd_tz.api.sales_invoice_validation.vfd_validation",
     },
     "Customer": {
         "validate": "vfd_tz.api.utils.clean_and_update_tax_id_info",
@@ -137,7 +137,7 @@ scheduler_events = {
 # ------------------------------
 #
 # override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "vfd_tz.event.get_events"
+# 	"frappe.desk.doctype.event.get_events": "vfd_tz.event.get_events"
 # }
 #
 # each overriding function accepts a `data` argument;
