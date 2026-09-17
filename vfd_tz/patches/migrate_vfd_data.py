@@ -26,9 +26,9 @@ def execute():
 
         for customer in customers:
             values = {}
-            if customer.vfd_custidtype not in (None, ""):
+            if customer.vfd_custidtype not in (None, "") and customer.vfd_cust_id_type in (None, ""):
                 values["vfd_cust_id_type"] = customer.vfd_custidtype
-            if customer.vfd_custid not in (None, ""):
+            if customer.vfd_custid not in (None, "") and customer.vfd_cust_id in (None, ""):
                 values["vfd_cust_id"] = customer.vfd_custid
 
             if values:
