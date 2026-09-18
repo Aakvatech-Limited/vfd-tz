@@ -309,10 +309,37 @@ def posting_all_vfd_invoices():
         frappe.local.flags.vfd_posting = False
 
 
+def _recover_successful_vfd_posting(doc):
+    existing_success = frappe.get_all(
+        "VFD Invoice Posting Info",
+        filters={
+            "sales_invoice": doc.name,
+            "ackcode": 0,
+        },
+        fields=["name", "rctnum"],
+        page_length=1,
+        order_by="creation desc",
+    )
+
+    if not existing_success:
+        return False
+
+    posting_info = existing_success[0]
+    doc.vfd_posting_info = posting_info.name
+    doc.vfd_status = "Success"
+    doc.flags.ignore_links = True
+    doc.save(ignore_permissions=True)
+    frappe.db.commit()
+    return True
+
+
 def posting_vfd_invoice(invoice_name):
     doc = frappe.get_doc("Sales Invoice", invoice_name)
     if doc.vfd_posting_info or doc.docstatus != 1:
         return
+
+    if _recover_successful_vfd_posting(doc):
+        return "Success"
     if doc.vfd_status == "Not Sent":
         doc.vfd_status = "Pending"
         doc.db_update()
@@ -460,6 +487,7 @@ def posting_vfd_invoice(invoice_name):
     if int(posting_info_doc.ackcode) == 0:
         doc.vfd_posting_info = posting_info_doc.name
         doc.vfd_status = "Success"
+        doc.flags.ignore_links = True
         doc.save(ignore_permissions=True)
         frappe.db.commit()
         return "Success"
