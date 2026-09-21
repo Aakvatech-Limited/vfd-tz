@@ -49,18 +49,16 @@ def get_cert_serial(registration_doc):
 
 
 def get_absolute_path(file_name, is_private=False):
-	from frappe.utils import cstr
+	"""Absolute path of an attachment, from either a public or a private file URL."""
+	if file_name.startswith("/private/files/"):
+		is_private = True
+		file_name = file_name[len("/private/files/") :]
+	elif file_name.startswith("/files/"):
+		file_name = file_name[len("/files/") :]
 
-	site_name = cstr(frappe.local.site)
-	if file_name.startswith("/files/"):
-		file_name = file_name[7:]
-	return (
-		frappe.utils.get_bench_path()
-		+ "/sites/"
-		+ site_name
-		+ "/"
-		+ frappe.utils.get_path("private" if is_private else "public", "files", file_name)[1:]
-	)
+	folder = "private" if is_private else "public"
+	site_path = f"{frappe.utils.get_bench_path()}/sites/{frappe.local.site}"
+	return f"{site_path}/{folder}/files/{file_name}"
 
 
 def get_p12_certificate(registration_doc):
@@ -87,6 +85,8 @@ def get_latest_registration_doc(company, throw=True):
 	doc_list = frappe.get_all(
 		"VFD Registration",
 		filters={"docstatus": 1, "company": company, "r_status": "Active"},
+		order_by="creation desc",
+		page_length=1,
 	)
 	if not len(doc_list):
 		if throw:
