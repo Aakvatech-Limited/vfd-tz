@@ -2,7 +2,7 @@ import json
 from unittest.mock import MagicMock, patch
 
 import frappe
-from frappe.tests.utils import FrappeTestCase
+from frappe.tests import UnitTestCase
 
 from vfd_tz.vfd_tz.api.sales_invoice import (
 	_recover_successful_vfd_posting,
@@ -12,9 +12,19 @@ from vfd_tz.vfd_tz.api.sales_invoice import (
 )
 
 
-class TestSalesInvoiceTaxBreakup(FrappeTestCase):
+class _TaxDoc:
+	"""Stand-in for a Sales Invoice; frappe._dict would shadow `items` with dict.items."""
+
+	def __init__(self, **values):
+		self.__dict__.update(values)
+
+	def get(self, key, default=None):
+		return self.__dict__.get(key, default)
+
+
+class TestSalesInvoiceTaxBreakup(UnitTestCase):
 	def _make_tax_doc(self, rate=18, amount=180):
-		return frappe._dict(
+		return _TaxDoc(
 			items=[
 				frappe._dict(
 					name="ITEM-ROW-1",
@@ -59,7 +69,7 @@ class TestSalesInvoiceTaxBreakup(FrappeTestCase):
 		)
 
 	def test_legacy_json_item_wise_tax_detail_fallback_is_preserved(self):
-		doc = frappe._dict(
+		doc = _TaxDoc(
 			items=[],
 			item_wise_tax_details=[],
 			taxes=[
@@ -79,7 +89,7 @@ class TestSalesInvoiceTaxBreakup(FrappeTestCase):
 		self.assertEqual(tax_data["TEST-ITEM-1"]["VAT 18%"].tax_amount, 180)
 
 
-class TestSalesInvoiceVFDPosting(FrappeTestCase):
+class TestSalesInvoiceVFDPosting(UnitTestCase):
 	def _make_invoice_doc(self):
 		doc = MagicMock()
 		doc.name = "ACC-SINV-TEST-0001"
