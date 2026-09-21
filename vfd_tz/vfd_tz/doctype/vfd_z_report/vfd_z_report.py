@@ -1,8 +1,6 @@
 # Copyright (c) 2021, Aakvatech and contributors
 # For license information, please see license.txt
 
-from ast import While
-
 import frappe
 import requests
 from frappe import _
