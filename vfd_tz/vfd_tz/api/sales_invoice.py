@@ -181,10 +181,17 @@ def enqueue_posting_vfd_invoice(invoice_name):
 		if doc.vfd_status == "Not Sent":
 			doc.vfd_status = "Pending"
 		doc.db_update()
-		frappe.db.commit()
 		frappe.msgprint(_("Registered Invoice to be sent to TRA VFD System"))
 	if not frappe.local.flags.vfd_posting:
-		enqueue(method=posting_all_vfd_invoices, queue="short", timeout=10000, is_async=True)
+		# v16 ignores commit inside document hooks, so the worker must start only once the
+		# invoice and its VFD counters are committed.
+		enqueue(
+			method=posting_all_vfd_invoices,
+			queue="short",
+			timeout=10000,
+			is_async=True,
+			enqueue_after_commit=True,
+		)
 	else:
 		frappe.log_error(_("VFD Invoice posting already in progress"))
 	return True
