@@ -9,6 +9,7 @@ readme = "README.md"
 dynamic = ["version"]
 dependencies = [
     "dicttoxml",
+    "defusedxml",
 ]
 
 [project.optional-dependencies]
