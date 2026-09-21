@@ -1,20 +1,22 @@
-from xml.etree import cElementTree as ElementTree
-from dicttoxml import dicttoxml 
+from defusedxml import ElementTree
+from dicttoxml import dicttoxml
+
 
 def xml_to_dic(xml_string):
-    root = ElementTree.XML(xml_string)
-    xmldict = XmlDictConfig(root)
-    return xmldict
+	root = ElementTree.XML(xml_string)
+	xmldict = XmlDictConfig(root)
+	return xmldict
 
-def dict_to_xml(obj, custom_root = "EFDMS"):
-	xml = dicttoxml(obj, custom_root = custom_root, attr_type=False, item_func=default_item_func)
+
+def dict_to_xml(obj, custom_root="EFDMS"):
+	xml = dicttoxml(obj, custom_root=custom_root, attr_type=False, item_func=default_item_func)
 	return str(xml)[2:-1]
 
 
 def default_item_func(name):
-    return "None"
+	return "None"
 
-	
+
 class XmlListConfig(list):
 	def __init__(self, aList):
 		for element in aList:
@@ -32,10 +34,10 @@ class XmlListConfig(list):
 
 
 class XmlDictConfig(dict):
-	'''
+	"""
 	Example usage:
 
-	>>> tree = ElementTree.parse('your_file.xml')
+	>>> tree = ElementTree.parse("your_file.xml")
 	>>> root = tree.getroot()
 	>>> xmldict = XmlDictConfig(root)
 
@@ -45,7 +47,8 @@ class XmlDictConfig(dict):
 	>>> xmldict = XmlDictConfig(root)
 
 	And then use xmldict for what it is... a dict.
-	'''
+	"""
+
 	def __init__(self, parent_element):
 		if parent_element.items():
 			self.update(dict(parent_element.items()))
@@ -60,14 +63,14 @@ class XmlDictConfig(dict):
 				else:
 					# here, we put the list in dictionary; the key is the
 					# tag name the list elements all share in common, and
-					# the value is the list itself 
+					# the value is the list itself
 					aDict = {element[0].tag: XmlListConfig(element)}
 				# if the tag has attributes, add those to the dict
 				if element.items():
 					aDict.update(dict(element.items()))
 				self.update({element.tag.lower(): aDict})
 			# this assumes that if you've got an attribute in a tag,
-			# you won't be having any text. This may or may not be a 
+			# you won't be having any text. This may or may not be a
 			# good idea -- time will tell. It works for the way we are
 			# currently doing XML configuration files...
 			elif element.items():
