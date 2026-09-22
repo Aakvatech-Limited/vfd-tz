@@ -178,6 +178,7 @@ fixtures = [
 					"Sales Invoice-vfd_verification_url",
 					"Sales Taxes and Charges Template-vfd_vatrate",
 					"Sales Invoice-vfd_z_report",
+					"Sales Invoice-send_serial_no_to_tra",
 				),
 			]
 		],
