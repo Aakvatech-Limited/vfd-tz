@@ -20,6 +20,8 @@ class VFDToken(Document):
 
 @frappe.whitelist()
 def get_token(company, force=False):
+	frappe.has_permission("VFD Registration", throw=True)
+
 	token_data = {}
 	doc = get_latest_registration_doc(company, throw=False)
 	if not doc:
@@ -36,6 +38,8 @@ def get_token(company, force=False):
 			"expires_date": [">", now_datetime()],
 		},
 		fields=["name", "access_token"],
+		order_by="expires_date desc",
+		page_length=1,
 	)
 
 	if len(token_list) and not force:
