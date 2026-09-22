@@ -181,10 +181,17 @@ def enqueue_posting_vfd_invoice(invoice_name):
 		if doc.vfd_status == "Not Sent":
 			doc.vfd_status = "Pending"
 		doc.db_update()
-		frappe.db.commit()
 		frappe.msgprint(_("Registered Invoice to be sent to TRA VFD System"))
 	if not frappe.local.flags.vfd_posting:
-		enqueue(method=posting_all_vfd_invoices, queue="short", timeout=10000, is_async=True)
+		# v16 ignores commit inside document hooks, so the worker must start only once the
+		# invoice and its VFD counters are committed.
+		enqueue(
+			method=posting_all_vfd_invoices,
+			queue="short",
+			timeout=10000,
+			is_async=True,
+			enqueue_after_commit=True,
+		)
 	else:
 		frappe.log_error(_("VFD Invoice posting already in progress"))
 	return True
@@ -626,12 +633,6 @@ def get_rounded_tax_amount(itemised_tax, precision):
 	for taxes in itemised_tax.values():
 		for tax_account in taxes:
 			taxes[tax_account]["tax_amount"] = flt(taxes[tax_account]["tax_amount"], precision)
-
-
-def before_update_after_submit(doc, method):
-	return
-	if doc.vfd_status == "Success":
-		frappe.throw(_("Cannot change Sales Invoice after VFD Status is Success!"))
 
 
 def auto_enqueue(doc, method):
