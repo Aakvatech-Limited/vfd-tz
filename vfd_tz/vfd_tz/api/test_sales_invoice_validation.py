@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import frappe
-from frappe.tests.utils import FrappeTestCase
+from frappe.tests import UnitTestCase
 
 from vfd_tz.vfd_tz.api.sales_invoice_validation import (
 	_get_calculated_item_wise_tax_details,
@@ -20,7 +20,7 @@ class DummyDoc:
 		self.values[key] = value
 
 
-class TestSalesInvoiceBeforeSubmitValidation(FrappeTestCase):
+class TestSalesInvoiceBeforeSubmitValidation(UnitTestCase):
 	def _make_calculated_row(self):
 		return frappe._dict(
 			{
